@@ -146,11 +146,17 @@ export default function QuizClient({
   if (!current) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="bg-[#faf6ec] border border-[#d8cdb6] rounded-2xl p-8 text-center">
+        <div className="bg-[#faf6ec] border border-[#d8cdb6] rounded-2xl p-8 text-center max-w-md">
           <p className="text-[#5b5247] font-serif-sc text-lg">暂无题目</p>
           {mode === 'wrong' && (
-            <p className="text-sm text-[#8c8170] mt-2">错题本是空的，先去做题吧</p>
+            <p className="text-sm text-[#8c8170] mt-2 mb-4">错题本是空的，先去做题吧</p>
           )}
+          <button
+            onClick={() => changeMode('unit')}
+            className="px-5 py-2 bg-[#a8272b] text-white rounded-lg hover:bg-[#7f1d20] transition-colors font-serif-sc"
+          >
+            返回单元测试
+          </button>
         </div>
       </div>
     );
