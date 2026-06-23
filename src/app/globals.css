@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #efe8d9;
+  --panel: #faf6ec;
+  --panel2: #f4eedf;
+  --ink: #211c16;
+  --ink2: #5b5247;
+  --faint: #8c8170;
+  --seal: #a8272b;
+  --seal-d: #7f1d20;
+  --seal-soft: #f1d9d6;
+  --jade: #2f6b4f;
+  --jade-soft: #dbe9e0;
+  --gold: #8a6d3b;
+  --line: #d8cdb6;
+  --line2: #e6ddc9;
+  --shadow: 0 1px 0 #fff8 inset, 0 8px 24px -14px #5b524733;
+  --background: var(--paper);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 110% -10%, #f7f1e4, transparent 60%),
+    radial-gradient(900px 500px at -10% 120%, #ece3d0, transparent 55%),
+    var(--paper);
+  color: var(--ink);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--seal-soft);
+}
+
+.font-serif-sc {
+  font-family: "Noto Serif SC", "Songti SC", "STSong", STZhongsong, SimSun, "Source Han Serif SC", serif;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
