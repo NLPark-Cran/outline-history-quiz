@@ -12,6 +12,9 @@ npx drizzle-kit migrate
 echo "[3/4] Building Next.js standalone..."
 npm run build
 
+echo "[3.5/4] Copying static assets to standalone..."
+cp -r .next/static .next/standalone/.next/
+
 echo "[4/4] Installing systemd service..."
 cp scripts/outline-quiz.service /etc/systemd/system/outline-quiz.service
 systemctl daemon-reload
