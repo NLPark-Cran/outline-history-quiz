@@ -41,11 +41,11 @@ async function main() {
       let bestScore = 0;
 
       for (const kp of chapterMeta.knowledge) {
-        const keywords = kp.p.flatMap((p) => tokenize(p)).slice(0, 20);
-        const s = scoreTag(fullText, kp.h, keywords);
+        const keywords = tokenize(`${kp.summary} ${kp.detail}`).slice(0, 20);
+        const s = scoreTag(fullText, kp.title, keywords);
         if (s > bestScore) {
           bestScore = s;
-          bestTag = kp.h;
+          bestTag = kp.title;
         }
       }
 

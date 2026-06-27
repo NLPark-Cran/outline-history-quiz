@@ -71,6 +71,42 @@ export async function submitAnswer(
   return { isCorrect };
 }
 
+export async function toggleMistake(
+  userId: number,
+  chapter: string,
+  questionIndex: number,
+  markAsWrong: boolean,
+  correct: string
+) {
+  if (markAsWrong) {
+    const wrongOption = ['A', 'B', 'C', 'D'].find((l) => l !== correct) || 'A';
+    await db
+      .insert(answers)
+      .values({
+        userId,
+        chapter,
+        questionIndex,
+        selected: wrongOption,
+        correct,
+        isCorrect: false,
+      })
+      .onConflictDoUpdate({
+        target: [answers.userId, answers.chapter, answers.questionIndex],
+        set: {
+          selected: wrongOption,
+          correct,
+          isCorrect: false,
+          answeredAt: new Date(),
+        },
+      });
+  } else {
+    await db
+      .delete(answers)
+      .where(and(eq(answers.userId, userId), eq(answers.chapter, chapter), eq(answers.questionIndex, questionIndex)));
+  }
+  return { markAsWrong };
+}
+
 export interface StatsResult {
   totalAnswered: number;
   totalCorrect: number;
@@ -186,9 +222,12 @@ export async function getMostWrongQuestions(userId: number, limit = 10) {
     .orderBy(desc(sql`count(*)`))
     .limit(limit);
 
+  const questionMap = new Map(
+    getAllQuestions().map((q) => [`${q.chapter}-${q.index}`, q.question])
+  );
   return rows.map((r) => ({
     ...r,
-    question: getAllQuestions().find((q) => q.chapter === r.chapter && q.index === r.questionIndex)?.question,
+    question: questionMap.get(`${r.chapter}-${r.questionIndex}`),
   }));
 }
 

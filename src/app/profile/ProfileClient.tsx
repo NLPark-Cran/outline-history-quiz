@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import {
   BarChart,
   Bar,
@@ -9,14 +10,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
 } from 'recharts';
 import { StatsResult, WrongTopicStat } from '@/lib/data';
-import { ChapterMeta, Question } from '@/lib/questions';
+import { Question } from '@/lib/questions';
 import { cn } from '@/lib/utils';
 
 interface ProfileClientProps {
@@ -29,10 +25,16 @@ interface ProfileClientProps {
     wrongCount: number;
     question?: Question;
   }[];
-  chapters: Record<string, ChapterMeta>;
   chapterKeys: string[];
   chapterNames: Record<string, string>;
   wrongKeys: string[];
+  returnMode?: string;
+  returnChapter?: string;
+  returnPosition?: string;
+  returnQuestionChapter?: string;
+  returnQuestionIndex?: string;
+  returnCount?: string;
+  returnShuffle?: string;
 }
 
 const CN = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
@@ -42,10 +44,16 @@ export default function ProfileClient({
   stats,
   weakTopics,
   mostWrong,
-  chapters,
   chapterKeys,
   chapterNames,
   wrongKeys,
+  returnMode,
+  returnChapter,
+  returnPosition,
+  returnQuestionChapter,
+  returnQuestionIndex,
+  returnCount,
+  returnShuffle,
 }: ProfileClientProps) {
   const chapterData = useMemo(
     () =>
@@ -70,9 +78,24 @@ export default function ProfileClient({
             <p className="text-xs text-[#5b5247]">学号 {user.studentId}</p>
           </div>
           <div className="flex-1" />
-          <a href="/quiz" className="px-4 py-2 text-sm bg-[#a8272b] text-white rounded-lg hover:bg-[#7f1d20] transition-colors shadow-[0_5px_14px_-7px_#7f1d20] font-serif-sc">
+          <Link
+            href={
+              returnMode
+                ? `/quiz?mode=${encodeURIComponent(returnMode)}&chapter=${encodeURIComponent(returnChapter || '1')}&position=${encodeURIComponent(
+                    returnPosition || '0'
+                  )}&returnCount=${encodeURIComponent(returnCount || 'all')}&returnShuffle=${encodeURIComponent(
+                    returnShuffle || 'false'
+                  )}${
+                    returnQuestionChapter && returnQuestionIndex
+                      ? `&returnQuestionChapter=${encodeURIComponent(returnQuestionChapter)}&returnQuestionIndex=${encodeURIComponent(returnQuestionIndex)}`
+                      : ''
+                  }`
+                : '/quiz'
+            }
+            className="px-4 py-2 text-sm bg-[#a8272b] text-white rounded-lg hover:bg-[#7f1d20] transition-colors shadow-[0_5px_14px_-7px_#7f1d20] font-serif-sc"
+          >
             返回刷题
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -148,12 +171,12 @@ export default function ProfileClient({
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-serif-sc text-base font-bold text-[#211c16]">高频错题 TOP</h3>
             {wrongKeys.length > 0 && (
-              <a
-                href={`/quiz?mode=wrong`}
+              <Link
+                href="/quiz?mode=wrong"
                 className="px-3 py-1.5 text-sm bg-[#a8272b] text-white rounded-lg hover:bg-[#7f1d20] transition-colors font-serif-sc"
               >
                 重做错题
-              </a>
+              </Link>
             )}
           </div>
           {mostWrong.length === 0 ? (

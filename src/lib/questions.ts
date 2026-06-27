@@ -1,32 +1,73 @@
 import rawQuestions from '@/data/questions.json';
 import rawChapters from '@/data/chapters.json';
+import rawOverview from '@/data/overview.json';
+import rawPlaces from '@/data/places.json';
 
 export interface Question {
+  id: string;
   q: string;
   o: string[];
   a: string;
+  correctText: string;
+  answerSource: string;
+  explanation: string;
 }
 
 export interface KnowledgeItem {
-  h: string;
-  p: string[];
+  title: string;
+  summary: string;
+  detail: string;
 }
 
 export interface TimelineEvent {
-  d: string;
-  t: string;
-  x: string;
+  date: string;
+  title: string;
+  summary: string;
+  detail: string;
+  place?: string;
 }
 
 export interface ChapterMeta {
   title: string;
   subtitle: string;
+  period: string;
+  theme: string;
+  keywords: string[];
   knowledge: KnowledgeItem[];
   timeline: TimelineEvent[];
 }
 
+export interface OverviewKnowledgeItem {
+  h: string;
+  p: string[];
+}
+
+export interface OverviewTimelineEvent {
+  d: string;
+  t: string;
+  x: string;
+  place?: string;
+}
+
+export interface OverviewMeta {
+  id: string;
+  title: string;
+  subtitle: string;
+  period: string;
+  knowledge: OverviewKnowledgeItem[];
+  timeline: OverviewTimelineEvent[];
+}
+
+export interface Place {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
 export const QUESTIONS = rawQuestions as Record<string, Question[]>;
 export const CHAPTERS = rawChapters as Record<string, ChapterMeta>;
+export const OVERVIEW = rawOverview as OverviewMeta;
+export const PLACES = rawPlaces as Record<string, Place>;
 export const CHAPTER_KEYS = Object.keys(QUESTIONS).sort((a, b) => Number(a) - Number(b));
 export const TOTAL_QUESTIONS = CHAPTER_KEYS.reduce((sum, k) => sum + QUESTIONS[k].length, 0);
 

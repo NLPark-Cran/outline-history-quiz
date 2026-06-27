@@ -8,9 +8,9 @@ function resolveDbPath() {
   const envPath = process.env.DATABASE_URL?.replace('file:', '');
   if (envPath) {
     if (path.isAbsolute(envPath)) return envPath;
-    return path.resolve(process.cwd(), envPath);
+    return path.resolve(/*turbopackIgnore: true*/ process.cwd(), envPath);
   }
-  return path.resolve(process.cwd(), './data/outline.db');
+  return path.resolve(/*turbopackIgnore: true*/ process.cwd(), './data/outline.db');
 }
 
 const dbPath = resolveDbPath();
@@ -21,5 +21,6 @@ if (!fs.existsSync(dbDir)) {
 
 const sqlite = new Database(dbPath);
 sqlite.exec('PRAGMA journal_mode = WAL;');
+sqlite.exec('PRAGMA foreign_keys = ON;');
 
 export const db = drizzle(sqlite, { schema });

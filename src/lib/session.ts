@@ -9,11 +9,16 @@ export interface SessionData {
 }
 
 export async function getSession() {
+  const password = process.env.SESSION_PASSWORD;
+  if (!password || password.length < 32) {
+    throw new Error('SESSION_PASSWORD environment variable must be at least 32 characters long');
+  }
   const cookieStore = await cookies();
   return getIronSession<SessionData>(cookieStore, {
-    password: process.env.SESSION_PASSWORD!,
+    password,
     cookieName: 'outline-session',
     cookieOptions: {
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 30, // 30 days
