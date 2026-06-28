@@ -106,8 +106,9 @@ export default function ChapterMap({ title, timeline }: ChapterMapProps) {
   const [leafletReady, setLeafletReady] = useState(false);
   const [selectedEvents, setSelectedEvents] = useState<MapEvent[] | null>(null);
   const [tileSource, setTileSource] = useState<TileSource>(() => {
-    if (typeof window === 'undefined') return 'carto';
-    return (localStorage.getItem(STORAGE_KEY) as TileSource) || 'carto';
+    if (typeof window === 'undefined') return 'amap';
+    const saved = localStorage.getItem(STORAGE_KEY) as TileSource | null;
+    return saved === 'carto' ? 'carto' : 'amap';
   });
 
   const grouped = useMemo(() => groupByPlace(timeline), [timeline]);
@@ -138,6 +139,7 @@ export default function ChapterMap({ title, timeline }: ChapterMapProps) {
     [setTileSource]
   );
 
+  // Initialize the map once.
   useEffect(() => {
     let mounted = true;
 
@@ -156,18 +158,6 @@ export default function ChapterMap({ title, timeline }: ChapterMapProps) {
       });
 
       L.control.attribution({ position: 'bottomright' }).addTo(mapInstance);
-
-      const tileConfig = TILE_LAYERS[tileSource];
-      const tiles = L.tileLayer(tileConfig.url, {
-        attribution: tileConfig.attribution,
-        subdomains: tileConfig.subdomains,
-        maxZoom: 18,
-        detectRetina: true,
-        updateWhenIdle: true,
-        updateWhenZooming: false,
-        keepBuffer: 2,
-      }).addTo(mapInstance);
-      tileLayerRef.current = tiles;
 
       const layer = L.layerGroup().addTo(mapInstance);
       mapRef.current = mapInstance;
@@ -188,8 +178,33 @@ export default function ChapterMap({ title, timeline }: ChapterMapProps) {
         LRef.current = null;
       }
     };
-  }, [tileSource]);
+  }, []);
 
+  // Switch tile layer when tileSource changes, without rebuilding the whole map.
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !leafletReady) return;
+
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+      tileLayerRef.current = null;
+    }
+
+    const tileConfig = TILE_LAYERS[tileSource];
+    const tiles = L.tileLayer(tileConfig.url, {
+      attribution: tileConfig.attribution,
+      subdomains: tileConfig.subdomains,
+      maxZoom: 18,
+      detectRetina: true,
+      updateWhenIdle: true,
+      updateWhenZooming: false,
+      keepBuffer: 2,
+    }).addTo(map);
+    tileLayerRef.current = tiles;
+  }, [tileSource, leafletReady]);
+
+  // Render markers based on timeline and current coordinate system.
   useEffect(() => {
     const L = LRef.current;
     const map = mapRef.current;
@@ -252,26 +267,26 @@ export default function ChapterMap({ title, timeline }: ChapterMapProps) {
           <span>{placeIds.length} 个地点</span>
           <div className="inline-flex rounded-lg border border-[#d8cdb6] overflow-hidden">
             <button
-              onClick={() => switchTileSource('carto')}
-              className={`px-2 py-1 text-[11px] ${
-                tileSource === 'carto'
-                  ? 'bg-[#a8272b] text-white'
-                  : 'bg-white text-[#5b5247] hover:bg-[#f4eedf]'
-              }`}
-              title="CARTO（全球 CDN，默认）"
-            >
-              CARTO
-            </button>
-            <button
               onClick={() => switchTileSource('amap')}
-              className={`px-2 py-1 text-[11px] border-l border-[#d8cdb6] ${
+              className={`px-2 py-1 text-[11px] ${
                 tileSource === 'amap'
                   ? 'bg-[#a8272b] text-white'
                   : 'bg-white text-[#5b5247] hover:bg-[#f4eedf]'
               }`}
-              title="高德地图（大陆访问更快，自动转换坐标）"
+              title="高德地图（大陆访问更快，推荐）"
             >
-              高德
+              高德（建议）
+            </button>
+            <button
+              onClick={() => switchTileSource('carto')}
+              className={`px-2 py-1 text-[11px] border-l border-[#d8cdb6] ${
+                tileSource === 'carto'
+                  ? 'bg-[#a8272b] text-white'
+                  : 'bg-white text-[#5b5247] hover:bg-[#f4eedf]'
+              }`}
+              title="CARTO（全球 CDN）"
+            >
+              CARTO
             </button>
           </div>
         </div>

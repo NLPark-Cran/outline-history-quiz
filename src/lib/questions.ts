@@ -2,6 +2,7 @@ import rawQuestions from '@/data/questions.json';
 import rawChapters from '@/data/chapters.json';
 import rawOverview from '@/data/overview.json';
 import rawPlaces from '@/data/places.json';
+import rawEssays from '@/data/essays.json';
 
 export interface Question {
   id: string;
@@ -68,6 +69,22 @@ export const QUESTIONS = rawQuestions as Record<string, Question[]>;
 export const CHAPTERS = rawChapters as Record<string, ChapterMeta>;
 export const OVERVIEW = rawOverview as OverviewMeta;
 export const PLACES = rawPlaces as Record<string, Place>;
+
+export interface EssayPoint {
+  title: string;
+  content: string;
+  pages: string;
+}
+
+export interface Essay {
+  q: string;
+  frame: string;
+  pts: EssayPoint[];
+  ai: string[] | null;
+  org: string[] | null;
+}
+
+export const ESSAYS = rawEssays as Record<string, Essay[]>;
 export const CHAPTER_KEYS = Object.keys(QUESTIONS).sort((a, b) => Number(a) - Number(b));
 export const TOTAL_QUESTIONS = CHAPTER_KEYS.reduce((sum, k) => sum + QUESTIONS[k].length, 0);
 

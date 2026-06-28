@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<!-- 中国近代史纲要 · 刷题台（知识库 + 历史地图 + AI） -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>近代史纲要 · 刷题台</title>
+<style>
+  :root{
+    --paper:#efe8d9; --panel:#faf6ec; --panel2:#f4eedf;
+    --ink:#211c16; --ink2:#5b5247; --faint:#8c8170;
+    --seal:#a8272b; --seal-d:#7f1d20; --seal-soft:#f1d9d6;
+    --jade:#2f6b4f; --jade-soft:#dbe9e0;
+    --gold:#8a6d3b; --line:#d8cdb6; --line2:#e6ddc9;
+    --water:#cfe0e6; --water2:#bcd3db; --land:#e9e0cb; --land-edge:#b9a87f;
+    --shadow:0 1px 0 #fff8 inset, 0 8px 24px -14px #5b524733;
+    --serif:"Noto Serif SC","Songti SC","STSong",STZhongsong,SimSun,"Source Han Serif SC",serif;
+    --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow-x:clip}
+  body{
+    background:
+      radial-gradient(1200px 600px at 110% -10%, #f7f1e4, transparent 60%),
+      radial-gradient(900px 500px at -10% 120%, #ece3d0, transparent 55%),
+      var(--paper);
+    color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--seal-soft)}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:1320px;margin:0 auto;padding:18px 18px 96px}
+
+  header.mast{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;
+    padding:6px 4px 16px;border-bottom:2px solid var(--ink);margin-bottom:18px}
+  .seal-logo{width:46px;height:46px;border-radius:8px;background:var(--seal);
+    color:#fff;display:grid;place-items:center;font-family:var(--serif);
+    font-weight:700;font-size:22px;box-shadow:0 6px 16px -8px var(--seal-d);
+    border:1px solid var(--seal-d);transform:rotate(-2deg)}
+  .mast h1{font-family:var(--serif);font-weight:700;font-size:25px;margin:0;letter-spacing:.04em}
+  .mast .sub{color:var(--ink2);font-size:13px;margin-top:2px}
+  .mast .grow{flex:1}
+  .stat{font-family:var(--serif);text-align:right;line-height:1.15}
+  .stat b{font-size:22px;color:var(--seal)}
+  .stat span{display:block;font-size:11px;color:var(--faint);font-family:var(--sans);letter-spacing:.1em}
+
+  .grid{display:grid;grid-template-columns:1fr 412px;gap:20px;align-items:start}
+  .grid>*{min-width:0}
+  @media(max-width:1040px){ .grid{grid-template-columns:1fr} }
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 14px;margin-bottom:14px}
+  .seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:3px}
+  .seg button{padding:7px 15px;border-radius:8px;font-size:14px;color:var(--ink2);font-family:var(--serif)}
+  .seg button.on{background:var(--seal);color:#fff;box-shadow:0 4px 12px -6px var(--seal-d)}
+  select{font-family:var(--sans);font-size:14px;padding:8px 12px;border:1px solid var(--line);
+    border-radius:9px;background:var(--panel2);color:var(--ink);max-width:100%;min-width:0;
+    text-overflow:ellipsis}
+  .controls>*{min-width:0}
+  .mini{font-size:12.5px;padding:7px 11px;border:1px solid var(--line);border-radius:9px;
+    background:var(--panel2);color:var(--ink2)}
+  .mini:hover{border-color:var(--seal);color:var(--seal)}
+  .grow{flex:1}
+
+  .qbox{padding:22px 24px 18px}
+  .qmeta{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:12.5px;margin-bottom:12px;
+    font-family:var(--serif);letter-spacing:.08em;flex-wrap:wrap}
+  .qmeta .tag{background:var(--panel2);border:1px solid var(--line);padding:2px 9px;border-radius:20px;color:var(--ink2)}
+  .qmeta .tag.red{color:var(--seal);border-color:var(--seal-soft);background:#fff}
+  .qstem{font-size:18.5px;line-height:1.7;font-weight:500;margin:0 0 18px;font-family:var(--serif)}
+  .qstem .num{color:var(--seal);font-weight:700;margin-right:8px}
+
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);
+    border-radius:11px;background:var(--panel2);transition:.12s;text-align:left;width:100%}
+  .opt:hover:not(.locked){border-color:var(--seal);background:#fff}
+  .opt .k{width:26px;height:26px;flex:none;border-radius:7px;background:#fff;border:1px solid var(--line);
+    display:grid;place-items:center;font-family:var(--serif);font-weight:700;color:var(--ink2);font-size:14px}
+  .opt .t{padding-top:1px}
+  .opt.locked{cursor:default}
+  .opt.right{border-color:var(--jade);background:var(--jade-soft)}
+  .opt.right .k{background:var(--jade);color:#fff;border-color:var(--jade)}
+  .opt.wrong{border-color:var(--seal);background:var(--seal-soft)}
+  .opt.wrong .k{background:var(--seal);color:#fff;border-color:var(--seal)}
+  .opt.dim{opacity:.55}
+
+  .prerow{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+  .prerow .tiny{color:var(--faint);font-size:12px}
+  .hint-out{margin-top:12px;background:#fffdf6;border:1px solid var(--gold);border-left:3px solid var(--gold);
+    border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.75;color:var(--ink2);white-space:pre-wrap;display:none}
+  .hint-out.show{display:block;animation:fade .25s}
+  .hint-out.load{font-style:italic;color:var(--faint);border-style:dashed}
+
+  .exp{margin-top:18px;border-top:1px dashed var(--line);padding-top:16px;display:none}
+  .exp.show{display:block;animation:fade .25s}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .exp .res{font-family:var(--serif);font-size:15px;margin-bottom:6px}
+  .exp .res .ok{color:var(--jade);font-weight:700}
+  .exp .res .no{color:var(--seal);font-weight:700}
+  .exp .ans{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--gold);
+    padding:11px 14px;border-radius:9px;color:var(--ink2);font-size:14px;margin:8px 0 12px}
+  .ai-out{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;
+    font-size:14px;line-height:1.75;white-space:pre-wrap;display:none}
+  .ai-out.show{display:block}
+  .ai-out.load{color:var(--faint);font-style:italic}
+
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  .btn{padding:9px 16px;border-radius:10px;font-size:14px;font-family:var(--serif)}
+  .btn.solid{background:var(--seal);color:#fff;box-shadow:0 5px 14px -7px var(--seal-d)}
+  .btn.solid:hover{background:var(--seal-d)}
+  .btn.ghost{border:1px solid var(--line);background:var(--panel2);color:var(--ink2)}
+  .btn.ghost:hover{border-color:var(--seal);color:var(--seal)}
+  .btn.ai{border:1px solid var(--seal);color:var(--seal);background:#fff}
+  .btn.ai:hover{background:var(--seal);color:#fff}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+
+  .sheet{padding:14px 16px;margin-top:14px}
+  .sheet h3{font-family:var(--serif);font-size:14px;margin:0 0 10px;color:var(--ink2);
+    display:flex;justify-content:space-between;align-items:center}
+  .sheet .legend{font-size:11px;color:var(--faint);font-family:var(--sans);display:flex;gap:12px}
+  .sheet .legend i{font-style:normal;display:inline-flex;align-items:center;gap:4px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .grid-n{display:flex;flex-wrap:wrap;gap:6px}
+  .gn{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);
+    font-size:12.5px;color:var(--ink2);font-family:var(--serif)}
+  .gn.cur{outline:2px solid var(--ink);outline-offset:1px}
+  .gn.ok{background:var(--jade-soft);border-color:var(--jade);color:var(--jade)}
+  .gn.no{background:var(--seal-soft);border-color:var(--seal);color:var(--seal)}
+
+  /* ===== right column ===== */
+  .rightcol{display:flex;flex-direction:column;gap:16px;position:sticky;top:14px}
+  .rc-tabs{display:none}
+  .know-card .head{padding:14px 16px 0}
+  .chtitle{font-family:var(--serif);font-size:17px;font-weight:700}
+  .chsub{color:var(--gold);font-size:12.5px;margin-top:2px;letter-spacing:.04em}
+  .fullbadge{display:none;margin-top:8px;font-size:11.5px;color:var(--seal);background:var(--seal-soft);
+    border:1px solid var(--seal-soft);padding:3px 9px;border-radius:20px;font-family:var(--serif)}
+  .tabs{display:flex;gap:4px;padding:12px 12px 0}
+  .tabs button{flex:1;padding:8px 4px;border-radius:9px 9px 0 0;font-size:13px;font-family:var(--serif);
+    color:var(--ink2);border:1px solid transparent;border-bottom:none}
+  .tabs button.on{background:var(--panel2);border-color:var(--line);color:var(--seal)}
+  .pane{padding:14px 16px 18px;border-top:1px solid var(--line);max-height:46vh;overflow:auto}
+  .pane::-webkit-scrollbar{width:7px}.pane::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+
+  .ksec{margin-bottom:15px}
+  .ksec h4{font-family:var(--serif);font-size:14.5px;margin:0 0 7px;color:var(--seal);
+    display:flex;align-items:center;gap:7px}
+  .ksec h4::before{content:"";width:8px;height:8px;background:var(--seal);transform:rotate(45deg);flex:none}
+  .ksec ul{margin:0;padding-left:2px;list-style:none}
+  .ksec li{position:relative;padding:4px 0 4px 16px;font-size:13.5px;color:var(--ink2);line-height:1.65}
+  .ksec li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;
+    background:var(--gold)}
+
+  .pp{display:flex;gap:10px;padding:9px 2px;border-bottom:1px dashed var(--line2);align-items:baseline}
+  .pp:last-child{border-bottom:none}
+  .pp-n{font-family:var(--serif);font-weight:700;color:var(--seal);font-size:14px;flex:none;min-width:74px}
+  .pp-r{font-size:13px;color:var(--ink2);line-height:1.6}
+  .empty{color:var(--faint);font-size:13px;padding:10px 2px}
+
+  .tl{position:relative;margin:2px 0 0 4px;padding-left:4px}
+  .tl::before{content:"";position:absolute;left:21px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(var(--line),var(--seal-soft),var(--line))}
+  .ev{position:relative;padding:0 0 4px 56px;margin-bottom:4px}
+  .ev .seal{position:absolute;left:0;top:1px;width:44px;height:44px;border-radius:50%;
+    background:#fff;border:2px solid var(--seal);color:var(--seal);display:grid;place-items:center;
+    font-family:var(--serif);font-weight:700;font-size:10.5px;line-height:1.05;text-align:center;
+    box-shadow:0 4px 10px -6px var(--seal-d);cursor:pointer;transition:.14s;z-index:1;padding:2px}
+  .ev .seal:hover{background:var(--seal);color:#fff;transform:scale(1.06)}
+  .ev.open .seal{background:var(--seal);color:#fff}
+  .ev .row{cursor:pointer;padding:8px 0 6px}
+  .ev .ttl{font-family:var(--serif);font-weight:600;font-size:14.5px}
+  .ev .hint{font-size:11.5px;color:var(--faint);margin-top:1px}
+  .ev .detail{display:none;background:var(--panel2);border:1px solid var(--line);
+    border-left:3px solid var(--seal);border-radius:9px;padding:10px 12px;margin:4px 0 8px;
+    font-size:13px;color:var(--ink2);line-height:1.7}
+  .ev.open .detail{display:block;animation:fade .2s}
+
+  /* ===== 思考题 ===== */
+  .essay-head{font-size:12px;color:var(--faint);margin:0 0 10px;font-family:var(--serif);line-height:1.6}
+  .essay{border:1px solid var(--line);border-radius:10px;margin-bottom:9px;background:var(--panel2);overflow:hidden}
+  .essay-q{display:flex;gap:9px;align-items:flex-start;width:100%;text-align:left;padding:11px 12px;font-family:var(--serif)}
+  .essay-q:hover{background:#fff}
+  .essay-q .eq-n{flex:none;width:22px;height:22px;border-radius:6px;background:var(--seal);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+  .essay-q .eq-t{flex:1;font-size:14px;font-weight:600;color:var(--ink);line-height:1.5}
+  .essay-q .eq-ar{flex:none;color:var(--faint);transition:transform .2s;margin-top:2px}
+  .essay.open .eq-ar{transform:rotate(90deg);color:var(--seal)}
+  .essay-a{display:none;padding:0 13px 12px;border-top:1px solid var(--line);background:#fffdf8}
+  .essay.open .essay-a{display:block;animation:fade .2s}
+  .essay-a ul{margin:10px 0 0;padding-left:2px;list-style:none}
+  .essay-a li{position:relative;padding:6px 0 6px 15px;font-size:13px;color:var(--ink2);line-height:1.72}
+  .essay-a li::before{content:"";position:absolute;left:1px;top:13px;width:5px;height:5px;border-radius:50%;background:var(--seal)}
+  .essay-a .eframe{background:var(--seal-soft);border:1px solid #e7c7c4;border-radius:8px;padding:7px 10px;margin:10px 0 4px;font-size:12.5px;color:var(--seal-d);line-height:1.6;font-family:var(--serif)}
+  .essay-a .eframe b{color:var(--seal)}
+  .essay-a li .ek{color:var(--seal);font-weight:700;font-family:var(--serif);margin-right:3px}
+  .essay-a li .ek::after{content:"——";color:var(--faint);font-weight:400;margin-left:2px}
+  .cite{color:var(--gold);font-size:11px;margin-left:4px;white-space:nowrap}
+  .essay-quiz{padding:0}
+  .eq-tip{font-size:13px;color:var(--ink2);background:var(--jade-soft);border:1px dashed var(--jade);border-radius:9px;padding:10px 12px;margin-bottom:14px;font-family:var(--serif)}
+  .essay-a.ans-open{display:block;border:1px solid var(--line);border-radius:10px;margin-top:0;background:#fffdf8}
+  .gn.gn-essay{background:var(--jade-soft);border-color:var(--jade);color:var(--jade);font-family:var(--serif)}
+  .gn.gn-essay.done{background:var(--jade);color:#fff}
+  .ever-tabs{display:flex;gap:5px;margin:0 0 10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .ever-tabs button{flex:1;font-size:12px;padding:6px 4px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--ink2);font-family:var(--serif)}
+  .ever-tabs button.on{background:var(--seal);color:#fff;border-color:var(--seal)}
+  .ever{display:none}.ever.ever-on{display:block}
+  .ver-full{margin:6px 0 0;padding-left:2px;list-style:none}
+  .ver-full li{position:relative;padding:6px 0 6px 15px;font-size:12.5px;color:var(--ink2);line-height:1.7}
+  .ver-full li::before{content:"";position:absolute;left:1px;top:13px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+  .ver-org-list{margin:6px 0 0;padding-left:2px;list-style:none}
+  .ver-org-list li{position:relative;padding:7px 0 7px 16px;font-size:12.5px;color:var(--ink2);line-height:1.76;border-bottom:1px dashed var(--line2)}
+  .ver-org-list li:last-child{border-bottom:none}
+  .ver-org-list li::before{content:"";position:absolute;left:2px;top:13px;width:5px;height:5px;background:var(--jade);transform:rotate(45deg)}
+
+  /* ===== map ===== */
+  .map-card{overflow:hidden}
+  .map-head{display:flex;align-items:center;gap:8px;padding:13px 14px 10px;flex-wrap:wrap}
+  .map-head b{font-family:var(--serif);font-size:15px}
+  .map-head .ms{font-size:11.5px;color:var(--faint)}
+  .map-head .tools{margin-left:auto;display:flex;gap:6px}
+  .tlbtn{font-size:12px;padding:6px 11px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink2);font-family:var(--serif)}
+  .tlbtn.on{background:var(--seal);color:#fff;border-color:var(--seal)}
+  .mapwrap{position:relative;height:360px;background:linear-gradient(160deg,var(--water),var(--water2));
+    border-top:1px solid var(--line);touch-action:none;overflow:hidden;cursor:grab}
+  .mapwrap:active{cursor:grabbing}
+  #map{width:100%;height:100%;display:block}
+  .grat{stroke:#ffffff66;stroke-width:.6;stroke-dasharray:3 4}
+  .land{fill:var(--land);stroke:var(--land-edge);stroke-width:1.1;stroke-linejoin:round}
+  .river{fill:none;stroke:#7fa9c9;stroke-width:1.3;opacity:.8;stroke-linecap:round;stroke-linejoin:round}
+  .sea{fill:#5f8294;font-size:12px;font-family:var(--serif);opacity:.75;letter-spacing:2px}
+  .nei{fill:#9c917b;font-size:11px;font-family:var(--serif);opacity:.6;letter-spacing:1px}
+  .mk{cursor:pointer}
+  .mkring{opacity:.28}
+  .mkdot{stroke:#fff;stroke-width:1}
+  .mk:hover .mkring{opacity:.5}
+  .mklbl{fill:var(--ink);font-family:var(--sans);paint-order:stroke;stroke:#fdfaf2;stroke-width:2.4px;font-weight:600}
+  .mkcount{fill:#fff;text-anchor:middle;dominant-baseline:middle;font-family:var(--sans);font-weight:700}
+  .mk.faded{opacity:.32}
+  .arr{stroke:#7f1d20;opacity:.78;stroke-linecap:round}
+  .arrh{fill:#7f1d20;opacity:.85}
+  .map-ctrl{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:5px}
+  .map-ctrl button{width:30px;height:30px;border-radius:8px;background:#fffffff0;border:1px solid var(--line);
+    font-size:17px;color:var(--ink2);font-family:var(--serif);box-shadow:0 3px 8px -4px #0004;line-height:1}
+  .map-ctrl button:hover{color:var(--seal);border-color:var(--seal)}
+  .map-legend{position:absolute;left:10px;top:10px;background:#fffffff0;border:1px solid var(--line);
+    border-radius:9px;padding:7px 9px;max-width:60%;font-size:11px;display:none;max-height:78%;overflow:auto}
+  .map-legend.show{display:block}
+  .map-legend .lg{display:flex;align-items:center;gap:6px;padding:2px 0;cursor:pointer;border-radius:5px}
+  .map-legend .lg:hover{background:var(--panel2)}
+  .map-legend .lg.off{opacity:.4}
+  .map-legend .sw{width:10px;height:10px;border-radius:50%;flex:none}
+  .map-pop{position:absolute;z-index:5;width:248px;max-width:84%;background:#fff;border:1px solid var(--line);
+    border-radius:11px;box-shadow:0 14px 36px -16px #0007;display:none;overflow:hidden}
+  .map-pop.show{display:block;animation:fade .15s}
+  .pop-h{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;
+    background:var(--panel2);border-bottom:1px solid var(--line)}
+  .pop-h b{font-family:var(--serif);font-size:14px}
+  .pop-x{font-size:16px;color:var(--faint);width:24px;height:24px;border-radius:6px}
+  .pop-x:hover{background:#fff;color:var(--seal)}
+  .pop-b{max-height:230px;overflow:auto;padding:6px 12px 10px}
+  .pop-ev{display:flex;gap:9px;padding:8px 0;border-bottom:1px dashed var(--line2)}
+  .pop-ev:last-child{border-bottom:none}
+  .pop-d{flex:none;align-self:flex-start;color:#fff;font-family:var(--serif);font-size:11px;font-weight:700;
+    padding:2px 7px;border-radius:14px;white-space:nowrap}
+  .pop-t{font-family:var(--serif);font-weight:600;font-size:13.5px;line-height:1.4}
+  .pop-ch{font-style:normal;font-size:10.5px;color:var(--faint);font-weight:400;margin-left:4px}
+  .pop-x2{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-top:2px}
+
+  /* ===== floating AI ===== */
+  .fab{position:fixed;right:20px;bottom:20px;z-index:40;width:56px;height:56px;border-radius:50%;
+    background:var(--seal);color:#fff;font-family:var(--serif);font-size:13px;font-weight:700;
+    box-shadow:0 12px 26px -10px var(--seal-d);border:1px solid var(--seal-d);line-height:1.1}
+  .fab:hover{background:var(--seal-d)}
+  .drawer{position:fixed;inset:0 0 0 auto;width:min(420px,100vw);z-index:50;background:var(--panel);
+    border-left:1px solid var(--line);box-shadow:-20px 0 50px -30px #0006;transform:translateX(101%);
+    transition:transform .26s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+  .drawer.open{transform:none}
+  .drawer .dh{padding:16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .drawer .dh b{font-family:var(--serif);font-size:16px}
+  .drawer .dh .x{margin-left:auto;font-size:20px;color:var(--faint);width:30px;height:30px;border-radius:8px}
+  .drawer .dh .x:hover{background:var(--panel2);color:var(--ink)}
+  .prov{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line2);align-items:center;flex-wrap:wrap}
+  .prov .lab{font-size:12px;color:var(--faint)}
+  .prov button{font-size:12.5px;padding:5px 11px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink2)}
+  .prov button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .keyrow{padding:0 16px 10px;border-bottom:1px solid var(--line2);display:none}
+  .keyrow.show{display:block}
+  .keyrow input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;
+    background:#fff;font-size:12.5px;font-family:var(--sans)}
+  .keyrow .tip{font-size:11px;color:var(--faint);margin-top:5px}
+  .chatlog{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:88%;padding:11px 13px;border-radius:12px;font-size:13.5px;line-height:1.7;white-space:pre-wrap}
+  .msg.u{align-self:flex-end;background:var(--seal);color:#fff;border-bottom-right-radius:4px}
+  .msg.a{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .msg.sys{align-self:center;font-size:11.5px;color:var(--faint);background:none;text-align:center}
+  .chatin{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px}
+  .chatin textarea{flex:1;resize:none;height:42px;max-height:120px;padding:10px 12px;border:1px solid var(--line);
+    border-radius:10px;font-family:var(--sans);font-size:13.5px;background:#fff}
+  .chatin .send{padding:0 16px;border-radius:10px;background:var(--seal);color:#fff;font-family:var(--serif)}
+  .quickrow{padding:0 16px 10px;display:flex;gap:6px;flex-wrap:wrap}
+  .quickrow button{font-size:11.5px;padding:5px 9px;border-radius:14px;border:1px solid var(--line);
+    background:#fff;color:var(--ink2)}
+  .quickrow button:hover{border-color:var(--seal);color:var(--seal)}
+
+  .scrim{position:fixed;inset:0;background:#2118;z-index:45;opacity:0;pointer-events:none;transition:.25s}
+  .scrim.on{opacity:1;pointer-events:auto}
+
+  .result{padding:18px 22px;margin-bottom:14px;display:none;align-items:center;gap:16px;border-left:4px solid var(--seal)}
+  .result.show{display:flex}
+  .result .big{font-family:var(--serif);font-size:30px;color:var(--seal);font-weight:700}
+  .result .lbl{color:var(--ink2);font-size:13px}
+
+  .sidetoggle{display:none}
+  .closebar{display:none}
+
+  /* ===== phone ===== */
+  @media(max-width:1040px){
+    .sidetoggle{display:inline-flex}
+    .rightcol{position:fixed;inset:0;z-index:46;background:var(--paper);
+      opacity:0;visibility:hidden;transform:translateY(14px);pointer-events:none;
+      transition:opacity .24s,transform .24s,visibility .24s;
+      overflow:auto;padding:12px;gap:12px;border-radius:0}
+    .rightcol.open{opacity:1;visibility:visible;transform:none;pointer-events:auto}
+    .rc-tabs{display:flex;gap:6px;position:sticky;top:0;z-index:2;background:var(--paper);padding:2px 0 8px}
+    .rc-tabs button{flex:1;padding:9px;border-radius:10px;font-family:var(--serif);font-size:14px;
+      border:1px solid var(--line);background:var(--panel2);color:var(--ink2)}
+    .rc-tabs button.on{background:var(--seal);color:#fff;border-color:var(--seal)}
+    .rc-tabs .close{flex:none;width:44px;color:var(--seal);background:#fff}
+    .know-card.hide,.map-card.hide{display:none}
+    .pane{max-height:none}
+    .mapwrap{height:64vh}
+  }
+  @media(max-width:560px){
+    body{font-size:14.5px}
+    .wrap{padding:12px 12px 96px}
+    header.mast{gap:8px 12px;align-items:center;padding:4px 2px 12px;margin-bottom:14px}
+    .seal-logo{width:38px;height:38px;font-size:18px}
+    .mast h1{font-size:18.5px;letter-spacing:.02em}
+    .mast .sub{font-size:11px;margin-top:1px}
+    .mast .grow{flex:1 1 100%;height:0}
+    .stat{flex:1;text-align:center}
+    .stat b{font-size:17px}
+    .stat span{font-size:9.5px;letter-spacing:.02em}
+    .controls{padding:10px;gap:8px;margin-bottom:12px}
+    .seg{flex:1 1 100%}.seg button{flex:1;padding:7px 0;font-size:13.5px}
+    #chapSel{flex:1 1 100%}
+    .controls .mini{flex:1 1 auto;text-align:center}
+    .controls .grow{display:none}
+    .qbox{padding:16px 15px 14px}
+    .qstem{font-size:16px;margin-bottom:15px}
+    .opt{padding:11px 12px;gap:10px}.opt .t{font-size:14px}
+    .result .big{font-size:24px}
+    .drawer{width:100vw;border-left:none}
+    .fab{width:52px;height:52px;right:16px;bottom:16px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="seal-logo">史</div>
+    <div>
+      <h1>近代史纲要 · 刷题台</h1>
+      <div class="sub">单元测试 / 全书测试 · 知识库 + 人物事件 + 历史地图 + AI 复习</div>
+    </div>
+    <div class="grow"></div>
+    <div class="stat"><b id="stCorrect">0</b><span>已答对</span></div>
+    <div class="stat"><b id="stDone">0</b><span>已作答 / 483</span></div>
+    <div class="stat"><b id="stWrong">0</b><span>错题本</span></div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <main>
+      <div class="card controls">
+        <div class="seg">
+          <button id="mUnit" class="on" onclick="setMode('unit')">单元测试</button>
+          <button id="mFull" onclick="setMode('full')">全书测试</button>
+          <button id="mExam" onclick="setMode('exam')">模拟考</button>
+        </div>
+        <select id="chapSel" onchange="onChapChange()"></select>
+        <button class="mini" id="newExamBtn" onclick="newExam()" style="display:none">🎲 换一套</button>
+        <button class="mini" onclick="shuffleList()">🔀 乱序</button>
+        <button class="mini" onclick="redoSet()">🔁 重做本组</button>
+        <button class="mini" onclick="reviewWrong()">📕 错题重做</button>
+        <div class="grow"></div>
+        <button class="mini sidetoggle" onclick="openSide('map')">🗺️ 地图</button>
+        <button class="mini sidetoggle" onclick="openSide('know')">📖 知识库</button>
+        <button class="mini" onclick="resetProgress()">清空</button>
+      </div>
+
+      <div class="card result" id="result"></div>
+
+      <div class="card qbox">
+        <div class="qmeta" id="qmeta"></div>
+        <p class="qstem" id="qstem"></p>
+        <div class="opts" id="opts"></div>
+
+        <div class="prerow" id="preRow">
+          <button class="btn ai" onclick="aiHint()">💡 AI 提示</button>
+          <span class="tiny">不确定时，先让 AI 给点思路（不直接给答案）</span>
+        </div>
+        <div class="hint-out" id="hintOut"></div>
+
+        <div class="exp" id="exp">
+          <div class="res" id="expRes"></div>
+          <div class="ans" id="expAns"></div>
+          <div class="ai-out" id="aiOut"></div>
+          <div class="btnrow">
+            <button class="btn solid" onclick="redoOne()">🔄 重做本题</button>
+            <button class="btn ai" id="aiExpBtn" onclick="aiExplain()">✦ AI 详细解析</button>
+            <button class="btn ghost" onclick="askAiAbout()">问 AI 这一题</button>
+          </div>
+        </div>
+
+        <div class="btnrow" style="margin-top:18px;border-top:1px solid var(--line2);padding-top:16px">
+          <button class="btn ghost" onclick="go(-1)">← 上一题</button>
+          <button class="btn solid" onclick="go(1)">下一题 →</button>
+          <div class="grow"></div>
+          <span id="posLbl" style="color:var(--faint);font-size:13px;font-family:var(--serif)"></span>
+        </div>
+      </div>
+
+      <div class="card sheet">
+        <h3>答题卡
+          <span class="legend">
+            <i><span class="dot" style="background:var(--jade)"></span>对</i>
+            <i><span class="dot" style="background:var(--seal)"></span>错</i>
+            <i><span class="dot" style="background:var(--line)"></span>未答</i>
+          </span>
+        </h3>
+        <div class="grid-n" id="sheet"></div>
+      </div>
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="rightcol" id="rightcol">
+      <div class="rc-tabs">
+        <button id="rcKnow" class="on" onclick="rcTab('know')">📖 知识库</button>
+        <button id="rcMap" onclick="rcTab('map')">🗺️ 历史地图</button>
+        <button class="close" onclick="closeSide()">✕</button>
+      </div>
+
+      <section class="card know-card" id="knowCard">
+        <div class="head">
+          <div class="chtitle" id="knowTitle"></div>
+          <div class="chsub" id="knowSub"></div>
+          <span class="fullbadge" id="fullBadge"></span>
+        </div>
+        <div class="tabs">
+          <button id="tabK" class="on" onclick="knowTab('k')">知识点</button>
+          <button id="tabP" onclick="knowTab('p')">人物·事件</button>
+          <button id="tabT" onclick="knowTab('t')">时间轴</button>
+          <button id="tabE" onclick="knowTab('e')">思考题</button>
+        </div>
+        <div class="pane" id="paneK"></div>
+        <div class="pane" id="paneP" style="display:none"></div>
+        <div class="pane" id="paneT" style="display:none"></div>
+        <div class="pane" id="paneE" style="display:none"></div>
+      </section>
+
+      <section class="card map-card" id="mapCard">
+        <div class="map-head">
+          <b>历史地图</b><span class="ms" id="mapSub">点击标记看事件</span>
+          <div class="tools">
+            <button class="tlbtn" id="tlBtn" onclick="toggleArrows()">显示时间线</button>
+          </div>
+        </div>
+        <div class="mapwrap" id="mapWrap">
+          <svg id="map" viewBox="0 0 840 640" preserveAspectRatio="xMidYMid meet">
+            <g id="vp">
+              <g id="baseG"></g>
+              <g id="arrG"></g>
+              <g id="mkG"></g>
+            </g>
+          </svg>
+          <div class="map-ctrl">
+            <button onclick="zoomBy(1.35)" title="放大">＋</button>
+            <button onclick="zoomBy(0.74)" title="缩小">－</button>
+            <button onclick="mapReset()" title="复位" style="font-size:14px">⟳</button>
+          </div>
+          <div class="map-legend" id="mapLegend"></div>
+          <div class="map-pop" id="mapPop"></div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<button class="fab" onclick="openAI()">AI<br>复习</button>
+<div class="scrim" id="scrim" onclick="closeAI();closeSide()"></div>
+
+<div class="drawer" id="drawer">
+  <div class="dh">
+    <div class="seal-logo" style="width:34px;height:34px;font-size:16px;transform:none">AI</div>
+    <b>AI 复习助手</b>
+    <button class="x" onclick="closeAI()">✕</button>
+  </div>
+  <div class="prov">
+    <span class="lab">引擎</span>
+    <button id="pvClaude" class="on" onclick="setProvider('claude')">内置 AI</button>
+    <button id="pvDS" onclick="setProvider('deepseek')">DeepSeek</button>
+  </div>
+  <div class="keyrow" id="keyrow">
+    <input id="dskey" type="password" placeholder="粘贴 DeepSeek API Key（sk-...）" oninput="saveKey()">
+    <div class="tip">Key 仅存于本地浏览器，用于直接调用 api.deepseek.com。在 Claude 站内预览中外部请求可能被拦截；如不通，请把本页下载到本地用浏览器打开后再用 DeepSeek。</div>
+  </div>
+  <div class="quickrow">
+    <button onclick="quick('讲讲本章最容易考的5个考点')">本章高频考点</button>
+    <button onclick="quick('帮我把本章的人物和对应事件列成对照表')">人物事件对照</button>
+    <button onclick="quick('帮我梳理本章的时间线并解释因果关系')">梳理时间线</button>
+    <button onclick="quick('用要点帮我解答并讲解本章的课后思考题')">课后思考题</button>
+    <button onclick="quick('出3道本章的易错单选题考考我，先不给答案')">来几道易错题</button>
+  </div>
+  <div class="chatlog" id="chatlog"></div>
+  <div class="chatin">
+    <textarea id="chatbox" placeholder="问点什么…（Enter 发送）" onkeydown="chatKey(event)"></textarea>
+    <button class="send" onclick="sendChat()">发送</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = {"1": [{"q": "在中国封建社会的经济中，（）占主导地位。", "o": ["封建地主土地所有制经济", "封建农奴制经济", "自由交换的商品经济", "垄断资本主义经济"], "a": "A"}, {"q": "（）是中国封建社会的基本生产结构。", "o": ["以物易物的自然经济", "以个体家庭为单位并与家庭手工业牢固结合的小农经济", "资本主义性质的手工工场", "资本主义机器生产"], "a": "B"}, {"q": "（）标志着世界历史开始进入资本主义时代。", "o": ["1640年的英国资产阶级革命", "17至18世纪的启蒙运动", "18世纪60年代起的工业革命", "19世纪末20世纪初帝国主义形成"], "a": "A"}, {"q": "19世纪初，英国工业迅猛发展，（）成为资本主义世界的工业中心。", "o": ["纽约", "伦敦", "汉堡", "巴黎"], "a": "B"}, {"q": "在19世纪末资本主义进入帝国主义阶段之后，（）成为殖民剥削的重要形式。", "o": ["掠夺资源", "资本输出", "侵占土地", "商品输出"], "a": "B"}, {"q": "1840年，英国发动侵略中国的（），中国历史发展从此发生重大转折。", "o": ["鸦片战争", "第二次鸦片战争", "黄海海战", "八国联军侵华战争"], "a": "A"}, {"q": "19世纪初，（）已经基本上完成工业革命，成为世界资本主义最强大的国家。", "o": ["英国", "美国", "法国", "日本"], "a": "A"}, {"q": "1842年6月，英国集中兵力猛攻长江门户吴淞炮台，江南提督（）率领守军，顽强抵抗，英勇杀敌，最终英勇牺牲。", "o": ["邓世昌", "陈化成", "林则徐", "关天培"], "a": "B"}, {"q": "（）是近代中国最革命的阶级，是中国新生产力的代表。", "o": ["农民阶级", "工人阶级", "小资产阶级", "民族资产阶级"], "a": "B"}, {"q": "中国民主革命的主力军是（）。", "o": ["农民阶级", "工人阶级", "小资产阶级", "民族资产阶级"], "a": "A"}, {"q": "（）的抗英斗争，是中国近代史上中国人民第一次大规模的反侵略武装斗争，显示了中国人民不甘屈服和敢于斗争的英雄气概。", "o": ["西藏人民", "三元里人民", "天津大沽炮台守军", "香港中国造船工人"], "a": "B"}, {"q": "台湾绅民发布檄文，表示“愿人人战死而失台，决不愿拱手而让台”表达了誓与台湾共存亡的决心，发生在（）签订之后。", "o": ["《南京条约》", "《天津条约》", "《马关条约》", "《辛丑条约》"], "a": "C"}, {"q": "《马关条约》签订后，台湾人民与总兵（）所率领的黑旗军共同抗击日本侵略。", "o": ["冯子材", "吴彭年", "刘永福", "刘铭传"], "a": "C"}, {"q": "以下人民群众的反侵略斗争中，（）不是发生在八国联军侵华战争时期。", "o": ["义和团在廊坊阻击英国海军中将西摩指挥的八国联军2000多人", "太平军在浙江慈溪击伤“常胜军”统领、美国人华尔", "义和团和清军在天津老龙头火车站、紫竹林租界等地与侵略者拼死鏖战", "义和团与清军在东北抗击沙俄侵略军"], "a": "B"}, {"q": "中法战争期间，法舰进犯淡水，都被督办台湾事务大臣（）指挥守军击退。", "o": ["冯子材", "吴彭年", "刘永福", "刘铭传"], "a": "D"}, {"q": "1895年甲午战争中，海军提督（）率北洋舰队从到朝鲜返航途中遇上日本联合舰队12艘军舰来袭，迎敌而上、奋力反击。", "o": ["丁汝昌", "冯子材", "关天培", "陈化成"], "a": "A"}, {"q": "1895年甲午战争中，“致远”号管带（）下令向日舰“吉野”号猛撞，不幸被鱼雷击中，船体炸裂沉没，全舰250名官兵壮烈牺牲。", "o": ["丁汝昌", "邓世昌", "刘步蟾", "林泰曾"], "a": "B"}, {"q": "帝国主义列强对中国的争夺和瓜分的图谋，在（）爆发后达到高潮。", "o": ["第二次鸦片战争", "中法战争", "中日甲午战争", "八国联军侵华战争"], "a": "C"}, {"q": "1885年3月，爱国将领（）指挥清军在中越边境前线大败法军，取得镇南关大捷和谅山大捷。", "o": ["冯子材", "吴彭年", "刘永福", "刘铭传"], "a": "A"}, {"q": "八国联军侵占北京后，（）发布镇压义和团的上谕，称“义和团实为肇祸之由非痛加铲除不可”，并命令各地文武官员对义和团要“行查办，务净根株”。", "o": ["光绪皇帝", "溥仪皇帝", "慈禧太后", "摄政王载沣"], "a": "C"}, {"q": "（）是近代中国睁眼看世界的第一人。", "o": ["郑观应", "林则徐", "魏源", "王韬"], "a": "B"}, {"q": "（）主持节译了《世界地理大全》，编成叙述世界五大洲30多个国家的地理、历史等情况的《四洲志》一书。", "o": ["郑观应", "林则徐", "魏源", "王韬"], "a": "B"}, {"q": "魏源编成（）一书，介绍了世界各国的历史、地理，总结鸦片战争经验教训，论述海防战略战术以及西洋科技船炮图说等等。", "o": ["《盛世危言》", "《海国图志》", "《救亡决论》", "《天演论》"], "a": "B"}, {"q": "提出设立议院，实行“君民共主”制度主张的是（）。", "o": ["郑观应", "徐桐", "刚毅", "翁同龢"], "a": "A"}, {"q": "1895年，（）写了《救亡决论》一文，响亮地喊出了“救亡”的口号。", "o": ["郑观应", "严复", "魏源", "王韬"], "a": "B"}, {"q": "1898年4月，（）在保国会的演说中，把中华民族普遍产生的亡国灭种的危机感表达得淋滴尽致。", "o": ["郑观应", "梁启超", "康有为", "严复"], "a": "C"}, {"q": "（）翻译了《天演论》，用“物竞天择”“适者生存”的社会进化论思想，为亡国灭种的危机意识和民族意识提供了理论根据。", "o": ["郑观应", "梁启超", "康有为", "严复"], "a": "D"}, {"q": "资本-帝国主义列强对中国的侵略，首先和主要的是（）。", "o": ["文化渗透", "经济掠夺", "政治控制", "军事侵略"], "a": "D"}, {"q": "1842年，英国强迫清政府签订《南京条约》，把（）割让给英国。", "o": ["澳门半岛", "香港岛", "辽东半岛", "中国台湾全岛及所有附属各岛屿和澎湖列岛"], "a": "B"}, {"q": "1849年，葡萄牙武力强占（）。", "o": ["澳门半岛", "香港岛", "辽东半岛", "中国台湾全岛及所有附属各岛屿和澎湖列岛"], "a": "A"}, {"q": "1887年，（）胁迫清政府订立通商条约，允许其“永居管理澳门”。", "o": ["西班牙", "葡萄牙", "匈牙利", "意大利"], "a": "B"}, {"q": "（）于1858年胁迫黑龙江将军奕山与之签订《瑷珲条约》，割去黑龙江以北60万平方公里领土。", "o": ["英国", "法国", "美国", "俄国"], "a": "D"}, {"q": "1895年，（）强迫清政府签订《马关条约》，割去中国台湾全岛及所有附属各岛屿和澎湖列岛。", "o": ["日本", "英国", "法国", "美国"], "a": "A"}, {"q": "1898年，（）强租山东的胶州湾，把山东划为其势力范围。", "o": ["英国", "法国", "美国", "德国"], "a": "D"}, {"q": "1901年（）规定，外国军队有权在北京使馆区和北京至大沽、山海关一线包括天津、唐山等12处“留兵驻守”。", "o": ["《南京条约》", "《天津条约》", "《马关条约》", "《辛丑条约》"], "a": "D"}, {"q": "（）从俄国手中攫得租自中国的旅顺口和大连湾、长春至旅顺口的铁路及其他有关权益，并在旅顺设置“关东总督府”。", "o": ["日本", "英国", "法国", "美国"], "a": "A"}, {"q": "八国联军侵华战争时签订的（），规定中国应支付的赔款额高达4.5两白银，分39年还清。", "o": ["《南京条约》", "《北京条约》", "《马关条约》", "《辛丑条约》"], "a": "D"}, {"q": "“允许外国公使常驻北京”出自（）。", "o": ["《南京条约》", "《天津条约》", "《马关条约》", "《辛丑条约》"], "a": "B"}, {"q": "“外国人可以在中国横行不法，中国政府却无权干预”出自（）。", "o": ["列强在中国享有领事裁判权", "外国公使常驻北京", "中国海关被外国人把持", "列强向清政府供应军火、船只"], "a": "A"}, {"q": "（）自1863年任总税务司开始，直到1908年回国，掌握中国海关大权达40余年之久。", "o": ["英国人赫德", "英国公使普鲁斯", "英国人李泰国", "美国公使田贝"], "a": "A"}, {"q": "1859年，海关总税务司署在上海设立，（）成为第一任总税务司。", "o": ["英国人赫德", "英国公使普鲁斯", "英国人李泰国", "美国公使田贝"], "a": "C"}, {"q": "在近代的通商口岸里，外国人的所作所为不包括（）。", "o": ["依仗不平等条约享有种种特权", "控制当地的工商、金融事业", "言行受到中国政府严加管控", "设立租界，实行殖民统治"], "a": "C"}, {"q": "（）之后，中国开始逐步丧失了关税自主权。", "o": ["鸦片战争", "第二次鸦片战争", "中法战争", "甲午战争"], "a": "A"}, {"q": "外国资本在中国设立的（），是它们对中国进行资本输出的枢纽，是列强对华经济侵略的中心。", "o": ["工厂", "银行", "铁路", "矿场"], "a": "B"}], "2": [{"q": "1843年，（）撷取原始基督教教义中反映下层民众要求的平等思想和某些宗教仪式，加以改造，创立了拜上帝教。", "o": ["杨秀清", "洪秀全", "李秀成", "韦昌辉"], "a": "B"}, {"q": "1851年1月，（）率拜上帝教教众在广西省桂平县金田村发动起义，建号太平天国。", "o": ["洪秀全", "杨秀清", "李秀成", "石达开"], "a": "A"}, {"q": "（）提出的《资政新篇》，是太平天国后期颁布的社会发展方案。", "o": ["洪秀全", "杨秀清", "洪仁玕", "李秀成"], "a": "C"}, {"q": "太平天国的领导者们希望通过施行（），建立“有田同耕，有饭同食，有衣同穿，有钱同使，无处不均匀，无人不饱暖”的理想社会。", "o": ["《救亡决论》", "《天演论》", "《天朝田亩制度》", "《资政新篇》"], "a": "C"}, {"q": "《天朝田亩制度》是一个以解决（）问题为中心的比较完整的社会改革方案。", "o": ["土地", "军事", "商品流通", "思想风气"], "a": "A"}, {"q": "（）严重地削弱了太平天国的领导和军事力量，成为太平天国由盛转衰的分水岭。", "o": ["定都天京", "北伐失利", "天京事变", "陈玉成战死"], "a": "C"}, {"q": "（）是中国旧式农民战争的最高峰。", "o": ["义和团运动", "太平天国起义", "白莲教起义", "捻军起义"], "a": "B"}, {"q": "（）是中国近代历史上第一个比较系统的发展资本主义的方案，反映了太平天国某些领导人在后期试图通过向外国学习来寻求出路的一种努力。", "o": ["《天朝田亩制度》", "《资政新篇》", "《救亡决论》", "《天演论》"], "a": "B"}, {"q": "以下（）不是“洋务派”官员。", "o": ["张之洞", "奕䜣", "倭仁", "崇厚"], "a": "C"}, {"q": "最先对洋务派兴办洋务事业的指导思想作出比较完整表述的是（）。", "o": ["林则徐", "冯桂芬", "康有为", "洪仁玕"], "a": "B"}, {"q": "冯桂芬在（）一书中强调，为了应对西方的挑战，中国亟须进行改革。", "o": ["《资政新篇》", "《救亡决论》", "《劝学篇》", "《校邠庐抗议》"], "a": "D"}, {"q": "洋务派兴办的军用工业不包括（）。", "o": ["江南制造总局", "金陵机器局", "福州船政局", "开平矿务局"], "a": "D"}, {"q": "洋务派兴办的民用企业多数采取（）的方式。", "o": ["完全官办", "官督商办", "外资主导", "独立商办"], "a": "B"}, {"q": "以下由洋务派兴办的近代企业中，不是由李鸿章筹办或控制的民用企业是（）。", "o": ["轮船招商局", "开平矿务局", "天津电报局", "天津机器局"], "a": "D"}, {"q": "洋务派从19世纪70到90年代建立的四支水师中，（）是海军主力。", "o": ["福建水师", "广东水师", "南洋水师", "北洋水师"], "a": "D"}, {"q": "（）不是洋务派创办的新式学堂类型。", "o": ["文法学堂", "翻译学堂", "工艺学堂", "军事学堂"], "a": "A"}, {"q": "中国近代教育开始于（）。", "o": ["洋务运动时期", "维新运动时期", "清末“新政”时期", "中华人民共和国成立后"], "a": "A"}, {"q": "（）标志着以“自强”“求富”为目标的洋务运动的失败。", "o": ["林则徐被贬新疆伊犁", "英法军队攻占北京", "北洋海军全军覆没", "《辛丑条约》签订"], "a": "C"}, {"q": "湖北枪炮厂是由洋务派官员（）创办的。", "o": ["张之洞", "曾国藩", "左宗棠", "李鸿章"], "a": "A"}, {"q": "（）提出，“以中国之伦常名教为原本，辅以诸国富强之术”。这个思想后来被进一步概括为“中体西用”。", "o": ["郑观应", "张之洞", "冯桂芬", "奕䜣"], "a": "C"}, {"q": "北洋舰队由（）管辖，拥有舰艇20多艘。", "o": ["左宗棠", "关天培", "李鸿章", "沈葆桢"], "a": "C"}, {"q": "（）中国出现了一个民族资本设厂的高潮，中国民族资本主义得到发展。", "o": ["1840年-1842年", "1860年-1870年", "1895年-1898年", "1908年-1911年"], "a": "C"}, {"q": "（）不是资产阶级维新派办的报纸。", "o": ["《时务报》", "《国闻报》", "《民报》", "《湘报》"], "a": "C"}, {"q": "（）不是资产阶级维新派办的学会。", "o": ["强学会", "同盟会", "南学会", "保国会"], "a": "B"}, {"q": "（）在1895年曾联合在京参加会试的1300多名举人共同发起“公车上书”。", "o": ["康有为", "沈葆桢", "杨深秀", "严复"], "a": "A"}, {"q": "（）6月11日，光绪皇帝颁布了“明定国是”谕旨，宣布开始变法，并在此后的103天中，接连发布了一系列推行新政的政令，史称“戊戌变法”。", "o": ["1860年", "1898年", "1900年", "1908年"], "a": "B"}, {"q": "经过密谋策划，守旧势力于1898年9月21日发动政变，（）以“训政”的名义，重新独揽大权，将光绪皇帝软禁于中南海瀛台，同时下令搜捕维新人士。", "o": ["慈禧太后", "载沣", "奕劻", "善耆"], "a": "A"}, {"q": "“百日维新”如同昙花一现，除（）被保留下来以外，其余新政措施大都被废除。", "o": ["广州万木草堂", "京师大学堂", "《时务报》", "长沙时务学堂"], "a": "B"}, {"q": "（）不是维新派本身存在的局限性。", "o": ["不敢否定封建主义", "对帝国主义抱有幻想", "坚决排斥西方文化", "惧怕人民群众"], "a": "C"}, {"q": "谭嗣同慷慨就义前喟叹“有心杀贼，无力回天”。事实上，真正的“回天之力”存在于（）。", "o": ["民族资产阶级本身", "对中国友好的少数西方人", "封建统治阶级中有改革倾向的人", "亿万民众之中"], "a": "D"}, {"q": "康有为在每次上书中，都反复向光绪皇帝强调“即无强敌之通，揭竿斩术，已可忧危”，使皇帝及其大臣们“求为长安布衣而不可得”。这表明维新派（）。", "o": ["幻想通过和平、合法的手段，实现自上而下的改良", "认为君主立宪制无所不能", "幻想西方列强能帮助自己变法维新", "惧怕、仇视人民群众"], "a": "D"}, {"q": "（）不是维新派大力传播的思想观念。", "o": ["西方资产阶级的社会政治学说", "民主、科学的思想", "自由平等、社会进化观念", "西方自然科学知识"], "a": "B"}, {"q": "维新派主张用（）取代君主专制制度。", "o": ["君主立宪制", "总统共和制", "议会共和制", "人民代表大会制度"], "a": "A"}, {"q": "（）不适合用以描述维新变法中的光绪皇帝。", "o": ["富有爱国心", "老谋深算", "想要有所作为", "并无实权"], "a": "B"}, {"q": "谭嗣同指出，“君末也，民本也”；严复认为，国家是“民之公产”。这表明维新派（）。", "o": ["批判封建君主专制制度", "主张全面学习西方政治制度", "主张废除科举八股", "主张摒弃仁义礼智信"], "a": "A"}], "3": [{"q": "中国民主革命的伟大先行者（）发动和领导了辛亥革命，推翻了清王朝统治，结束了统治中国几千年的君主专制制度，以巨大的震撼力和影响力推动了中国社会变革。", "o": ["孙中山", "陈天华", "秋瑾", "邹容"], "a": "A"}, {"q": "（）开创了完全意义上的近代民族民主革命。", "o": ["辛亥革命", "“二次革命”", "五四运动", "大革命"], "a": "A"}, {"q": "（）打开了中国进步的闸门，传播了民主共和理念，极大推动了中华民族思想解放，点燃了振兴中华的希望。", "o": ["大革命", "五四运动", "“二次革命”", "辛亥革命"], "a": "D"}, {"q": "戊戌维新运动失败后，以（）为代表的革命派在中国掀起了一场资产阶级革命运动。", "o": ["黄兴", "宋教仁", "孙中山", "蔡锷"], "a": "C"}, {"q": "20世纪初，各阶层人民的斗争风起云涌，遍及全国。从1902年至1911年间，各地较大规模的民变多达（）起。", "o": ["200余", "500余", "800余", "1300余"], "a": "D"}, {"q": "1903年至1904年，英国派兵侵入（），遭到当地爱国军民顽强英勇的反击。", "o": ["中国西藏", "中国新疆", "中国台湾", "中国东北"], "a": "A"}, {"q": "（）标志着以慈禧太后为首的清政府已经彻底放弃了抵抗外国侵略者的念头，甘当“洋人的朝廷”", "o": ["英国人担任海关总税务司", "辛酉政变的发动", "《辛丑条约》的签订", "成立“内阁”"], "a": "C"}, {"q": "清政府进行“新政”的根本目的是（）。", "o": ["延续反动统治", "发展资本主义工商业", "宣扬民主共和的思想观念", "扩大资产阶级的政治权益"], "a": "A"}, {"q": "中国的资产阶级民主革命是以（）为代表的资产阶级革命派首先发动的。", "o": ["康有为", "梁启超", "孙中山", "盛宣怀"], "a": "C"}, {"q": "1894年，孙中山到檀香山组建了第一个革命团体（）。", "o": ["同盟会", "兴中会", "华兴会", "光复会"], "a": "B"}, {"q": "1904年，（）发表《中国问题的真解决》一文，指出只有推翻清政府的统治，才能真正解决中国问题。", "o": ["蔡元培", "陈其美", "章炳麟", "孙中山"], "a": "D"}, {"q": "1903年，（）发表《驳康有为论革命书》，反对康有为的保皇观点，歌颂革命为“启迪民智，除旧布新”的良药", "o": ["陈其美", "章炳麟", "蔡元培", "孙中山"], "a": "B"}, {"q": "邹容所撰写的（），以“革命军中马前卒”的名义，热情讴歌革命，号召人民推翻清朝统治，建立“中华共和国”。", "o": ["《革命军》", "《警世钟》", "《猛回头》", "《救亡决论》"], "a": "A"}, {"q": "（）号召人民奋起革命，“改条约，复税权，完全独立；雪仇耻，驱外族，复我冠裳”，推翻清政府这个“洋人的朝廷”。", "o": ["章炳麟", "邹容", "陈天华", "孙中山"], "a": "C"}, {"q": "1905年8月20日，孙中山和黄兴、宋教仁等人在日本东京成立（）。", "o": ["华兴会", "同盟会", "光复会", "岳王会"], "a": "B"}, {"q": "同盟会以（）为机关报，并确定了革命纲领。", "o": ["《新民丛报》", "《新青年》", "《时务报》", "《民报》"], "a": "D"}, {"q": "（）是近代中国第一个领导资产阶级革命的全国性政党。", "o": ["华兴会", "光复会", "同盟会", "科学补习所"], "a": "C"}, {"q": "革命派与改良派的大论战以（）为焦点。", "o": ["要不要进行社会革命", "要不要兴民权、设议院", "要不要以革命手段推翻清王朝", "要不要实行君主立宪"], "a": "C"}, {"q": "孙中山领导的同盟会不仅提出了革命纲领，而且进行了实际的革命活动，先后发动了多次武装起义。其中影响最大的是（）。", "o": ["广州起义", "萍浏醴起义", "黄冈起义", "镇南关起义"], "a": "A"}, {"q": "1911年9月7日，署理四川总督赵尔丰竟下令军警向手无寸铁的请愿群众开枪，造成（）。广大群众忍无可忍，在同盟会会员的参与下，掀起了全川的武装暴动。", "o": ["五卅惨案", "“成都血案”", "“较场口血案”", "二七惨案"], "a": "B"}, {"q": "在革命形势成熟的情况下，湖北新军中的革命团体共进会、文学社决定联合行动，在（ ）举行武装起义。", "o": ["宜昌", "武昌", "襄阳", "黄冈"], "a": "B"}, {"q": "（）年10月10日晚，驻武昌的新军工程第八营的革命党人打响了起义的第一枪。起义军血战通宵，最终占领武昌，取得首义的胜利。", "o": ["1905", "1911", "1912", "1919"], "a": "B"}, {"q": "（）年2月12日，清帝被迫退位。在中国延续了两千多年的封建君主专制制度终于覆灭。", "o": ["1905", "1911", "1912", "1919"], "a": "C"}, {"q": "（ ）年1月1日，孙中山在南京宣誓就职，改国号为中华民国，并成立中华民国临时政府。", "o": ["1905年", "1911年", "1912年", "1919年"], "a": "C"}, {"q": "“敢有帝制自为者，天下共击之”的民主主义观念是从（）开始深入人心的。", "o": ["维新变法", "辛亥革命", "五四运动", "大革命"], "a": "B"}, {"q": "（）后，一系列有利于工商业发展的政策和措施的颁布，推动了民族资本主义经济的发展，使随后的几年成了资本主义发展的“黄金时代”。", "o": ["光绪皇帝颁布“明定国是”", "南京临时政府成立", "清朝进行“新政”", "袁世凯任大总统后"], "a": "B"}, {"q": "男子剪辫、女子放足之风迅速席卷全国，发生在（）时期。", "o": ["维新变法", "辛亥革命", "五四运动", "大革命"], "a": "B"}, {"q": "1911年5月，清政府宣布“铁路干线收归国有”，并与四国银行团订立粤汉、川汉铁路借款合同，借“国有”名义把铁路利权出卖给帝国主义，掀起四省保路风潮，其中以（）最烈。", "o": ["湖北", "湖南", "广东", "四川"], "a": "D"}, {"q": "“自古以来，皇帝被看作至高无上、神圣不可侵犯的绝对权威，如今连皇帝都可以被打倒，那么还有什么陈腐的东西不可以被怀疑、不可以被抛弃？”这说明（）。", "o": ["辛亥革命推动了中国的社会变革，促使中国社会发生了新的积极变化", "辛亥革命推动了中国人民的思想解放，打开了禁锢思想进步的闸门", "辛亥革命在一定程度上打击了帝国主义的侵略势力", "辛亥革命沉重打击了中外反动势力"], "a": "B"}, {"q": "北洋军阀首领（）在帝国主义和国内反动势力，以及附从革命的旧官僚、立宪派的共同支持下，窃夺了辛亥革命的果实。", "o": ["孙传芳", "段祺瑞", "袁世凯", "冯国璋"], "a": "C"}, {"q": "1912年8月，（）以同盟会为基础联合其他几个政党，组成国民党。", "o": ["李宗仁", "宋教仁", "梁启超", "蔡锷"], "a": "B"}, {"q": "1913年3月，（）指使心腹收买刺客暗杀了宋教仁。", "o": ["袁世凯", "张作霖", "唐绍仪", "段祺瑞"], "a": "A"}, {"q": "1915年5月，为了让日本支持复辟帝制，袁世凯竟然基本接受日本提出的严重损害中国权益的（）。", "o": ["《秦土协定》", "《塘沽协定》", "“二十一条”要求", "“何梅协定”"], "a": "C"}, {"q": "1917年6月，前清官僚（）率军北上，拥废帝溥仪复辟，仅12天就在全国人民的声讨中失败了。", "o": ["荣庆", "赵尔巽", "杨森", "张勋"], "a": "D"}, {"q": "1915年12月，（）发表接受帝位申令，随后下令以1916年为“中华帝国洪宪元年”，准备在元旦举行登基大典。", "o": ["袁世凯", "段祺瑞", "马步芳", "爱新觉罗·溥仪"], "a": "A"}, {"q": "1913年宋教仁被刺后，孙中山开始看清袁世凯的真面目，毅然发动武装反袁的（）。", "o": ["辛亥革命", "“二次革命”", "护国运动", "护法运动"], "a": "B"}, {"q": "1914年，孙中山在日本组织（），坚持反袁武装斗争。", "o": ["兴中会", "同盟会", "光复会", "中华革命党"], "a": "D"}, {"q": "1915年12月25日，（）等人在云南组织“护国军”，宣布“独立”，很快形成席卷半个中国的护国运动。", "o": ["蔡锷", "张作霖", "徐世昌", "杨森"], "a": "A"}, {"q": "（）的失败，使孙中山认识到“南与北如一丘之貉”，想依靠南方军阀来反对北洋军阀，是行不通的。", "o": ["辛亥革命", "“二次革命”", "护国运动", "护法运动"], "a": "D"}, {"q": "孙中山本人沉痛地说过，当时中国“政治上、社会上种种黑暗腐败比前清更甚，人民困苦日甚一日”。这描述的是（）统治时期。", "o": ["北洋政府", "南京国民政府", "武汉国民政府", "广州国民政府"], "a": "A"}, {"q": "1915年5月，为了让日本支持复辟帝制，（）基本接受日本提出的严重损害中国权益的“二十一条”要求。", "o": ["曹锟", "吴佩孚", "段祺瑞", "袁世凯"], "a": "D"}], "4": [{"q": "（）取得胜利，社会主义从理论变为现实，打破了资本主义一统天下的世界格局。", "o": ["1848年欧洲革命", "俄国十月革命", "巴黎公社", "法国大革命"], "a": "B"}, {"q": "（）一声炮响，为中国送来了马克思列宁主义，给苦苦探寻救亡图存出路的中国人民指明了前进方向、提供了全新选择。", "o": ["巴黎公社", "法国大革命", "俄国十月革命", "宪章运动"], "a": "C"}, {"q": "1917年1月，（）出任北京大学校长，并聘请陈独秀为北大文科学长。", "o": ["顾颉刚", "蔡元培", "梁漱溟", "陈寅恪"], "a": "B"}, {"q": "《新青年》的主要撰稿人不包括（）。", "o": ["李大钊", "辜鸿铭", "胡适", "鲁迅"], "a": "B"}, {"q": "（）推翻了资产阶级临时政府，建立起由马克思主义政党领导的第一个社会主义国家，这昭示人们，资本主义制度并不是永恒的，无产阶级和其他劳动群众一旦觉醒起来、组织起来，完全可以依靠自身的力量创造出维护绝大多数人利益的崭新社会制度。", "o": ["1848年欧洲革命", "俄国十月革命", "巴黎公社", "法国大革命"], "a": "B"}, {"q": "在中国大地上率先举起马克思主义旗帜的是（）。", "o": ["李大钊", "毛泽东", "陈独秀", "董必武"], "a": "A"}, {"q": "1919年9月、11月，（）发表《我的马克思主义观》一文，比较系统地介绍了马克思主义理论。", "o": ["李大钊", "陈独秀", "毛泽东", "周恩来"], "a": "A"}, {"q": "五四运动开始时，英勇地出现在斗争前面的是（）。", "o": ["农民", "学生", "商人", "工人"], "a": "B"}, {"q": "巴黎和会规定德国应将在中国山东获得的一切特权转交给（），消息传回国内，激起了各阶层人民的强烈愤怒。", "o": ["法国", "日本", "美国", "英国"], "a": "B"}, {"q": "（）年5月4日，北京大学等北京十几所学校的学生冲破反动军警的阻拦，在天安门前集会，高呼“中国的土地可以征服而不可以断送！中国的人民可以杀戮而不可以低头！国亡了！同胞起来呀！”", "o": ["1912", "1919", "1921", "1929"], "a": "B"}, {"q": "五四运动的口号不包括（）。", "o": ["“停止内战，一致对外”", "“外争主权、内除国贼”", "“取消二十一条”“", "“还我青岛”"], "a": "A"}, {"q": "五四运动时期，中国（）开始以独立的姿态登上政治舞台。", "o": ["小资产阶级知识分子", "封建军阀势力", "工人阶级", "农民阶级"], "a": "C"}, {"q": "（）实现了中国人民和中华民族自鸦片战争以来的第一次全面觉醒。", "o": ["辛亥革命", "新文化运动", "五四运动", "大革命"], "a": "C"}, {"q": "五四运动前夕，中国产业工人已达（）。五四运动就获得了比以往革命斗争更加广泛的群众基础。", "o": ["10万人左右", "100万人左右", "200万人左右", "1000万人左右"], "a": "C"}, {"q": "中国早期信仰马克思主义的人物，不包括（）。", "o": ["新文化运动的精神领袖", "五四爱国运动的左翼骨干", "北洋政府的核心官员", "原中国同盟会会员、辛亥革命时期的活动家"], "a": "C"}, {"q": "在中国早期的马克思主义思想运动中，（）起着主要作用。", "o": ["吴玉章", "李大钊", "梁启超", "杨匏安"], "a": "B"}, {"q": "1919年11月、12月，杨匏安发表（）一文，对马克思主义的基本内容，包括唯物史观、剩余价值理论和阶级斗争学说等，作了比较确切的阐述。", "o": ["《马克思主义》", "《法俄革命之比较观》", "《庶民的胜利》", "《Bolshevism的胜利》"], "a": "A"}, {"q": "（）“猛看猛译”马克思主义书籍，供自己和他人阅读，成为中国留法学生中的马克思主义者。", "o": ["蔡和森", "鲁迅", "陈望道", "竺可桢"], "a": "A"}, {"q": "天津学生领袖（）说，自己到欧洲以后，“对于一切主义开始推求比较”，到1921年秋，终于“定妥了我的目标”即共产主义。", "o": ["李汉俊", "蔡和森", "陈望道", "周恩来"], "a": "D"}, {"q": "“中国人在精神上就由被动转入主动”是指（）。", "o": ["民主共和的观念深入人心", "中国人接受了资产阶级民主主义", "中国人学会了马克思列宁主义", "五四运动传播了新思想新文化新知识"], "a": "C"}, {"q": "1920年3月，（）在北京大学组织成立马克思学说研究会，是中国最早学习和研究马克思主义的团体。", "o": ["蔡和森", "瞿秋白", "李大钊", "陈独秀"], "a": "C"}, {"q": "中国工人阶级政党最早的组织，是在中国工人阶级最密集的中心城市（）建立的。", "o": ["上海", "广州", "武汉", "南京"], "a": "A"}, {"q": "1920年8月，（）翻译的《共产党宣言》中文全译本公开出版。", "o": ["李汉俊", "蔡和森", "陈望道", "周恩来"], "a": "C"}, {"q": "（）在潜心翻译《共产党宣言》中文版时，把粽子蘸着墨汁吃掉却浑然不觉，还说：“真理的味道非常甜”。这彰显了中国共产主义者对马克思主义救国真理的渴求，对共产主义理想的坚定信念。", "o": ["瞿秋白", "陈望道", "周恩来", "蔡和森"], "a": "B"}, {"q": "上海党的早期组织成员（）改名换服，到厚生铁工厂做工，学习工人的语言，从事工人的劳动，力求与工人打成一片。", "o": ["沈泽民", "杨明斋", "俞秀松", "李启汉"], "a": "C"}, {"q": "在共产党早期组织领导下，1920年8月，（）在上海成立，引导青年学习马克思主义。", "o": ["中华全国妇女联合会", "社会主义青年团", "少年先锋队", "共产主义儿童团"], "a": "B"}, {"q": "中国共产党第一次全国代表大会于（）年7月23日在上海法租界望志路106号举行。", "o": ["1919", "1920", "1921", "1924"], "a": "C"}, {"q": "参加中国共产党第一次全国代表大会的代表，来自7个地方，代表全国（）名党员。", "o": ["30余", "50余", "80余", "100余"], "a": "B"}, {"q": "由于会场受到暗探注意和法租界巡捕房搜查，中国共产党第一次全国代表大会最后一天的会议转移到（）的游船上举行。", "o": ["无锡太湖", "嘉兴南湖", "苏州澄湖", "苏州淀湖"], "a": "B"}, {"q": "中国共产党一经成立，就把实现（）作为党的最高理想和最终目标。", "o": ["资本主义", "社会主义", "共产主义", "民主主义"], "a": "C"}, {"q": "中国共产党第二次全国代表大会于（）在上海举行。", "o": ["1921年7月", "1922年7月", "1923年6月", "1925年1月"], "a": "B"}, {"q": "1921年9月，（）成立了中国第一个农民协会，开展反抗地主压迫的斗争。", "o": ["四川万县", "浙江萧山县", "湖南韶山县", "江西井冈山"], "a": "B"}, {"q": "1922年6月，（）来到家乡赤山约，经过艰苦的工作，成立了农会；次年召开海丰全县农民代表大会，海丰总农会宣告成立，全县范围的农民运动轰轰烈烈地开展起来。", "o": ["夏明翰", "彭湃", "项英", "苏兆征"], "a": "B"}, {"q": "1923年2月7日，京汉铁路罢工遭到反动军阀血腥镇压，造成（）。", "o": ["二七惨案", "“较场口血案”", "“成都血案”", "五卅惨案"], "a": "A"}, {"q": "1924年1月，中国国民党第一次全国代表大会由（）主持在广州举行。", "o": ["孙中山", "于右任", "廖仲恺", "吴稚晖"], "a": "A"}, {"q": "国共合作实现后，以（）为中心，汇集了全国革命力量，开创了反对帝国主义和封建军阀的革命新局面。", "o": ["北京", "上海", "武汉", "广州"], "a": "D"}, {"q": "在日益高涨的革命形势下，中国共产党进行了创建直接领导的革命武装的尝试，是于1926年初由（）指挥的国民革命军第四军独立团。", "o": ["贺龙", "左权", "朱德", "叶挺"], "a": "D"}, {"q": "在日益高涨的革命形势下，北方地区的革命运动也迅速发展起来。李大钊和北方党组织进行了争取（）及其国民军的工作。", "o": ["冯玉祥", "孙传芳", "张作霖", "阎锡山"], "a": "A"}, {"q": "（）是中国工人运动史上持续时间最长的一次政治大罢工。", "o": ["省港大罢工", "京汉铁路大罢工", "五卅罢工", "安源路矿工人罢工"], "a": "A"}, {"q": "1925年7月1日，国民政府在（）建立。", "o": ["北京", "上海", "武汉", "广州"], "a": "D"}, {"q": "1925年，北洋军阀统治着全国大部分地区，控制着湖南、湖北、河南三省和直隶（河北）保定一带的是直系军阀（）。", "o": ["吴佩孚", "张作霖", "蔡锷", "张勋"], "a": "A"}, {"q": "1926年3月，蒋介石（），打击共产党和工农革命力量。", "o": ["实现宁汉合流", "制造皖南事变", "制造七一五反革命政变", "制造中山舰事件"], "a": "D"}, {"q": "1927年（），蒋介石在上海发动反共政变，以“清党”为名，在东南各省大规模捕杀共产党员和革命群众。", "o": ["4月12日", "7月15日", "9月18日", "10月10日"], "a": "A"}], "5": [{"q": "1928年6月，奉系军阀首领（）在退回关外途中，被日本人预埋的炸药炸死。", "o": ["张作霖", "张学良", "张宗昌", "张治中"], "a": "A"}, {"q": "1928年12月29日，（）从东北发出通告，宣布“遵守三民主义，服从国民政府，改易旗帜”。", "o": ["张作霖", "张学良", "张宗昌", "张治中"], "a": "B"}, {"q": "“奠都以来，青年之遭杀戮者，报纸记载至三十万人之多，而失踪监禁者更不可胜计。杀之不快，更施以活埋；禁之不足，复加以毒刑。地狱现形，人间何世？”与之相关的是国民党（）。", "o": ["推行保甲制度", "建立全国性特务系统", "查禁进步书刊", "摊派、征税"], "a": "B"}, {"q": "（）的“砍头不要紧，只要主义真”的就义诗，表达了共产党共产党人英员的信念之光不灭。", "o": ["陈延年", "陈乔年", "夏明翰", "赵世炎"], "a": "C"}, {"q": "1927年（），中共中央在汉口秘密召开紧急会议，会议确定了土地革命和武装起义的方针。", "o": ["7月1日", "7月8日", "7月23日", "8月7日"], "a": "D"}, {"q": "“须知政权是由枪杆子中取得的。”是毛泽东在（）提出的。", "o": ["中共五大", "八七会议", "古田会议", "赣南会议"], "a": "B"}, {"q": "大革命失败以后，在关系党和革命事业前途和命运的严重危机时刻，（）提出了“找着新的道路”的任务。", "o": ["中共五大", "八七会议", "古田会议", "赣南会议"], "a": "B"}, {"q": "1927年8月1日，在以周恩来为书记的前敌委员会领导下，贺龙、叶挺、朱德、刘伯承等率领共产党掌握和影响的军队2万多人，在（）打响了武装反抗国民党反动派的第一枪。", "o": ["广州", "南昌", "长沙", "井冈山"], "a": "B"}, {"q": "（）是中国共产党独立领导革命战争、创建人民军队和武装夺取政权的开端。", "o": ["南昌起义", "秋收起义", "广州起义", "黄麻起义"], "a": "A"}, {"q": "1927年9月9日，毛泽东等领导的湘赣边界（）爆发。起义军公开打出了“工农革命军”的旗帜。", "o": ["南昌起义", "秋收起义", "广州起义", "黄麻起义"], "a": "B"}, {"q": "1927年12月11日，张太雷和叶挺、叶剑英等领导了（），对国民党的屠杀政策发动了英勇的反击。", "o": ["南昌起义", "秋收起义", "广州起义", "黄麻起义"], "a": "C"}, {"q": "大革命失败后，集中体现中国革命正确方向的是毛泽东、朱德领导的（）革命根据地的斗争。", "o": ["井冈山", "鄂豫皖", "闽西", "湘西"], "a": "A"}, {"q": "1927年11月，湘赣边界第一个红色政权（）成立。", "o": ["湘赣边界工农兵政府", "陵水县苏维埃政府", "海陆丰工农兵苏维埃政府", "茶陵县工农兵政府"], "a": "D"}, {"q": "1928年4月下旬，朱德、陈毅率领南昌起义保留下来的部队和湘南起义农军陆续转移到（），与毛泽东领导的部队会师，成立工农革命军第四军。", "o": ["闽西地区", "井冈山地区", "川东地区", "鄂豫皖地区"], "a": "B"}, {"q": "“没有调查，没有发言权”，“中国革命斗争的胜利要靠中国同志了解中国情况”，出自毛泽东的文章（）。", "o": ["《星星之火，可以燎原》", "《中国的红色政权为什么能够存在？》", "《井冈山的斗争》", "《反对本本主义》"], "a": "D"}, {"q": "毛泽东在（）一文中进一步指出：红军、游击队和红色区域的建立和发展，是半殖民地中国在无产阶级领导之下的农民斗争的最高形式，和半殖民地农民斗争发展的必然结果。", "o": ["《星星之火，可以燎原》", "《中国的红色政权为什么能够存在？》", "《井冈山的斗争》", "《反对本本主义》"], "a": "A"}, {"q": "（）通过了毛泽东起草的会议决议，确立了思想建党、政治建军原则。", "o": ["中共五大", "八七会议", "古田会议", "赣南会议"], "a": "C"}, {"q": "（）规定，红军必须绝对服从共产党的领导，必须全心全意为党的纲领、路线和政策而奋斗。", "o": ["中共五大决议", "八七会议", "古田会议决议", "赣南会议"], "a": "C"}, {"q": "随着革命新道路的开辟，中国革命开始走向复兴，（）实际上已经成为中国革命的主要形式。", "o": ["城市武装起义", "学生罢课游行", "红军游击战争", "工人罢工暴动"], "a": "C"}, {"q": "土地革命时期，在中国共产党的土地革命路线指引下，根据地进行了热火朝天的（），充分调动了广大农民发展生产和参军参战的积极性。", "o": ["“打土豪，分田地”的斗争", "“自己动手，丰衣足食”的大生产运动", "“一平二调”的“共产风”", "农业生产互助合作"], "a": "A"}, {"q": "在大革命失败、白色恐怖极其严重的条件下，中国革命之所以能够得到坚持和发展，根本原因就在于中国共产党紧紧地依靠（）。", "o": ["农民", "前清官僚", "买办群体", "民族资产阶级"], "a": "A"}, {"q": "1931年11月，中华苏维埃第一次全国代表大会在（）召开。", "o": ["陕西延安", "贵州遵义", "江西瑞金", "湖南长沙"], "a": "C"}, {"q": "从1927年7月大革命失败到1935年1月遵义会议召开前，以王明为代表的（）错误，使中国革命遭受严重挫折。", "o": ["右倾机会主义", "“左”倾教条主义", "右倾投降主义", "经验主义"], "a": "B"}, {"q": "中央红军主力开始长征后，（）等率领中央根据地留下的部分红军在南方坚持了艰苦卓绝的三年游击战争。", "o": ["毛泽东、朱德", "刘伯承、邓小平", "项英、陈毅", "贺龙、习仲勋"], "a": "C"}, {"q": "（），中共中央、中革军委率中央红军主力8.6万人踏上战略转移的漫漫征程，开始了世界历史上前所未有的壮举。", "o": ["1934年5月", "1934年10月", "1935年3、4月", "1935年10月"], "a": "B"}, {"q": "在（）后，中央红军从长征出发时的8.6万人锐减到3万多人。严酷的事实促使广大党员和红军指战员对“左”倾错误领导产生了怀疑和不满。", "o": ["强渡湘江", "强渡乌江", "四渡赤水", "强渡大渡河"], "a": "A"}, {"q": "1934年12月，中央政治局在（）举行会议，根据毛泽东的建议，通过决议，放弃到湘西北同红二、六军团会合的计划，改向贵州北部进军。", "o": ["湖南通道", "贵州黎平", "贵州遵义", "四川会理"], "a": "B"}, {"q": "1935年1月7日，红军攻克（），1月15日至17日，中共中央在此召开政治局扩大会议", "o": ["湖南通道", "贵州黎平", "贵州遵义", "四川会理"], "a": "C"}, {"q": "（）确立了以毛泽东为主要代表的马克思主义正确路线在党中央的领导地位，开始形成以毛泽东同志为核心的第一代中央领导集体。", "o": ["中华苏维埃第一次全国代表大会", "遵义会议", "党的七大", "党的七届二中全会"], "a": "B"}, {"q": "翻越人迹罕至、终年积雪的夹金山，1935年6月中央红军抵达（），与红四方面军会师。", "o": ["四川懋功", "陕北吴起", "甘泉地区", "甘肃会宁"], "a": "A"}, {"q": "1936年10月9日，红四方面军指挥部同红一方面军在（）会合。", "o": ["四川懋功", "陕北吴起", "甘泉地区", "甘肃会宁"], "a": "D"}, {"q": "1936年10月22日，红二方面军指挥部到达（），同红一方面公会合。至此，三大主力红军的长征胜利结束。", "o": ["甘肃将台堡", "甘肃会宁", "四川懋功", "陕北吴起"], "a": "A"}, {"q": "1935年12月，毛泽东作（）的报告，阐明党的抗日民族统一战线的新政策，系统说明了党的政治策略上的诸问题", "o": ["《中国革命战争的战略问题》", "《论反对日本帝国主义的策略》", "《实践论》", "《论持久战》"], "a": "B"}, {"q": "1936年12月，毛泽东写下（）一文，总结了土地革命战争中党内在军事问题上的争论，系统说明了有关中国革命战争战略方面的诸问题。", "o": ["《中国革命战争的战略问题》", "《论反对日本帝国主义的策略》", "《矛盾论》", "《论持久战》"], "a": "A"}], "6": [{"q": "中华儿女同仇敌忾，进行了长达（）艰苦卓绝的抗日战争，打败了穷凶极恶的日本军国主义侵略者，取得了中国人民抗日战争的伟大胜利。", "o": ["7年", "8年", "14年", "18年"], "a": "C"}, {"q": "1927年，日本首相田中义一主持召开“东方会议”，宣示了（），企图把“满蒙”从中国本土彻底分割出去。", "o": ["《对华政策纲要》", "“田中奏折”", "《基本国策纲要》", "“大陆政策”"], "a": "A"}, {"q": "1931年（）深夜，日本关东军炸毁“南满铁路”沈阳北郊柳条湖附近的一段路轨，反诬中国军队所为，当即炮轰东北军驻地北大营，接着向沈阳城等地发动进攻。", "o": ["7月7日", "9月18日", "10月10日", "12月12日"], "a": "B"}, {"q": "日本全面侵华战争由（）开始。", "o": ["九一八事变", "一·二八事变", "华北事变", "七七事变"], "a": "D"}, {"q": "1937年12月，日军占领（）后，展开烧、杀、淫、掠“大竞赛”。中国平民和被俘士兵被集体射杀、火焚、活埋及用其他方法处死者达30万人以上", "o": ["上海", "南京", "北平", "武汉"], "a": "B"}, {"q": "日军实行细菌战、化学战，对中国军民实行惨无人道的活体试验，日军（）将带有病毒的投掷器投放到中国许多地区，造成大量中国平民死亡。", "o": ["731部队", "106师团", "广岛师团", "223联队"], "a": "A"}, {"q": "日本侵略者在中国犯下的罪行罄竹难书，战争期间，中国军民伤亡人数超过（）。", "o": ["1000万", "2000万", "2800万", "3500万"], "a": "D"}, {"q": "中国人民在（）的奋起抵抗，成为中国人民抗日战争的起点，同时揭开了世界反法西斯战争的序幕。", "o": ["山东", "沿海", "东北", "西北"], "a": "C"}, {"q": "1931年9月20日，中共中央发表宣言，响亮提出（）。", "o": ["“反对华北自治”", "“停止内战，一致对外”", "“坚持抗战到底——反对中途妥协”", "“反对日本帝国主义强占东三省”"], "a": "D"}, {"q": "中国共产党直接领导了东北人民的抗日武装斗争，1936年2月后，中国共产党领导的东北抗日武装力量陆续改建为（）。", "o": ["东北抗日联军", "奉军", "中国人民解放军东北野战军", "国民革命军东北边防军"], "a": "A"}, {"q": "一·二八事变后，国民党（）奋起抗日，中共中央号召各界民众支援。", "o": ["新六军", "第九集团军", "第十九路军", "第二十九军"], "a": "C"}, {"q": "1933年5月，原西北军将领（）成立察哈尔民众抗日同盟军，并谋求同共产党合作。", "o": ["冯玉祥", "刘湘", "佟麟阁", "张维玺"], "a": "A"}, {"q": "1933年11月，第十九路军将领蔡廷锴、蒋光鼐以及国民党内爱国人士李济深、陈铭枢等发动了反蒋抗日的（）。", "o": ["西安事变", "福建事变", "天京事变", "北京事变"], "a": "B"}, {"q": "1934年4月，由中国共产党提出，宋庆龄、何香凝、李杜等1779人领衔，发表了（），在该纲领上签字的群众达几十万人。", "o": ["八一宣言", "《中共中央为公布国共合作宣言》", "《中国人民对日作战的基本纲领》", "《中国共产党抗日救国十大纲领》"], "a": "C"}, {"q": "1935年12月9日，北平学生举行声势浩大的抗日游行，遭到国民党军警镇压。其游行口号不包括（）。", "o": ["“反对华北自治”", "“外争主权、内除国贼”", "“停止内战，一致对外”", "“打倒日本帝国主义”"], "a": "B"}, {"q": "（）标志着中国人民抗日救亡运动新高潮的到来。", "o": ["五四运动", "一二·九运动", "一二·一运动", "一二三〇运动"], "a": "B"}, {"q": "1935年8月1日，中共驻共产国际代表团草拟（）并公开发表，主张停止内战，组织国防政府和抗日联军，对日作战。", "o": ["《中国人民对日作战的基本纲领》", "《对目前时局的宣言》", "《中国共产党抗日救国十大纲领》", "《中国苏维埃政府、中国共产党中央为抗日救国告全体同胞书》"], "a": "D"}, {"q": "1935年12月，中共中央召开政治局扩大会议，提出党的基本策略任务是（）。", "o": ["建立广泛的抗日民族统一战线", "独立抗日", "尽快用武力推翻国民党政权", "向顽固派无条件妥协"], "a": "A"}, {"q": "1936年9月1日，中共中央明确提出党的总方针是（）。", "o": ["“联蒋抗日”", "“逼蒋抗日”", "“反蒋抗日”", "“独立抗日”"], "a": "B"}, {"q": "1935年12月，中共中央在陕北（）召开政治局扩大会议，批评了党内长期存在的“左”倾冒险主义、关门主义错误倾向。", "o": ["瓦窑堡", "洛川", "杨家岭", "枣园"], "a": "A"}, {"q": "（）爆发后，中国进入全民族抗战阶段，并开辟了世界反法西斯战争的东方主战场。", "o": ["九一八事变", "卢沟桥事变", "西安事变", "福建事变"], "a": "B"}, {"q": "西安事变发生后，党中央派（）前往西安。", "o": ["徐特立", "林伯渠", "王若飞", "周恩来"], "a": "D"}, {"q": "1937年8月25日，中共中央革命军事委员会发布命令，宣布红军改名为（）。朱德任总指挥，彭德怀任副总指挥。", "o": ["国民革命军第四路军", "国民革命军第八路军", "国民革命军第十八军", "国民革命军第二十九军"], "a": "B"}, {"q": "1937年，南方八省的红军游击队改编为国民革命军陆军新编第四军，（）任军长，项英任副军长。", "o": ["刘伯承", "朱德", "叶挺", "贺龙"], "a": "C"}, {"q": "（）标志着以国共两党第二次合作为基础的抗日民族统一战线正式形成。", "o": ["周恩来等将《中共中央为公布国共合作宣言》交给蒋介石", "国民党中央通讯社发表中共中央的宣言", "红军改名为八路军", "蒋介石发表实际上承认共产党合法地位的谈话"], "a": "D"}, {"q": "少数民族群众积极参加抗日战争。（）领导的翼中回民支队就进行了大小战斗870多次。", "o": ["马定夫", "马占山", "马本斋", "马振华"], "a": "C"}, {"q": "抗日战争开始后，港澳同胞和海外华侨以各种方式参加抗日活动。以（）为主席的华侨筹赈祖国难民总会，分支机构遍及东南亚。", "o": ["陈嘉庚", "陈荣久", "陈钟书", "陈安宝"], "a": "A"}, {"q": "从卢沟桥事变到（），中国抗战处于战略防御阶段。", "o": ["上海沦陷", "太原失守", "广州、武汉失守", "枣宜会战"], "a": "C"}, {"q": "1938年3月，李宗仁等部在（）中取得大捷，歼灭了日军大量有生力量。", "o": ["台儿庄战役", "豫湘桂战役", "昆仑关战役", "武汉保卫战"], "a": "A"}, {"q": "在淞沪会战中，第八十八师五二四团团附（）率孤军据守四行仓库，被上海市民誉为“八百壮士”。", "o": ["戴安澜", "谢晋元", "张自忠", "佟麟阁"], "a": "B"}, {"q": "1939年1月，国民党五届五中全会决定成立“防共委员会”，确定（）的方针。", "o": ["“防共、限共、溶共、反共”", "“调整、巩固、充实、提高”", "“又团结又斗争”", "“避敌主力、打其虚弱”"], "a": "A"}, {"q": "1940年5月，在枣宜会战中，第三十三集团军总司令（）殉国。", "o": ["佟麟阁", "赵登禹", "张自忠", "戴安澜"], "a": "C"}, {"q": "1942年2月，中国远征军进入缅甸对日作战。陆军第二〇〇师师长（）在缅北殉国。", "o": ["佟麟阁", "赵登禹", "张自忠", "戴安澜"], "a": "D"}, {"q": "在1944年4月至1945年1月的（）中，国民党军队大溃败，丢失拥有146座大小城市、6000多万人口的20多万平方公里的国土。", "o": ["淞沪抗战", "绥远抗战", "第三次长沙会战", "豫湘桂战役"], "a": "D"}, {"q": "1941年12月，日军发动太平洋战争后，美国提议设立（）。", "o": ["缅甸战区", "越南战区", "中国战区", "朝鲜战区"], "a": "C"}, {"q": "1937年8月，中国共产党在（）召开政治局扩大会议，制定了抗日救国十大纲领。", "o": ["陕北洛川", "陕北瓦窑堡", "陕北延安", "西柏坡"], "a": "A"}, {"q": "1938年5月至6月间，毛泽东发表（）的讲演，总结全民族抗战10个月来的经验，批驳了“亡国论”“速胜论”等错误观点", "o": ["《中国革命战争的战略问题》", "《论反对日本帝国主义的策略》", "《抗日游击战争的战略问题》", "《论持久战》"], "a": "D"}, {"q": "（）系统阐明了抗日战争的发展规律和坚持抗战、争取抗战胜利必须实行的战略总方针，是中国共产党领导抗日战争的纳领性文献。", "o": ["《中国革命战争的战略问题》", "《论反对日本帝国主义的策略》", "《实践论》《矛盾论》", "《论持久战》"], "a": "D"}, {"q": "毛泽东写了（），特别强调了抗日战争全过程中游击战争的重要战略地位。", "o": ["《中国革命战争的战略问题》", "《抗日游击战争的战略问题》", "《论反对日本帝国主义的策略》", "《论持久战》"], "a": "B"}, {"q": "1937年9月，八路军第一一五师主力在（）附近伏击日军，取得全民族抗战以来中国军队主动寻歼敌人的第一次重大胜利。", "o": ["平型关", "台儿庄", "枣庄", "昆仑关"], "a": "A"}, {"q": "新四军挺进长江南北后，创建了（）抗日根据地。", "o": ["山东", "华中", "浙东", "湘西"], "a": "B"}, {"q": "为打击日本侵略者，人民军队在有利条件下也进行过例如百团大战的（）。", "o": ["地道战", "游击战", "运动战", "地雷战"], "a": "C"}, {"q": "国共统一战线内部不可避免地存在着矛盾和斗争，其原因不包括（）。", "o": ["代表不同的阶级利益", "由不同民族群体构成", "参加抗战的目的不尽相间", "实行的抗战路线不同"], "a": "B"}, {"q": "1941年1月，国民党顽固派发动（），在皖南以8万余兵力包围袭击新四军军部及所属部队，并诬称新四军“叛变”，宣布取消其番号。", "o": ["第一次反共高潮", "第二次反共高潮", "第三次反共高潮", "第四次反共高潮"], "a": "B"}, {"q": "1941年5月中共中央批准颁布的（），全面体现了中国共产党关于根据地建设的基本方针。", "o": ["《中国土地法大纲》", "《陕甘宁边区施政纲领》", "《中国人民对日作战的基本纲领》", "《中国共产党抗日救国十大纲领》"], "a": "B"}, {"q": "为克服根据地面临的严重困难局面，党领导根据地军民开展了（）。", "o": ["反饥饿运动", "大生产运动", "整风运动", "土地改革运动"], "a": "B"}, {"q": "八路军第三五九旅艰苦奋斗，使荒凉的（）变成了“陕北江南”。", "o": ["南泥湾", "杨家岭", "杨家沟", "枣园"], "a": "A"}, {"q": "1944年9月，中共参政员（）在国民参政会上正式提出立即结束国民党一党统治、建立各抗日党派民主联合政府的主张，得到各界热烈响应。", "o": ["周恩来", "吴玉章", "林伯渠", "徐特立"], "a": "C"}, {"q": "1938年8月，中共驻共产国际代表（）回国，传达共产国际指示：中共中央的政治路线是正确的，中共中央要以毛泽东为首来解决统一领导的问题。", "o": ["王稼祥", "王若飞", "瞿秋白", "董必武"], "a": "A"}, {"q": "（）以后的中国民主革命，属于无产阶级领导的人民大众的反帝反封建的新民主主义革命。", "o": ["辛亥革命", "五四运动", "大革命", "抗日战争"], "a": "B"}, {"q": "“为什么人的问题，是一个根本的问题，原则的问题。”出自1942年5月毛泽东在（）的讲话。", "o": ["扩大的六届六中全会", "延安文艺座谈会", "扩大的六届七中全会", "洛川会议"], "a": "B"}, {"q": "中共扩大的六届七中全会原则通过了（），至此，整风运动胜利结束。", "o": ["《中国共产党抗日救国十大纲领》", "《新民主主义论》", "《中国革命和中国共产党》", "《关于若干历史问题的决议》"], "a": "D"}, {"q": "1945年4月23日至6月11日，中国共产党第七次全国代表大会在（）举行。", "o": ["重庆", "延安", "西柏坡", "北京"], "a": "B"}, {"q": "（）把毛泽东思想确立为党的指导思想并写入了党章。", "o": ["中共七大", "七届二中全会", "中共八大", "新政协会议"], "a": "A"}, {"q": "1945年4月，包括解放区代表（）在内的中国代表团出席了联合国制宪会议，中国成为联合国的创始国和联合国安理会常任理事国之一。", "o": ["董必武", "王稼祥", "王若飞", "周恩来"], "a": "A"}, {"q": "1945年7月26日，中、美、英三国发表（），敦促日本投降。", "o": ["波茨坦公告", "开罗宣言", "雅尔塔协定", "德黑兰宣言"], "a": "A"}, {"q": "1945年8月9日，毛泽东发表（）的声明，号召“中国人民的一切抗日力量应举行全国规模的反攻”。", "o": ["《论反对日本帝国主义的策略》", "《 发刊词》", "《对日寇的最后一战》", "《中国共产党抗日救国十大纲领》"], "a": "C"}, {"q": "1945年（），日本天皇裕仁发布《终战诏书》，日本无条件投降。", "o": ["8月9日", "8月15日", "9月3日", "10月25日"], "a": "B"}, {"q": "抗日战争取得完全胜利的重要标志是（）。", "o": ["日本天皇裕仁发布《终战诏书》", "中、美、英三国发表波茨坦公告", "日本代表在投降书上签字", "被日本占领50年的台湾以及澎湖列岛重归中国主权管辖"], "a": "D"}, {"q": "（）是世界反法西斯战争的东方主战场。", "o": ["太平洋战场", "缅甸战场", "中国战场", "东欧战场"], "a": "C"}, {"q": "（）是最早为中国抗战提供援助的国家。", "o": ["美国", "苏联", "新加坡", "英国"], "a": "B"}, {"q": "美国陆军航空队退役军官（）组建美国援华志愿航空队，冒险开辟驼峰航线。", "o": ["马海德", "陈纳德", "柯棣华", "爱波斯坦"], "a": "B"}], "7": [{"q": "国民党统治集团作为大地主、大资产阶级的政治代表，其根本目标是（）。", "o": ["改造国民政府为民主的新政府", "建立有利于资本主义发展的立宪制国家", "维持蒋介石的独裁统治和半殖民地半封建社会", "建设和平的、团结的中国"], "a": "C"}, {"q": "蒋介石在积极准备内战的同时，又表示愿意与中共进行和平谈判。原因不包括（）。", "o": ["以此敷衍国内外舆论，掩盖其正在进行的内战准备", "其内心仍有和平建国、政治协商的意愿", "诱使中共交出人民军队和解放区政权", "若谈判不成，即发动内战并把战争责任转嫁给中国共产党"], "a": "B"}, {"q": "1945年10月10日，国共双方签署（），即“双十协定”，确认和平建国的基本方针，同意“长期合作，坚决避免内战”。", "o": ["《对目前时局的宣言》", "《中共中央为公布国共合作宣言》", "《关于若干历史问题的决议》", "《政府与中共代表会谈纪要》"], "a": "D"}, {"q": "1946年1月10日，（）开幕，出席会议的有国民党、共产党、民主同盟、青年党和无党派人士代表共38人。", "o": ["政治协商会议", "全国土地会议", "中国人民政治协商会议", "制宪会议"], "a": "A"}, {"q": "1946年6月26日，国民党军以进攻（）为起点，挑起了全面内战。", "o": ["华北解放区", "中原解放区", "东北解放区", "山东解放区"], "a": "B"}, {"q": "1946年6月至1947年6月，人民军队处于（）阶段。战争主要在解放区进行。", "o": ["战略撤退", "战略反攻", "战略防御", "战略进攻"], "a": "C"}, {"q": "1947年6月底，（）率领的晋冀鲁豫野战军主力，实施中央突破，千里跃进大别山。", "o": ["陈毅、粟裕", "贺龙、习仲勋", "陈赓、谢富治", "刘伯承、邓小平"], "a": "D"}, {"q": "1947年10月10日，中国人民解放军总部发表宣言，提出（）的口号，极大鼓舞了解放军全体指战员和全国人民的斗志。", "o": ["“打倒蒋介石，解放全中国”", "“停止内战，一致对外”", "“反对华北自治”", "“避敌主力、打其虚弱”"], "a": "A"}, {"q": "1946年5月4日，中共中央发布（），标志着党的土地政策的重要改变。", "o": ["《中国土地法大纲》", "《井冈山土地法》", "《中华人民共和国土地法》", "《关于土地问题的指示》"], "a": "D"}, {"q": "1947年7月至9月，中国共产党制定的（），明确规定“废除封建性及半封建性剥削的土地制度”。", "o": ["《中国土地法大纲》", "《井冈山土地法》", "《中华人民共和国土地法》", "《关于土地问题的指示》"], "a": "A"}, {"q": "1947年7月至9月，中国共产党在西柏坡召开了全国土地会议，明确规定“（）”。", "o": ["减租减息，发展生产", "停止实行没收地主土地", "联合中农，团结富农", "实行耕者有其田的土地制度"], "a": "D"}, {"q": "解放区进行的土地制度改革使农民进一步认识到（）是他们自身利益的坚决维护者。", "o": ["中国国民党", "中国共产党", "民族资产阶级", "小资产阶级知识分子"], "a": "B"}, {"q": "在国民党统治区，以（）为先导的人民民主运动也迅速发展起来，成为配合人民解放战争的第二条战线。", "o": ["学生运动", "工人运动", "农民起义", "商人罢市"], "a": "A"}, {"q": "1945年底，昆明学生发动了以（）为主要口号的一二·一运动。", "o": ["“反对内战，争取自由”", "“停止内战，一致对外”", "“打倒蒋介石，解放全中国”", "“反对日本帝国主义强占东三省”"], "a": "A"}, {"q": "为抗议驻华美军强暴北京大学先修班一女学生，北平学生高喊“抗议美军暴行！”“美军退出中国！”的口号，举行示威游行。这就是（）。", "o": ["“一二三〇运动”", "五卅运动", "“一二·九运动”", "五四运动"], "a": "A"}, {"q": "1947年5月到6月，城市居民（）席卷包括江苏、浙江、安徽、四川等省的40多个大小城镇。", "o": ["投机银元", "“抢米”风潮", "购买股票风潮", "购买黄金风潮"], "a": "B"}, {"q": "1941年3月，中国民主政团同盟在重庆诞生，（）被推选为中央常务委员会主席。", "o": ["戴季陶", "黄炎培", "傅作义", "林森"], "a": "B"}, {"q": "1945年12月，中国民主促进会在上海宣告成立，组成人员部分是（）所联系的文化、教育、出版工作者，另一部分是王绍鏊所联系的部分上海工商界爱国人士。", "o": ["马叙伦", "胡适", "傅斯年", "张恨水"], "a": "A"}, {"q": "抗日战争胜利后，某些民主党派的领导人企图走（）的道路，建立资产阶级共和国，他们所主张的实质上是旧民主主义的道路。", "o": ["和平改良", "暴力革命", "君主立宪", "官僚买办操控"], "a": "A"}, {"q": "1948年1月，民盟领导人（）等在香港召开民盟一届三中全会，宣布不接受解散民盟的任何决定，并恢复民盟总部。", "o": ["何应钦", "沈钧儒", "白崇禧", "胡宗南"], "a": "B"}, {"q": "1949年1月22日，李济深、沈钧儒等民主党派的领导人和著名的无党派民主人士55人联合发表（）。", "o": ["《中国革命战争的战略问题》", "《中国革命和中国共产党》", "《共同纲领》", "《对时局的意见》"], "a": "D"}, {"q": "（），人民解放战争进入夺取全国胜利的决定性阶段。", "o": ["1945年10月", "1947年6月底", "1948年秋", "1949年10月"], "a": "C"}, {"q": "1949年4月21日，毛泽东、朱德发布《向全国进军的命令》，人民解放军第二、第三野战军强渡（），一举摧毁国民党苦心经营了3个半月的防线。", "o": ["黄河", "长江", "淮河", "汉水"], "a": "B"}, {"q": "（）宣告延续22年之久的国民党反动统治覆灭。", "o": ["人民解放军和平解放北平", "三大战役的胜利", "人民解放军占领南京", "纪念“五一”节口号的发布"], "a": "C"}, {"q": "1949年3月召开的（），规定了党在全国胜利后在政治、经济、外交方面应当采取的基本政策，指出了中国由农业国转变为工业国、由新民主主义社会转变为社会主义社会的发展方向。", "o": ["瓦窑堡会议", "中共七大", "中共七届二中全会", "新政协会议"], "a": "C"}, {"q": "毛泽东在（ ）上指出，在胜利面前，必须警惕资产阶级“糖衣炮弹”的攻击。", "o": ["遵义会议", "中共六届六中全会", "中共七大", "中共七届二中全会"], "a": "D"}, {"q": "（）标志着中国革命重心从农村转向城市。", "o": ["中央领导人与中央机关、人民解放军总部进驻北平香山", "中共七届二中全会的召开", "人民政协会议的召开", "《论人民民主专政》一文的发表"], "a": "A"}, {"q": "“我们决不当李自成，我们都希望考个好成绩”是毛泽东在（）情况下提出的。", "o": ["中共七大的召开", "抗日战争取得胜利", "人民政协会议的召开", "中央领导人与中央机关、人民解放军总部进驻北平香山"], "a": "D"}, {"q": "完成创建新中国的任务，是由（）承担的。", "o": ["中共七届二中全会", "中国人民政治协商会议", "开国大典", "中央人民政府委员会第一次会议"], "a": "B"}, {"q": "（），中国人民政治协商会议第一届全体会议在北平隆重开幕。", "o": ["1945年10月10日", "1949年4月21日", "1949年9月21日", "1049年10月1日"], "a": "C"}, {"q": "（）在一个时期内起着新中国临时宪法的作用。", "o": ["《中国人民政治协商会议组织法》", "《中国人民政治协商会议共同纲领》", "《论人民民主专政》", "《中华人民共和国宪法》"], "a": "B"}, {"q": "（）的召开，标志着中国共产党领导的多党合作和政治协商制度的确立。", "o": ["土地工作会议", "党的七届二中全会", "人民政协会议", "党的七大"], "a": "C"}, {"q": "1949年10月9日，（）当选政协全国委员会主席。", "o": ["毛泽东", "周恩来", "聂荣臻", "刘伯承"], "a": "A"}, {"q": "1949年10月1日，中央人民政府委员会任命（）为政务院总理兼外交部部长。", "o": ["毛泽东", "周恩来", "聂荣臻", "刘伯承"], "a": "B"}, {"q": "人民政协会议通过了中央人民政府组织法，一致选举（）为中央人民政府主席。", "o": ["毛泽东", "周恩来", "聂荣臻", "刘伯承"], "a": "A"}, {"q": "“我们的工作将写在人类的历史上，它将表明：占人类总数四分之一的中国人从此站立起来了。”这是毛泽东在（）上发表的宣告。", "o": ["中国共产党第七届中央委员会第二次全体会议", "中国人民政治协商会议第一届全体会议", "开国大典", "中央人民政府委员会第一次会议"], "a": "B"}, {"q": "革命的根本问题是（）。", "o": ["国家政权问题", "领导人的阶级问题", "参与群众的阶级问题", "创造革命理论问题"], "a": "A"}], "8": [{"q": "1949年10月1日召开的中央人民政府委员会第一次会议任命（）为人民革命军事委员会主席。", "o": ["毛泽东", "周恩来", "朱德", "贺龙"], "a": "A"}, {"q": "（）彻底废除了列强强加给中国的不平等条约和帝国主义在中国的一切特权。", "o": ["抗日战争的胜利", "南京国民党政权的覆灭", "《中苏友好同盟互助条约》的签订", "中华人民共和国的成立"], "a": "D"}, {"q": "新中国成立后，中国共产党成为在全国范围执掌政权的党，党的工作重心（）。", "o": ["从城市转向农村", "从农村转向城市", "依旧保持在农村", "依旧保持在城市"], "a": "B"}, {"q": "到（）年年底，国民经济得到全面恢复和初步发展。", "o": ["1949", "1952", "1954", "1957"], "a": "B"}, {"q": "为了发展和改革高等教育，1951年底至1953年，教育部对（）进行调整，大幅度扩大招生，以适应工业化建设对专业人才的急迫需要。", "o": ["初等学校", "中等学校", "高等学校", "科研机构"], "a": "C"}, {"q": "新中国成立之初，全国开展了大规模的（），城乡落后的卫生面貌大为改观。", "o": ["土地改革运动", "人民公社化运动", "学习雷锋", "爱国卫生运动"], "a": "D"}, {"q": "1950年2月，新中国同苏联订立了（）和有关协定。", "o": ["《尼布楚条约》", "《瑷珲条约》", "《中苏友好同盟互助条约》", "《友好互助合作条约》"], "a": "C"}, {"q": "1950年5月，人民解放军攻占（），解放台湾的准备工作进一步加紧进行。", "o": ["海南岛", "涠洲岛", "金门岛", "澎湖列岛"], "a": "A"}, {"q": "1950年8月起美军飞机不断入侵中国领空，多次轰炸中国东北边境地区，党中央在全面分析国际国内形势、权衡各种利弊之后，作出了（）的战略决策。", "o": ["“支援朝鲜人民，推迟解放台湾”", "“外争主权、内除国贼”", "“为解放台湾而奋斗到底”", "“打倒蒋介石，解放全中国”"], "a": "A"}, {"q": "应朝鲜劳动党和政府请求，中国共产党和人民政府作出了派遭中国人民志愿军入朝作战，抗美援朝、保家卫国的历史性决策，组建以（）为司令员兼政治委员的中国人民志愿军。", "o": ["周恩来", "彭德怀", "刘伯承", "贺龙"], "a": "B"}, {"q": "（）以伟大胜利宣告：“西方侵略者几百年来只要在东方一个海岸上架起几尊大炮就可霸占一个国家的时代是一去不复返了！”", "o": ["中法战争", "抗日战争", "人民解放战争", "抗美援朝战争"], "a": "D"}, {"q": "经过（），新中国真正站稳了脚跟，中国人民真正扬眉吐气了，彰显了新中国的大国地位，极大促进了国防和军队现代化，有力推动了世界和平与人类进步事业。", "o": ["辛亥革命", "抗日战争", "人民解放战争", "抗美援朝战争"], "a": "D"}, {"q": "为了加强中国共产党的自身建设，1951年底到1952年，开展了“三反”运动，其中不包括（）。", "o": ["反行贿", "反贪污", "反浪费", "反官僚主义"], "a": "A"}, {"q": "（）是整个社会经济的领导力量和新中国发展生产、繁荣经济的主要物质基础。", "o": ["国营经济", "私营经济", "官僚资本", "民族企业"], "a": "A"}, {"q": "新中国在利用资本主义工商业的过程中，已经开始对它进行适当的限制，并把其中的大部分引上了（）的道路。", "o": ["公私合营", "社会主义公有制", "初级形式的国家资本主义", "高级形式的国家资本主义"], "a": "C"}, {"q": "过渡时期是指中华人民共和国成立到（）的时期。", "o": ["土地改革完成", "宪法颁布", "社会主义改造基本完成", "“一五”计划完成"], "a": "C"}, {"q": "“一五”计划确定的经济建设指导方针，突出了集中主要力量发展（），建立国家工业化和国防现代化的初步基础的核心要点。", "o": ["农业", "手工业", "轻工业", "重工业"], "a": "D"}, {"q": "从（）年开始，经济建设工作有计划地在全国展开。全国城乡迅速形成参加和支授国家工业化建设的氛围。", "o": ["1949", "1953", "1956", "1959"], "a": "B"}, {"q": "1953年12月，党中央通过（），指导农业互助合作运动稳步前进。", "o": ["《中共中央关于农业和农村工作若干重大问题的决定》", "《农村人民公社工作条例（草案）》", "《关于在农村建立人民公社问题的决议》", "《关于发展农业生产合作社的决议》"], "a": "D"}, {"q": "到1956年，国营经济占国民收入的比重为32.2%，合作社经济占53.4%，公私合营经济占7.3%，个体经济占7.1%，资本主义经济接近于零。这说明（）。", "o": ["资本主义企业发展状况不好", "社会主义经济制度在中国建立起来", "应出台政策鼓励了私营企业发展", "经济结构不稳定"], "a": "B"}, {"q": "1956年9月《关于加强农业生产合作社的生产领导和组织建设的指示》所提出的分配原则不包括（）。", "o": ["按资本要素分配", "男女同工同酬", "按劳取酬", "多劳多得"], "a": "A"}, {"q": "新中国成立后，我国逐步形成了（）。在当时选择这样的经济体制，既遵循了马克思主义理论的内在要求，又充分考虑了当时的国内外形势。", "o": ["高度集中的计划经济体制", "私有制计划经济体制", "私有制市场经济体制", "以公有制为主体，多种所有制经济共同发展"], "a": "A"}, {"q": "1954年9月，（）在北京召开，大会讨论并通过了《中华人民共和国宪法》。", "o": ["中国人民政治协商会议第一届全体会议", "中央人民政府委员会第一次会议", "第一届全国人民代表大会第一次会议", "中国共产党第八次全国代表大会"], "a": "C"}, {"q": "（）是我国一项基本政治制度，是中国共产党根据中国历史和现实的特点，运用马克思主义民族理论解决中国民族问题的一项重大创造。", "o": ["中国共产党领导的多党合作和政治协商制度", "人民代表大会制度", "民族区域自治制度", "居民委员会制度"], "a": "C"}, {"q": "1954年9月16日的《人民日报》登载的《六亿人民心花开》中写道:“这次庄里选到乡，乡里选到县，县里选到省，省里选到中央”。这是在报道（）。", "o": ["中国人民政治协商会议第一届全体会议", "中央人民政府委员会第一次会议", "第一届全国人民代表大会第一次会议", "中国共产党第八次全国代表大会"], "a": "C"}, {"q": "新中国成立初期，因为没有经验，在经济建设上只得学习甚至照搬（）的做法。", "o": ["美国", "苏联", "日本", "法国"], "a": "B"}, {"q": "毛泽东提出（）的任务，为探索适合中国情况的社会主义建设道路，提供了基本的指导原则。", "o": ["农村包围城市，武装夺取政权", "马克思主义同中国实际“第二次结合”", "建设中国特色社会主义", "“从斗争中创造新局面的思想路线”"], "a": "B"}, {"q": "1956年4月初，毛泽东明确提出：“最重要的是要独立思考，把（）同中国革命和建设的具体实际相结合。……找出在中国怎样建设社会主义的道路。”", "o": ["马列主义基本原理", "苏联在社会主义建设中存在的缺点和错误", "美国工业生产的经验", "儒家传统治国理念"], "a": "A"}, {"q": "1956年1月，中共中央召开关于知识分子问题会议，动员全党和全国人民特别是广大知识分子（）。许多尖端科技项目的集体攻关从这时起步，并开始了向世界科学技术先进水平的进军。", "o": ["“百花齐放”", "“调整、巩固、充实、提高”", "“团结—批评—团结”", "“向现代科学进军”"], "a": "D"}, {"q": "《论十大关系》提出，在共产党和民主党派的关系上实行（）的方针，确认中国共产党领导的统一战线和多党合作要继续存在、发挥作用。", "o": ["“长期共存，互相监督”", "“发展进步势力、争取中间势力、反对顽固势力”", "“以斗争求团结”", "“关门主义”"], "a": "A"}, {"q": "（）是以毛泽东为主要代表的中国共产党人开始探索中国自己的社会主义建设道路的标志。", "o": ["《新民主主义论》", "《论十大关系》", "《中国革命和中国共产党》", "过渡时期总路线"], "a": "B"}, {"q": "1956年9月15日至27日，（）在北京举行。毛泽东致开幕词，刘少奇作政治报告，周恩来作关于发展国民经济第二个五年计划建议的报告。", "o": ["全国政协一届一次会议", "全国人大一届二次会议", "中共八大", "中共八届二中全会"], "a": "C"}, {"q": "1956年9月召开的（）指出，国内主要矛盾是人民对于经济文化迅速发展的需要同当前经济文化不能满足人民需要的状况之间的矛盾。", "o": ["中共八大", "中共八届二中全会", "全国政协一届一次会议", "全国人大一届二次会议"], "a": "A"}, {"q": "中共八大指出，全国人民的主要任务是（），逐步满足人民日益增长的物质和文化需要。", "o": ["调整国民经济", "开始进行社会主义改造", "集中力量发展社会生产力，实现国家工业化", "尽快建成社会主义现代化强国"], "a": "C"}, {"q": "（）拉开“大跃进”的序幕。", "o": ["1957年冬季掀起以兴修水利、养猪积肥和改良土壤为中心的农业生产高潮", "1957年1月13日《人民日报》社论提出要在生产战线上来一个大的跃进", "1966年5月中共中央政治局扩大会议通过《中国共产党中央委员会通知》", "国民经济出现的严重困难局面"], "a": "B"}, {"q": "为解决农业和农村问题，1961年1月，中共八届九中全会决定对国民经济实行（）的方针。", "o": ["“调整、巩固、充实、提高”", "“向现代科学进军”", "“团结—批评—团结”", "“百花齐放”"], "a": "A"}, {"q": "1964年底，我国提出实现“四个现代化”的历史任务，即“在不太长的历史时期内，把我国建设成为一个具有现代农业、现代工业、现代国防和（）的社会主义强国，赶上和超过世界先进水平”。", "o": ["现代科学技术", "现代军事技术", "现代文明大国", "现代教育强国"], "a": "A"}, {"q": "1970年经济建设中，内地战略后方以（）为重点的建设迅速全面铺开，地方“五小”工业迅猛发展。", "o": ["建筑业", "新建高等学校", "文化设施", "国防工业"], "a": "D"}, {"q": "1975年，（）在毛泽东、周恩来支持下，全面主持中共中央和国务院的日常工作，大刀阔斧地进行整顿。", "o": ["万里", "习仲勋", "邓小平", "薄一波"], "a": "C"}, {"q": "全面建设社会主义时期，在铁路交通运输等基础设施方面取得的成就不包括（）。", "o": ["建成了我国第一条电气化铁路宝成铁路", "建成了世界上海拔最高、线路最长的高原铁路青藏铁路", "大庆至秦皇岛的第一条长距离输油管道", "具备了自主设计制造万吨级远洋轮船的能力"], "a": "B"}, {"q": "屠呦呦是中国首位诺贝尔医学奖获得者。1972年，屠呦呦和她的同事成功提取出一种新型抗疟药（），挽救了数百万人的生命。", "o": ["青蒿素", "黄酮素", "叶绿素", "蓝莓素"], "a": "A"}, {"q": "1973年，以袁隆平为代表的农业科学家在世界上首次培育成功强优势的（）。", "o": ["海水稻", "籼型杂交水稻", "杂交燕麦", "杂交玉米"], "a": "B"}, {"q": "以（）为代表的大庆石油工人，以“宁肯少活20年，拼命也要拿下大油田”的豪情，以“有条件要上，没有条件创造条件也要上”的决心，用三年多的时间，建设起我国最大的石油基地——大庆油田。", "o": ["申纪兰", "黄宝妹", "王进喜", "马恒昌"], "a": "C"}, {"q": "河南兰考县委书记（），以“生也沙丘，死也沙丘，父老生死系”的赤诚，以“心中装着全体人民、唯独没有他自己”的公仆情怀，拖着患有慢性肝病的身体，带领全县人民封沙、治水、改地，最终积劳成疾去世。", "o": ["焦裕禄", "孔繁森", "张思德", "杨善洲"], "a": "A"}, {"q": "（），第26届联大决定恢复中华人民共和国在联合国的一切合法权利。从此，中国在联合国中发挥日益重要的作用，成为维护世界和平、反对霸权主义的一支中坚力量。", "o": ["1964年1月27日", "1971年10月25日", "1972年9月29日", "1979年1月1日"], "a": "B"}, {"q": "1972年2月，美国总统（）访华，中美双方在上海发表联合公报，打开了中美关系正常化的大门。", "o": ["里根", "尼克松", "克林顿", "福特"], "a": "B"}], "9": [{"q": "1977年7月，党的十届三中全会决定恢复（）在1976年被撒销的一切职务。", "o": ["叶剑英", "陈云", "邓小平", "李先念"], "a": "C"}, {"q": "（）年底，被中断十年的高等学校统一招生考试制度得到恢复。全国有570万人参加高考，27.3万人被录取。", "o": ["1977年", "1978年", "1979年", "1980年"], "a": "A"}, {"q": "1978年5月10日，中央党校内部刊物《理论动态》刊登（），引起了全社会的强烈反响，引发了关于真理标准问题的讨论。", "o": ["《关于建国以来党的若干历史问题的决议》", "《坚持四项基本原则》", "《解放思想，实事求是，团结致向前看》", "《实践是检验真理的唯一标准》"], "a": "D"}, {"q": "1978年11月10日至12月15日，中共中央在北京召开工作会议。邓小平在会议闭幕会上作题为（）的讲话，这个讲话是解放思想、开辟新时期新道路的宣言书，实际上成为随后召开的党的十一届三中全会的主题报告。", "o": ["《关于建国以来党的若干历史问题的决议》", "《坚持四项基本原则》", "《解放思想，实事求是，团结致向前看》", "《实践是检验真理的唯一标准》"], "a": "C"}, {"q": "（）是解放思想、开辟新时期新道路的宣言书，实际上成为随后召开的党的十一届三中全会的主题报告，为全会实现具有划时代意义的伟大转折奠定了重要基础。", "o": ["《关于建国以来党的若干历史问题的决议》", "《坚持四项基本原则》", "《解放思想，实事求是，团结致向前看》", "《实践是检验真理的唯一标准》"], "a": "C"}, {"q": "1978年12月18日至22日，（）在北京召开。会议冲破长期“左”的错误的严重束缚，彻底否定“两个凡是”的错误方针。", "o": ["中共中央工作会议", "党的十一届三中全会", "五届全国人大常委会第十五次会议", "党的十四大"], "a": "B"}, {"q": "党的十一届三中全会的会议内容不包括（）。", "o": ["高度评价关于真理标准问题的讨论，果断停止使用“以阶级斗争为纲”的口号", "决定把全党的工作重心转移到社会主义现代化建设上来", "提出了改革开放的任务", "批准广东、福建两省在深圳、珠海、汕头、厦门设置经济特区"], "a": "D"}, {"q": "1980年2月，党的十一届五中全会决定为（）彻底平反，恢复了其作为伟大的马克思主义者和无产阶级革命家、党和国家主要领导人之一的名誉。", "o": ["刘少奇", "彭真", "彭德怀", "邓小平"], "a": "A"}, {"q": "为了统一全党和全国人民的思想，团结一致向前看，1981年6月，党的十一届六中全会通过了《（）》，该决议对建国30年来历史上的大事进行了实事求是的分析。", "o": ["《关于建国以来党的若干历史问题的决议》", "《坚持四项基本原则》", "《解放思想，实事求是，团结致向前看》", "《实践是检验真理的唯一标准》"], "a": "A"}, {"q": "1979年4月召开的中共中央工作会议，提出对国民经济实行（）的方针，坚决纠正前两年经济工作中的失误，清理长期存在的“左”倾错误影响。", "o": ["“多、快、好、省”", "“调整、改革、整顿、提高”", "“全面跃进”", "“以钢为纲”"], "a": "B"}, {"q": "1978年夏秋之际，安徽省遭遇严重早灾，（）18户农民想出了包干到户的办法，“保证国家的，留足集体的，剩下都是自己的”。", "o": ["江阴市华西村", "江阴市长江村", "厦门市西塘村", "凤阳县小岗村"], "a": "D"}, {"q": "70年代末，在借鉴农村改革经验的基础上，以（）为主要内容的城市经济体制改革逐步在全国推开。", "o": ["扩大企业自主权", "企业股份制改革", "引进外资", "扩大对外开放领域"], "a": "A"}, {"q": "扩大企业自主权改革的重要意义不包括（）。", "o": ["初步改变了过去只按国家指令性计划生产的状况", "初步改变了过去不关心产品销路的状况", "从此不需要关心盈利亏损的状况", "增强了企业的自主经营意识和市场意识"], "a": "C"}, {"q": "“在社会主义公有制经济占优势的根本前提下，实行多种经济形式和多种经营方式长期并存，是我党的一项战略决策。”这段话出自（）。", "o": ["《中共中央关于制定国民经济和社会发展第七个五年计划的建议》", "《关于经济体制改革的决定》", "《关于建国以来党的若干历史问题的决议》", "《关于广开门路，搞活经济，解决城镇就业问题的若干决定》"], "a": "D"}, {"q": "1979年1月，广东省和交通部联名向国务院递交报告，提出在（）设立工业区的设想，得到中央批准。不久后，即在轰鸣的开山炮声中开工建设。", "o": ["蛇口", "龙华", "盐田", "宝安"], "a": "A"}, {"q": "1982年9月1日至11日，（）在北京举行。邓小平在开幕词中响亮提出：“把马克思主义的普遍真理同我国的具体实际结合起来，走自己的道路，建设有中国特色的社会主义”。", "o": ["党的十一大", "党的十二大", "党的十三大", "党的十四大"], "a": "B"}, {"q": "党的十二大提出了从1981年到20世纪末我国经济建设总的奋斗目标：在不断提高经济效益的前提下，国内工农业年总产值（），人民生活达到小康水平。", "o": ["在20世纪末与日本持平", "在20世纪末翻两番", "在20世纪末翻三番", "在20世纪末突破100万亿美元"], "a": "B"}, {"q": "（）于1982年11月至12月召开的五届全国人大五次会议通过，充分体现了十一届三中全会以来党和国家在现代化建设和民主法制建设方面的新思想、新举措和新要求。", "o": ["《中国共产党章程》", "《中华人民共和国宪法》", "《关于社会主义精神文明建设指导方针的决议》", "《中华人民共和国中外合资经营企业法》"], "a": "B"}, {"q": "以下关于1982年宪法的说法，不正确的是（）。", "o": ["以1954年宪法为基础", "纠正了1975年和1978年通过的宪法中存在的问题", "肯定了农村人民公社政社合一的体制", "体现了党和国家在现代化建设和民主法制建设方面的新思想、新举措和新要求"], "a": "C"}, {"q": "1984年10月，党的十二届三中全会通过（），突破了把计划经济同商品经济对立起来的观点，指出我国社会主义经济是在公有制基础上的有计划的商品经济。", "o": ["《关于经济体制改革的决定》", "《中共中央关于制定国民经济和社会发展第七个五年计划的建议》", "《关于建国以来党的若干历史问题的决议》", "《关于广开门路，搞活经济，解决城镇就业问题的若干决定》"], "a": "A"}, {"q": "1986年11月，我国决定实施发展高科技的（）。", "o": ["“863”计划", "科教兴国战略", "西部大开发战略", "“985工程”"], "a": "A"}, {"q": "1980年2月，党的十一届五中全会通过（），把党章的有关规定和民主集中制的原则具体化。", "o": ["《关于党内政治生活的若干准则》", "《关于严禁党政机关和党政干部经商、办企业的决定》", "《关于建立老干部退休制度的决定》", "《关于加强社会主义精神文明建设若干重要问题的决议》"], "a": "A"}, {"q": "党在社会主义初级阶段的基本路线是：领导和团结全国各族人民，以（）为中心，坚持四项基本原则，坚持改革开放，自力更生，艰苦创业、为把我国建设成为富强、民主、文明的社会主义现代化国家而奋斗。", "o": ["政治改革", "经济建设", "丰富文化", "发展军事"], "a": "B"}, {"q": "1979年12月，邓小平在会见日本首相大平正芳时指出：我们要实现的四个现代化，是中国式的四个现代化。我们的四个现代化的概念，不是像你们那样的现代化的概念，而是（）。", "o": ["“小康之家”", "“天下大同”", "“天下为公”", "“中庸之道”"], "a": "A"}, {"q": "1987年4月，邓小平在会见西班牙外宾时明确提出（）现代化战略设想。", "o": ["“两步走”", "“三步走”", "新时代“两步走”", "“两个一百年”"], "a": "B"}, {"q": "1988年4月，七届全国人大一次会议正式批准（）。", "o": ["建立深圳特区", "建立珠海特区", "建立上海自由贸易港", "设立海南省和建立海南经济特区"], "a": "D"}, {"q": "党的十一届三中全会后，根据对国际国内形势变化的判断，军事战略方针由“积极防御、诱敌深入”改为（）。", "o": ["“主动出击”", "“积极防御”", "“早打、大打”", "“避敌主力、打其虚弱”"], "a": "B"}, {"q": "1981年9月，全国人大常委会委员长（）发表谈话，就台湾回归祖国、实现和平统一问题提出九条方针。", "o": ["邓小平", "叶剑英", "陈云", "李先念"], "a": "B"}, {"q": "1982年9月，英国首相（）访问中国，中英两国开始就香港问题进行谈判。", "o": ["玛格丽特·希尔达·撒切尔", "温斯顿·丘吉尔", "戈登·布朗", "特雷莎·梅"], "a": "A"}, {"q": "1984年12月，中英两国政府正式签署关于香港问题的联合声明，确认（）的事宜。", "o": ["中国政府于1997年7月1日对香港恢复行使主权", "《中华人民共和国香港特别行政区基本法》通过", "中国政府将于1999年12月20日对澳门恢复行使主权", "《中华人民共和国澳门特别行政区基本法》通过"], "a": "A"}, {"q": "党的十一届三中全会后，随着国际形势的发展变化，中共中央对外交政策进行的重大调整不包括（）。", "o": ["改变战争不可避免而且迫在眉睫的观点", "对战争与和平问题作出新的科学判断", "实施“一边倒”政策", "改变过去联美抗苏的“一条线”战略"], "a": "C"}, {"q": "1990年4月，党中央、国务院批准开发开放（）。这不仅促进了本地的迅速发展，而且对长江三角洲、整个长江流城乃至全国的改革开放和经济发展产生了强大的辐射和带动作用。", "o": ["浦东新区", "深圳特区", "海南经济特区", "上海自由贸易港"], "a": "A"}, {"q": "（）证券交易所是改革开放以来在大陆开业的第一家证券交易所。", "o": ["上海", "深圳", "北京", "广州"], "a": "A"}, {"q": "（）是建立社会主义市场经济体制的中心环节，也是难点所在。党的十四届三中全会后，本领域的改革开始从以往的放权让利、政策调整，进入转换机制、制度创新阶段。", "o": ["医疗体制改革", "文化教育体制改革", "国有企业改革", "军队体制改革"], "a": "C"}, {"q": "20世纪90年代，党中央坚持“两手抓，两手都要硬”的方针，指出在进行经济建设的同时，也要重视（）。", "o": ["生态文明建设", "社会保障", "精神文明建设", "协调发展"], "a": "C"}, {"q": "（）首次使用“邓小平理论”这个概念，把这一理论同马克思列宁主义、毛泽东思想一道确立为中国共产党的指导思想，并写入修改后的《中国共产党章程》。", "o": ["党的十二大", "党的十三大", "党的十四大", "党的十五大"], "a": "D"}, {"q": "1997年2月19日，中国社会主义改革开放和现代化建设的总设计师（）逝世。", "o": ["毛泽东", "周恩来", "刘少奇", "邓小平"], "a": "D"}, {"q": "（）围绕“什么是社会主义、怎样建设社会主义”这个根本问题，比较系统地初步回答了建设有中国特色社会主义的一系列基本问题。", "o": ["毛泽东思想", "邓小平理论", "“三个代表”思想", "科学发展观"], "a": "B"}, {"q": "1998年10月召开的党的十五届三中全会，通过了（），进一步推动解决农业、农村、农民“三农”问题。", "o": ["《关于党内政治生活的若干准则》", "《中共中央关于加强党的建设几个重大问题的决定》", "《中共中央关于农业和农村工作若干重大问题的决定》", "《关于经济体制改革的决定》"], "a": "C"}, {"q": "党的十五大后，我国明确了以上海（）为龙头带动长江流城经济起飞的发展战略，确定要在21世纪初将上海建成国际经济、金融、贸易中心。", "o": ["浦东新区", "滨海新区", "两江新区", "天府新区"], "a": "A"}, {"q": "经过长达15年的谈判，2001年12月11日，中国正式加入（），正式成为其第143名成员。", "o": ["联合国", "世界贸易组织", "亚洲太平洋经济合作组织", "世界卫生组织"], "a": "B"}, {"q": "1995年5月，党中央准确分析科技发展趋势和国内外形势，作出关于加速科学技术进步的决定，确定实施（），开始全面落实科学技术是第一生产力的思想。", "o": ["西部大开发战略", "科教兴国战略", "可持续发展战略", "环境保护战略"], "a": "B"}, {"q": "贯彻落实西部大开发战略，扩大西部地区公共投资规模，一大批重点工程相继开工，其中不包括（）。", "o": ["青藏铁路", "西气东输", "西电东送", "长株潭城际铁路"], "a": "D"}, {"q": "20世纪90年代，我国在发展睦邻合作友好关系上取得的重要进展不包括（）。", "o": ["倡导并推动建立“中国—东盟自由贸易区”", "加入世界贸易组织", "《中非合作论坛北京宣言》《中非经济和社会发展合作纲领》的通过", "建立“上海合作组织”"], "a": "B"}, {"q": "（），中国和英国两国政府举行了香港政权交接仪式，宣告中国对香港恢复行使主权，中华人民共和国香港特别行政区正式成立。", "o": ["1984年12月19日", "1997年7月1日", "1987年4月13日", "1999年12月20日"], "a": "B"}, {"q": "澳门于（）回归祖国，中华人民共和国澳门特别行政区正式成立。", "o": ["1984年12月19日", "1997年7月1日", "1987年4月13日", "1999年12月20日"], "a": "D"}, {"q": "1995年1月30日，江泽民发表《为促进祖国统一大业的完成而继续奋斗》的讲话，强调（）是实现和平统一的基础和前提。", "o": ["坚持一个中国原则", "共同发展经济", "两岸交流不间断", "两岸“三通”"], "a": "A"}, {"q": "为了显示了中国政府和中国人民维护国家主权和领土完整的坚强决心，1995年下半年到1996年上半年人民解放军在（）进行了一系列大规模军事演习。", "o": ["南中国海", "北部湾", "黄海海域", "台湾海峡和台湾附近海域"], "a": "D"}, {"q": "以江泽民同志为主要代表的中国共产党人，科学分析国内外形势、党所处的历史方位和肩负的历史使命，加深了对什么是社会主义、怎样建设社会主义和（）的认识，逐步提出了“三个代表”重要思想。", "o": ["建设什么样的党、怎样建设党", "实现什么样的发展、怎样发展", "坚持和发展什么样的中国特色社会主义", "怎样坚持和发展中国特色社会主义"], "a": "A"}, {"q": "（）11月8日至14日，中国共产党第十六次全国代表大会在北京举行。江泽民作《全而建设小康社会，开创中国特色社会主义事业新局面》的报告。", "o": ["1997年", "2002年", "2006年", "2008年"], "a": "B"}, {"q": "（）高度评价“三个代表”重要思想的历史地位和重要作用，把“三个代表”重要思想同马克思列宁主义、毛泽东思想、邓小平理论一道确立为中国共产党必须长期坚持的指导思想，并写入党章。", "o": ["党的十六大", "党的十六届一中全会", "党的十七大", "庆祝中国共产党成立80周年大会"], "a": "A"}, {"q": "2003年春，我国遭遇一场过去从未出现过的（）重大疫情。在党中央、国务院坚强领导下，举国上下紧急动员，坚持群防群控，携手共克时艰，有效控制了疫情，保持了经济较快增长。", "o": ["非典型肺炎", "新冠肺炎", "禽流感", "中东呼吸综合征"], "a": "A"}, {"q": "非典的发生和蔓延，暴露出我国在经历了一个经济高速发展阶段之后，存在发展不够协调、公共卫生事业发展滞后、突发事件应急机制不健全等新矛盾新问题，引发了党中央对新形势下（）的深入思考。", "o": ["建设什么样的党、怎样建设党", "实现什么样的发展、怎样发展", "坚持和发展什么样的中国特色社会主义", "怎样坚持和发展中国特色社会主义"], "a": "B"}, {"q": "2006年10月召开的党的十六届六中全会提出了“（）”新的发展方针，强调既要保持经济平稳较快增长，又要努力提高质量和效益。", "o": ["促进经济又好又快发展", "新发展理念", "急速发展、紧盯增速", "多快好省、力争上游"], "a": "A"}, {"q": "《中共中央关于构建社会主义和谐社会若干重大问题的决定》指出，社会和谐是中国特色社会主义的本质属性，首次将（）列入现代化建设的奋斗目标。", "o": ["“民主”", "“公平”", "“富强”", "“和谐”"], "a": "D"}, {"q": "《中共中央关于构建社会主义和谐社会若干重大问题的决定》强调，必须坚持（），始终把最广大人民的根本利益作为党和国家一切工作的出发点和落脚点。", "o": ["只看经济发展速度", "以人为本", "主观主义", "高度集中"], "a": "B"}, {"q": "2006年1月1日起，在我国存在2600年的（）成为历史，这根本性地扭转了农民负担过重的状况，给亿万农民带来了看得见、摸得着的实惠。", "o": ["个人所得税", "耕地占用税", "消费税", "农业税"], "a": "D"}, {"q": "2006年3月，十届全国人大四次会议审议通过（）。第一次将延续50多年的“计划”改为“规划”，这一字之差体现了社会主义市场经济条件下中长期规划的功能定位，反映我国发展理念、经济体制、政府职能的重大变革。", "o": ["“十五”规划纲要", "“十一五”规划纲要", "“十二五”规划纲要", "“十三五”规划纲要"], "a": "B"}, {"q": "2008年5月12日，（）发生里氏8.0级特大地震。在党中央领导下，我国迅速组织了历史上救援速度最快、动员范围最广、投入力量最多的抗震救灾活动。", "o": ["四川汶川", "四川雅安", "青海玉树", "西藏昌都"], "a": "A"}, {"q": "为了更好地解决经济长期积累的结构性矛盾和经济增长方式粗放问题，党的十七大提出（）的战略任务。", "o": ["发展粗放型经济", "减少社会服务", "加快转变经济发展方式", "集中全部力量建设东部沿海地区"], "a": "C"}, {"q": "2008年10月，党的十七届三中全会作出《关于推进农村改革发展若干重大问题的决定》，强调农业是安天下、稳民心的战略产业，要求坚决守住（）耕地红线，促进城乡经济社会发展体化。", "o": ["1亿亩", "8亿亩", "10亿亩", "18亿亩"], "a": "D"}, {"q": "“十五”时期，国家面貌发生新的历史性变化。2010年中国经济总量超过日本，成为世界第（）大经济体。", "o": ["一", "二", "三", "四"], "a": "B"}, {"q": "党的十六大到十八大期间，我国在重要学科前沿和战略必争领域取得的重大自主创新成果不包括（）。", "o": ["“神舟五号”飞船首次实现载人航天飞行", "“神舟七号”飞船航天员成功进行中国人的第一次太空漫步", "发射“祝融号”火星探测器，探索未知宇宙", "“嫦娥一号”首次完成绕月探测"], "a": "C"}, {"q": "（）8月至9月，北京成功举办第二十九届夏季奥运会、第十三届残疾人奥运会，实现了中华民族的百年期盼，兑现了对国际社会的郑重承诺，进一步增进了同世界各国人民的相互了解和友谊。", "o": ["2001年", "2008年", "2011年", "2012年"], "a": "B"}, {"q": "2010年5月至10月，以“城市，让生活更美好”为主题的世界博览会在（）举行，这是第一次在发展中国家举办的注册类世博会，书写了中国人民同世界各国人民交流互鉴的新篇章。", "o": ["北京", "上海", "广州", "深圳"], "a": "B"}, {"q": "党的十七大首次把（）纳入中国特色社会主义政治制度的基本范畴，作为发展社会主义民主政治的基础性工程加以推进。", "o": ["人民代表大会制度", "民族区域自治制度", "中国共产党领导的多党合作和政治协商制度", "基层群众自治制度"], "a": "D"}, {"q": "2008年，城乡（）实现全部免除学杂费，惠及16亿学生，确保所有适龄儿童都能“不花钱，有学上”。", "o": ["高等教育", "职业教育", "中等教育", "义务教育"], "a": "D"}, {"q": "从2003年开始，内地与香港、澳门分别签署（）及其补充协议，进一步实现了互利共赢。", "o": ["《关于建立更紧密经贸关系的安排（CEPA）》", "《海峡两岸服务贸易协议》", "《两岸经济合作框架协议》", "《东盟服务贸易协议》"], "a": "A"}, {"q": "2005年3月14日，十届全国人大三次会议高票通过（），这充分表明全中国人民反对“台独”、维护国家统和领土完整的共同意志和坚定决心。", "o": ["《中华人民共和国国防法》", "《中华人民共和国国家安全法》", "《反分裂国家法》", "《中华人民共和国反间谍法》"], "a": "C"}, {"q": "2005年4月29日，中共中央总书记胡锦涛在北京会见中国国民党主席（），实现了60年来中国共产党和中国国民党主要领导人之间第一次历史性握手。", "o": ["连战", "宋楚瑜", "韩国瑜", "马英九"], "a": "A"}, {"q": "2009年9月，党的十七届四中全会通过（），提出了提高党的建设科学化水平的重大命题和重大任务。", "o": ["《中国共产党纪律处分条例》", "《关于领导干部报告个人有关事项的规定》", "《关于加强和改进新形势下党的建设若干重大问题的决定》", "《关于对配偶子女均已移居国（境）外的国家工作人员加强管理的暂行规定》"], "a": "C"}], "10": [{"q": "2012年11月8日至14日，（）在北京举行。这是在我国进入全面建成小康社会决定性阶段召开的一次十分重要的大会。", "o": ["党的十六大", "党的十七大", "党的十八大", "党的十九大"], "a": "C"}, {"q": "党的十八大阐明，中国特色社会主义的总依据是社会主义初级阶段，总布局是（）。", "o": ["“三位一体”", "“四位一体”", "“五位一体”", "“四个全面”"], "a": "C"}, {"q": "2012年11月29日，习近平在参观（）展览时首次提出并阐释实现中华民族伟大复兴的中国梦，", "o": ["《复兴之路》", "国家“十二五”科技创新成就展", "庆祝中华人民共和国成立70周年大型成就展", "庆祝改革开放40周年大型展览"], "a": "A"}, {"q": "（）是改革开放以来党的全部理论和实践的主题。", "o": ["社会主义市场经济体制", "社会主义精神文明建设", "社会主义生态文明建设", "中国特色社会主义"], "a": "D"}, {"q": "经过充分酝酿，2016年10月，（）明确了习近平总书记党中央的核心、全党的核心地位，正式提出“以习近平同志为核心的党中央”。", "o": ["党的十八届三中全会", "党的十八届六中全会", "党的十九届三中全会", "党的十九届四中全会"], "a": "B"}, {"q": "（）把习近平总书记党中央的核心、全党的核心地位写入党章。", "o": ["党的十八届六中全会", "党的十九大", "党的十九届三中全会", "党的十九届四中全会"], "a": "B"}, {"q": "2015年11月，习近平在中央财经领导小组第十一次会议上首次提出推进（），这是适应和引领经济发展新常态的重大创新。", "o": ["要素市场化配置改革", "供给侧结构性改革", "产权制度改革", "放管服改革"], "a": "B"}, {"q": "2013年至2017年，GDP年均增长超过7%；2017年，GDP总量达到82.08万亿元，稳居（），占世界经济比重达到15%左右，成为世界经济增长的主要动力源和稳定器。", "o": ["世界第一", "世界第二", "世界第三", "世界第四"], "a": "B"}, {"q": "2015年颁布的（）首次将“参加中国共产党领导的政治协商”作为民主党派基本职能之一。", "o": ["《关于加强党的政治建设的意见》", "《中华人民共和国公共文化服务保障法》", "《中国共产党纪律处分条例》", "《中国共产党统一战线工作条例》"], "a": "D"}, {"q": "基层群众自治制度的主要内容不包括以下的（）。", "o": ["民主选举", "民主协商", "民主决策", "直接参政"], "a": "D"}, {"q": "2017年3月，（）施行，实现了人民群众基本文化权益的法律保障。", "o": ["《中华人民共和国环境保护法》", "《中华人民共和国公共文化服务保障法》", "《生态文明体制改革总体方案》", "《中国共产党纪律处分条例》"], "a": "B"}, {"q": "建设生态文明，重在建章立制，用最严格的制度、最严密的法治保护生态环境。党的十八大以后，对生态文明建设进行的系统部署安排不包括以下的（）。", "o": ["将“生态文明体制改革”纳入全面深化改革的目标体系", "通过修订后的《中华人民共和国环境保护法》", "加强对野生动物的集中豢养", "印发《关于加快推进生态文明建设的意见》《生态文明体制改革总体方案》"], "a": "C"}, {"q": "2015年8月，国务院印发（），我国主体功能区战略实现陆域国土空间和海域国土空间的全覆盖。", "o": ["《全国海洋主体功能区规划》", "重点产业调整振兴规划", "《“健康中国2030”规划纲要》", "《国家应对气候变化规划（2014—2020年）》"], "a": "A"}, {"q": "2015年10月，党的十八届五中全会审议通过“十三五”规划建议，把（）作为全面建成小康社会的基本标志。", "o": ["国民人均收入达到1万美元", "城市人均住宅面积达到50平方米", "所属省市的经济增长率到达10%", "农村贫困人口脱贫"], "a": "D"}, {"q": "（）是“四个全面”战略布局中具有突破性和先导性的关键环节。", "o": ["全面建成小康社会", "全面深化改革", "全面依法治国", "全面从严治党"], "a": "B"}, {"q": "2013年11月，（）审议通过的《中共中央关于全面深化改革若干重大问题的决定》，对全面深化改革作出顶层设计和总体规划。", "o": ["党的十八届三中全会", "党的十八届四中全会", "党的十九届三中全会", "党的十九届四中全会"], "a": "A"}, {"q": "（）在“四个全面”战略布局中具有基础性、保障性作用。", "o": ["全面建成小康社会", "全面深化改革", "全面依法治国", "全面从严治党"], "a": "C"}, {"q": "为了增强全社会的宪法意识、弘扬宪法精神，2014年1月，十二届全国人大常委会以立法形式将（）设立为国家宪法日。", "o": ["4月15日", "9月3日", "10月23日", "12月4日"], "a": "D"}, {"q": "2017年5月印发的《关于实行国家机关“谁执法谁普法”普法责任制的意见》，首次将（）明确为法治宣传教育的责任主体。", "o": ["国家机关", "社区街道", "居民委员会", "物业公司"], "a": "A"}, {"q": "（）是“四个全面”战略布局的根本保证，是党的十八大以来党中央抓党的建设的鲜明主题。", "o": ["全面建成小康社会", "全面深化改革", "全面依法治国", "全面从严治党"], "a": "D"}, {"q": "2014年10月30日至11月2日，新世纪第一次全军政治工作会议在（）召开。", "o": ["湖南湘西", "甘肃兰州", "福建福州", "福建古田"], "a": "D"}, {"q": "2015年11月7日，习近平同台湾地区领导人（）在新加坡会晤。这是1949年以来两岸领导人的首次会晤，开创了两岸领导人直接对话、沟通的先河。", "o": ["连战", "马英九", "朱立伦", "洪秀柱"], "a": "B"}, {"q": "2014年6月，习近平在中国-阿拉伯国家合作论坛第六届部长级会议上首次正式使用（）的提法，并对应坚持的原则和丝绸之路精神作出系统阐述。", "o": ["人类命运共同体理念", "生态文明理念", "“一带一路”", "构建新型大国关系"], "a": "C"}, {"q": "2016年9月二十国集团领导人（）上，中国引导协调各方在创新增长、结构性改革、多边投资、气候变化等重要问题上制定出一系列指导原则和指标体系，有力推动二十国集团从危机应对向长效治理机制转型。", "o": ["杭州峰会", "上海峰会", "厦门峰会", "北京峰会"], "a": "A"}, {"q": "（）由习近平在访问印度尼西亚期间提出筹建，2016年1月正式开业，是首个由中国倡议设立的多边金融机构。", "o": ["国际复兴开发银行", "欧洲复兴开发银行", "亚洲基础设施投资银行", "亚洲开发银行"], "a": "C"}, {"q": "2017年10月18日至24日，（）在北京举行。这是在全面建成小康社会决胜阶段、中国特色社会主义进入新时代的关键时期召开的一次十分重要的大会。", "o": ["党的十六大", "党的十七大", "党的十八大", "党的十九大"], "a": "D"}, {"q": "（）一致同意，在党章中把习近平新时代中国特色社会主义思想同马克思列宁主义、毛泽东思想、邓小平理论、“三个代表”重要思想、科学发展观一道确立为党的行动指南。", "o": ["党的十六大", "党的十七大", "党的十八大", "党的十九大"], "a": "D"}, {"q": "2018年3月，十三届全国人大一次会议通过的宪法修正案，把（）载入宪法，实现了国家指导思想的与时俱进，反映了全国各族人民共同意志和全社会共同意愿。", "o": ["邓小平理论", "“三个代表”重要思想", "科学发展观", "习近平新时代中国特色社会主义思想"], "a": "D"}, {"q": "2020年1月8日，（）在北京召开。习近平指出，各级党组织和广大党员、干部、思想政治受到洗礼和锤炼，增强了守初心、担使命的思想自觉和行动自觉，干事创业、担当作为的精气神得到提振。", "o": ["党的群众路线教育实践活动总结大会", "“不忘初心、牢记使命”主题教育总结大会", "庆祝中国共产党成立95周年大会", "党史学习教育动员大会"], "a": "B"}, {"q": "按照中国特色社会主义事业（）总体布局，对经济建设、政治建设、文化建设、社会建设、生态文明建设进行了全面部署。", "o": ["“四个自信”", "“八个明确”", "“十四个坚持”", "“五位一体”"], "a": "D"}, {"q": "2019年10月，党的十九届四中全会把（）放在首要位置。", "o": ["坚持和完善党的领导制度体系", "坚持和完善党和国家监督体系", "坚持和完善中国特色社会主义制度", "坚持和完善人民当家作主制度体系"], "a": "A"}, {"q": "2018年8月，中共中央印发修订后的（），对在重大原则问题上不同党中央保持一致，搞山头主义、落实党中央决策部署打折扣、搞变通、搞两面派、做两面人等行为的处理作出具体规定，为确保全党令行禁止提供了有力纪律保障。", "o": ["《中国共产党重大事项请示报告条例》", "《关于加强党的政治建设的意见》", "《中国共产党纪律处分条例》", "《中国共产党中央委员会工作条例》"], "a": "C"}, {"q": "（）决定党的建设的方向和效果，是党的建设的“灵魂”和“根基”。", "o": ["党的政治建设", "党的纪律建设", "党的组织建设", "党的思想建设"], "a": "A"}, {"q": "2019年10月，（）审议通过《中共中央关于坚持和完善中国特色社会主义制度，推进国家治理体系和治理能力现代化若干重大问题的决定》，为实现中华民族伟大复兴提供了坚强制度保障。", "o": ["党的十八届六中全会", "党的十九届三中全会", "党的十九届四中全会", "党的十九届五中全会"], "a": "C"}, {"q": "2019年是中华人民共和国成立（），党和政府举行了气势恢宏、气氛热烈的庆祝活动，充分展示了新中国成立70年来的辉煌成就和制度优势，有力彰显了国威军威，极大振奋了民族精神，广泛激发了各方面力量。", "o": ["40周年", "50周年", "60周年", "70周年"], "a": "D"}, {"q": "党的十八大后，以习近平同志为核心的党中央决定设立国家安全委员会，提出并贯彻（），初步构建了国家安全体系主体框架。", "o": ["新发展理念", "“绿水青山就是金山银山”", "总体国家安全观", "“精准扶贫”"], "a": "C"}, {"q": "2020年6月，（）通过，明确由香港特别行政区在当地公布实施，对香港特别行政区维护国家安全制度机制作出法律化、规范化、明晰化的具体安排。", "o": ["《中华人民共和国香港特别行政区基本法》", "《中华人民共和国香港特别行政区维护国家安全法》", "《中华人民共和国香港特别行政区驻军法》", "《中华人民共和国领事特权与豁免条例》"], "a": "B"}, {"q": "（）是党中央面对世界百年本有之大变局和港澳内外环境新变化作出的重要战略决策，是对港澳工作领导体制作出的一次重大调整，从机构设置和制度安排上进一步加强了党中央对港澳工作的集中统领导。", "o": ["中央港澳工作领导小组的成立", "中央港澳工作协调小组的成立", "香港特别行政区维护国家安全委员会的成立", "中央人民政府驻香港特别行政区维护国家安全公署的成立"], "a": "A"}, {"q": "2019年7月发表的（）指出，如果有人要把台湾从中国分裂出去，中国军队将不惜一切代价，坚决予以挫败，捍卫国家统一。", "o": ["《反分裂国家法》", "《新时代的中国国防》白皮书", "《中国21世纪议程——中国21世纪人口、环境与发展白皮书》", "《告台湾同胞书》"], "a": "B"}, {"q": "党在新时代的强军目标是到（）把人民军队全面建成世界一流军队。", "o": ["2020年", "2027年", "2035年", "本世纪中叶"], "a": "D"}, {"q": "党的十九大把坚持党对人民军队的绝对领导上升为新时代坚持和发展中国特色社会主义的一条基本方略，把“中央军事委员会实行（）”写入党章，使这一领导体制在党的根本大法中确立下来。", "o": ["主席负责制", "战区负责制", "集体负责制", "本地负责制"], "a": "A"}, {"q": "2017年11月30日至12月3日，以“构建人类命运共同体、共同建设美好世界：政党的责任”为主题的（）在北京举行。", "o": ["亚太经合组织第二十七次领导人非正式会议", "联合国全球可持续交通大会", "二十国集团领导人第十六次峰会", "中国共产党与世界政党高层对话会"], "a": "D"}, {"q": "中国宣布力争在分别在（）实现碳达峰、碳中和。这一承诺体现了中国在环境保护和应对气候变化问题上的负责任大国作用和担当。", "o": ["2020年、2030年", "2030年、2060年", "2035年、2050年", "2035年、2060年"], "a": "B"}, {"q": "（）年是中国外交的“南南合作年”，从中拉、中阿到中非合作论坛，我国同发展中国家集体对话实现了全覆盖。", "o": ["2012", "2015", "2016", "2018"], "a": "D"}, {"q": "（）是新中国成立以来我国遭遇的传播速度最快、感染范围最广、防控难度最大的一次重大突发公共卫生事件，也是百年来全球发生的最严重的传染病大流行。", "o": ["“非典”疫情", "H1N1流感", "H1N5流感", "新冠肺炎疫情"], "a": "D"}, {"q": "2020年唯一实现正增长的世界主要经济体是（）。", "o": ["美国", "中国", "欧盟", "日本"], "a": "B"}, {"q": "2020年10月26日至29日，（）审议通过《中共中央关于制定国民经济和社会发展第十四个五年规划和二〇三五年远景目标的建议》。", "o": ["党的十八届六中全会", "党的十九届三中全会", "党的十九届四中全会", "党的十九届五中全会"], "a": "D"}, {"q": "（）时期是我国全面建成小康社会、实现第一个百年奋斗目标之后，乘势而上开启全面建设社会主义现代化国家新征程、向第二个百年奋斗目标进军的第一个五年。", "o": ["“十一五”", "“十二五”", "“十三五”", "“十四五”"], "a": "D"}, {"q": "习近平强调：“全面建成小康社会、实现第一个百年奋斗目标，（）是一个标志性指标。”", "o": ["社会主义民主政治得到贯彻落实", "农村贫困人口全部脱贫", "文化产业兴旺发达", "社会保障制度覆盖全体人民"], "a": "B"}, {"q": "为了打赢脱贫攻坚战，2019年10月，党的十九届四中全会提出“坚决打赢脱贫攻坚战，巩固脱贫攻坚成果，（）。“", "o": ["建立农村医疗保障体系", "实施农村危房改造政策", "保障适龄儿童义务教育", "建立解决相对贫困的长效机制"], "a": "D"}, {"q": "2020年（），中国最后9个贫困县实现贫困退出，标志着我国近1亿贫困人口实现脱贫，消除了绝对贫困和区域性整体贫困。", "o": ["7月1日", "9月1日", "11月23日", "12月31日"], "a": "C"}, {"q": "2021年2月25日，（）举行，习近平在会上庄严宣告：我国脱贫攻坚战取得了全面胜利。", "o": ["“不忘初心、牢记使命”主题教育总结大会", "全国脱贫攻坚总结表彰大会", "党史学习教育动员大会", "庆祝中国共产党成立100周年大会"], "a": "B"}, {"q": "带领乡亲们历时7年在绝壁上凿出一条通向外界道路的村党支部书记毛相林说：“山凿一尺宽一尺，路修一丈长一丈，就算我们这代人穷十年苦十年，也一定要让下辈人过上好日子。”这鲜明体现了（）", "o": ["农村贫困人口全部脱贫", "脱贫群众激发了奋发向上的精气神", "党群干群关系明显改善", "脱贫地区经济社会发展大踏步赶上来"], "a": "B"}, {"q": "广大扶贫干部舍小家为大家，加班加点、任劳任怨，把心血和汗水洒遍千山万水。百色百坭村驻村第一书记（）遭遇山洪，因公殉职，用美好青春诠释了共产党人的初心使命。", "o": ["张小娟", "曾翙翔", "吴应谱", "黄文秀"], "a": "D"}, {"q": "改革开放以来，按照现行贫困标准计算，中国（）农村贫困人口摆脱贫困；按照世界银行国际贫困标准，中国减贫人口占同期全球减贫人口70%以上。", "o": ["3.2亿", "5.3亿", "6.4亿", "7.7亿"], "a": "D"}, {"q": "按照世界银行国际贫困标准，中国减贫人口占同期全球减贫人口的（）以上。", "o": ["20%", "30%", "50%", "70%"], "a": "D"}, {"q": "我国新型城镇化稳步推进，到2019年末，常住人口城镇化率达（）。", "o": ["30%以上", "50%以上", "60%以上", "80%以上"], "a": "C"}, {"q": "2020年人均国民收入突破（），按世界银行标准，达到中高收入国家水平。", "o": ["1万人民币", "1万美元", "5万人民币", "5万美元"], "a": "B"}, {"q": "2017年，服务业占国内生产总值提升至51.6%，比1978年上升27个百分点，对经济增长的贡献率为58.8%。到2018年，第三产业占比进一步提升至52.2%，贡献率为59.7%，比1978年提高41.3个百分点。这说明（）。", "o": ["装备制造业和高技术产业快速增长", "高技术产业、农业、社会领域投资持续较快增长", "重大区域战略加快落实", "第三产业成为经济增长“新引擎”"], "a": "D"}, {"q": "（）目前是世界第一货物贸易大国，同时也是世界第一外汇储备大国。", "o": ["美国", "中国", "德国", "日本"], "a": "B"}, {"q": "2020年，中国研发经费投入强度达2.42%，比2015年提高0.18个百分点，达到（）水平。", "o": ["普通发展中国家", "中等发达国家", "高度发达国家", "远远领先其他国家"], "a": "B"}, {"q": "对外开放持续扩大，中国关税总水平已降至（）。", "o": ["7.5%", "10.5%", "12.5%", "15.5%"], "a": "A"}, {"q": "（）提出了“全体人民共同富裕取得更为明显的实质性进展”的目标，突出强调了“扎实推动共同富裕”，这在中国共产党的全会历史上还是第一次。", "o": ["党的十八届六中全会", "党的十九届三中全会", "党的十九届四中全会", "党的十九届五中全会"], "a": "D"}, {"q": "（）是“十四五”开局之年，中国共产党将带领人民乘势而上开启全面建设社会主义现代化国家新征程。", "o": ["2019年", "2020年", "2021年", "2022年"], "a": "C"}, {"q": "到（），中国将基本实现社会主义现代化。到那时，中国经济实力、科技实力、综合国力将大幅跃升，经济总量和城乡居民人均收入再迈上新的大台阶。", "o": ["2021年", "2027年", "2035年", "2049年"], "a": "C"}, {"q": "（）是中国共产党成立100周年。", "o": ["2019年", "2020年", "2021年", "2022年"], "a": "C"}, {"q": "2021年6月18日，（）开馆。习近平参观“‘不忘初心、牢记使命’中国共产党历史展览”，并带领党员领导同志重温入党誓词。", "o": ["中国共产党历史展览馆", "新文化运动纪念馆", "南湖革命纪念馆", "中国共产党第一次全国代表大会会址纪念馆"], "a": "A"}, {"q": "2021年6月28日，庆祝中国共产党成立100周年文艺演出（）在北京举行。演出以大型情景史诗形式呈现，综合运用多种艺术手段，生动展现中国共产党波澜壮阔的百年历史。", "o": ["《东方红》", "《伟大征程》", "《长征组歌》", "《延安颂》"], "a": "B"}, {"q": "6月29日，庆祝中国共产党成立100周年（）颁授仪式在北京人民大会堂金色大厅隆重举行。习近平向勋章获得者颁授勋章。", "o": ["“七一勋章”", "“五一勋章”", "“共和国勋章”", "“人民英雄”"], "a": "A"}, {"q": "2021年（），中共中央在天安门广场隆重召开庆祝中国共产党成立100周年大会。", "o": ["1月1日", "7月1日", "7月23日", "8月1日"], "a": "B"}]};
+const CHAPTERS  = {"1": {"title": "进入近代后中华民族的磨难与抗争", "subtitle": "鸦片战争 · 列强侵略 · 反抗与觉醒", "knowledge": [{"h": "战前的中国与世界", "p": ["封建社会中，封建地主土地所有制经济占主导地位，与家庭手工业结合的小农经济是基本生产结构。", "1640年英国资产阶级革命标志世界历史进入资本主义时代；19世纪初英国率先完成工业革命，成为最强大的资本主义国家。"]}, {"h": "资本-帝国主义的侵略", "p": ["侵略首先和主要的是军事侵略，其次是政治控制、经济掠夺、文化渗透。", "一系列不平等条约：《南京条约》《天津条约》《北京条约》《马关条约》《辛丑条约》。", "列强通过控制海关（赫德长期任总税务司）、设立银行、租界等进行经济侵略与资本输出。"]}, {"h": "社会性质与历史任务", "p": ["近代中国逐步沦为半殖民地半封建社会。", "两大主要矛盾：帝国主义与中华民族、封建主义与人民大众。", "两大历史任务：求得民族独立和人民解放、实现国家富强和人民富裕。"]}, {"h": "反抗侵略的斗争", "p": ["1841年三元里抗英，是近代中国人民第一次大规模反侵略武装斗争。", "关天培、陈化成、邓世昌、冯子材（镇南关大捷）等爱国将领英勇抗敌。"]}, {"h": "民族意识的觉醒", "p": ["林则徐——近代中国睁眼看世界第一人，主持编译《四洲志》。", "魏源编《海国图志》，提出“师夷长技以制夷”。", "严复译《天演论》，宣传“物竞天择、适者生存”；康有为、梁启超呼吁救亡图存。"]}], "timeline": [{"d": "1640", "t": "英国资产阶级革命", "x": "标志世界历史开始进入资本主义时代，为列强对外扩张提供了制度基础。"}, {"d": "1840", "t": "鸦片战争爆发", "x": "英国发动侵华战争，中国近代史由此开端，历史发展发生重大转折。"}, {"d": "1841", "t": "三元里抗英", "x": "广州三元里人民自发抗击英军，是近代中国第一次大规模反侵略武装斗争。"}, {"d": "1842", "t": "《南京条约》", "x": "割让香港岛、赔款、五口通商，中国开始沦为半殖民地半封建社会。"}, {"d": "1856-60", "t": "第二次鸦片战争", "x": "签订《天津条约》《北京条约》，外国公使常驻北京，侵略进一步加深。"}, {"d": "1858", "t": "《瑷珲条约》", "x": "俄国胁迫签订，割去黑龙江以北约60万平方公里领土。"}, {"d": "1883-85", "t": "中法战争", "x": "冯子材取得镇南关大捷，但清政府“不败而败”签约。"}, {"d": "1894-95", "t": "甲午战争", "x": "邓世昌（致远号）等殉国，签《马关条约》割台湾，瓜分危机达到高潮。"}, {"d": "1900", "t": "八国联军侵华", "x": "义和团运动被中外反动势力联合镇压，北京失陷。"}, {"d": "1901", "t": "《辛丑条约》", "x": "赔款4.5亿两白银，中国完全沦为半殖民地半封建社会。"}], "people": [{"n": "林则徐", "r": "虎门销烟；主持编译《四洲志》，近代睁眼看世界第一人"}, {"n": "魏源", "r": "编《海国图志》，提出“师夷长技以制夷”"}, {"n": "关天培", "r": "鸦片战争中虎门炮台殉国的爱国将领"}, {"n": "陈化成", "r": "1842年率守军死守吴淞炮台，英勇牺牲"}, {"n": "邓世昌", "r": "甲午黄海海战，“致远”舰管带，撞向敌舰殉国"}, {"n": "丁汝昌", "r": "北洋海军提督，威海卫战败殉国"}, {"n": "冯子材", "r": "中法战争取得镇南关大捷、谅山大捷"}, {"n": "刘永福", "r": "率黑旗军抗法，《马关条约》后助台湾军民抗日"}, {"n": "刘铭传", "r": "督办台湾，中法战争中击退法军进犯淡水"}, {"n": "严复", "r": "译《天演论》，宣传“物竞天择、适者生存”，著《救亡决论》"}, {"n": "康有为", "r": "1898年保国会演说，痛陈亡国灭种危机"}, {"n": "赫德", "r": "英国人，长期把持中国海关总税务司达40余年"}], "geo": [{"place": "广州·虎门", "lon": 113.3, "lat": 23.1, "d": "1839", "t": "虎门销烟", "x": "林则徐在虎门海滩当众销毁鸦片，揭开近代反侵略斗争序幕。"}, {"place": "广州·虎门", "lon": 113.3, "lat": 23.1, "d": "1840", "t": "鸦片战争爆发", "x": "英国从广东沿海挑起战争，中国近代史由此开端。"}, {"place": "广州", "lon": 113.3, "lat": 23.2, "d": "1841", "t": "三元里抗英", "x": "广州三元里人民自发抗击英军，近代第一次大规模反侵略武装斗争。"}, {"place": "南京", "lon": 118.8, "lat": 32.0, "d": "1842", "t": "《南京条约》", "x": "割香港岛、赔款、五口通商，中国开始沦为半殖民地半封建社会。"}, {"place": "瑷珲·黑河", "lon": 127.5, "lat": 50.2, "d": "1858", "t": "《瑷珲条约》", "x": "俄国胁迫签订，割去黑龙江以北约60万平方公里领土。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1860", "t": "火烧圆明园", "x": "第二次鸦片战争英法联军攻占北京，洗劫并焚毁圆明园。"}, {"place": "镇南关·凭祥", "lon": 106.7, "lat": 22.0, "d": "1885", "t": "镇南关大捷", "x": "冯子材指挥清军在中越边境大败法军。"}, {"place": "黄海·大东沟", "lon": 123.5, "lat": 39.5, "d": "1894", "t": "黄海海战", "x": "邓世昌率“致远”舰猛撞日舰，全舰官兵壮烈牺牲。"}, {"place": "威海卫", "lon": 122.1, "lat": 37.5, "d": "1895", "t": "北洋海军覆灭", "x": "威海卫之战北洋舰队全军覆没，洋务运动宣告失败。"}, {"place": "台湾", "lon": 121.0, "lat": 23.7, "d": "1895", "t": "《马关条约》割台", "x": "割台湾及澎湖列岛给日本，台湾军民与刘永福黑旗军奋起抗日。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1900", "t": "八国联军占北京", "x": "义和团运动被中外反动势力联合镇压。"}, {"place": "天津·大沽", "lon": 117.7, "lat": 38.98, "d": "1900", "t": "廊坊·大沽抗击", "x": "义和团在廊坊阻击联军，清军与义和团在天津鏖战。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1901", "t": "《辛丑条约》", "x": "赔款4.5亿两，中国完全沦为半殖民地半封建社会。"}]}, "2": {"title": "不同社会力量对国家出路的早期探索", "subtitle": "太平天国 · 洋务运动 · 戊戌维新", "knowledge": [{"h": "太平天国农民战争", "p": ["1851年洪秀全在金田起义，建号太平天国，1853年定都天京。", "《天朝田亩制度》提出绝对平均主义的土地纲领，是空想；《资政新篇》（洪仁玕）是中国第一个发展资本主义的方案。", "1856年天京事变由盛转衰，1864年失败。教训：农民阶级不能领导中国革命取得胜利。"]}, {"h": "洋务运动", "p": ["19世纪60—90年代，以“自强”“求富”为目标，指导思想是“中体西用”。", "代表：奕䜣、曾国藩、李鸿章、左宗棠、张之洞。", "创办军用工业（江南制造总局）、民用工业（轮船招商局）、新式学堂、派遣留学生。", "甲午战败标志洋务运动失败。"]}, {"h": "戊戌维新运动", "p": ["代表：康有为、梁启超、谭嗣同、严复。", "1895年公车上书揭开维新运动序幕；1898年百日维新。", "失败：戊戌六君子就义。原因是民族资产阶级软弱，把希望寄托于无实权的皇帝。", "意义：一次思想启蒙运动。"]}], "timeline": [{"d": "1851.1", "t": "金田起义", "x": "洪秀全率拜上帝教教众在广西桂平金田村起义，建号太平天国。"}, {"d": "1853", "t": "定都天京", "x": "颁布《天朝田亩制度》，确立绝对平均主义的土地纲领。"}, {"d": "1856", "t": "天京事变", "x": "领导集团内讧，太平天国由盛转衰。"}, {"d": "1859", "t": "《资政新篇》", "x": "洪仁玕提出，是太平天国后期带有资本主义色彩的社会发展方案。"}, {"d": "1860s", "t": "洋务运动兴起", "x": "以“自强”“求富”为目标，开启中国早期现代化探索。"}, {"d": "1864", "t": "天京陷落", "x": "太平天国农民战争失败。"}, {"d": "1895", "t": "公车上书", "x": "康有为、梁启超等联合举人上书，维新运动揭开序幕。"}, {"d": "1895", "t": "甲午战败", "x": "标志以“自强”“求富”为目标的洋务运动失败。"}, {"d": "1898.6", "t": "百日维新", "x": "戊戌变法实施103天后失败，戊戌六君子就义。"}], "people": [{"n": "洪秀全", "r": "创拜上帝教，1851年金田起义，建号太平天国"}, {"n": "洪仁玕", "r": "提出《资政新篇》，近代第一个发展资本主义的方案"}, {"n": "曾国藩", "r": "洋务派，创办安庆内军械所、江南制造总局"}, {"n": "李鸿章", "r": "洋务派，办轮船招商局、天津电报局，编练北洋水师"}, {"n": "左宗棠", "r": "洋务派，创办福州船政局"}, {"n": "张之洞", "r": "洋务派，办汉阳铁厂、湖北枪炮厂，概括“中体西用”"}, {"n": "冯桂芬", "r": "《校邠庐抗议》最早较完整表述洋务指导思想"}, {"n": "康有为", "r": "公车上书，戊戌变法领袖"}, {"n": "梁启超", "r": "主办《时务报》，维新派宣传家"}, {"n": "谭嗣同", "r": "戊戌六君子之一，“有心杀贼，无力回天”"}, {"n": "严复", "r": "译《天演论》，倡导社会进化论"}], "geo": [{"place": "桂平·金田", "lon": 110.08, "lat": 23.39, "d": "1851", "t": "金田起义", "x": "洪秀全率拜上帝教众起义，建号太平天国。"}, {"place": "南京·天京", "lon": 118.8, "lat": 32.0, "d": "1853", "t": "定都天京", "x": "太平天国定都南京，颁布《天朝田亩制度》。"}, {"place": "南京·天京", "lon": 118.8, "lat": 32.0, "d": "1856", "t": "天京事变", "x": "领导集团内讧，太平天国由盛转衰。"}, {"place": "南京·天京", "lon": 118.8, "lat": 32.0, "d": "1864", "t": "天京陷落", "x": "太平天国农民战争失败。"}, {"place": "安庆", "lon": 117.05, "lat": 30.51, "d": "1861", "t": "安庆内军械所", "x": "曾国藩创办，洋务派早期军用工业。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1865", "t": "江南制造总局", "x": "李鸿章等创办，规模最大的近代军用工业。"}, {"place": "福州", "lon": 119.3, "lat": 26.07, "d": "1866", "t": "福州船政局", "x": "左宗棠创办的近代造船企业与海军摇篮。"}, {"place": "武汉·汉阳", "lon": 114.3, "lat": 30.6, "d": "1890", "t": "汉阳铁厂·枪炮厂", "x": "张之洞创办，洋务派重要民用与军工企业。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1895", "t": "公车上书", "x": "康有为联合举人上书，维新运动揭开序幕。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1898", "t": "百日维新", "x": "戊戌变法实施103天后失败，仅京师大学堂得以保留。"}]}, "3": {"title": "辛亥革命与君主专制制度的终结", "subtitle": "孙中山 · 三民主义 · 武昌起义", "knowledge": [{"h": "革命背景", "p": ["《辛丑条约》后民族危机空前加深，清末新政破产，资产阶级革命派逐渐形成。"]}, {"h": "孙中山与三民主义", "p": ["孙中山是中国民主革命的伟大先行者；1894年建立兴中会。", "1905年成立中国同盟会——第一个全国性的资产阶级革命政党，纲领为“驱除鞑虏，恢复中华，创立民国，平均地权”。", "三民主义：民族、民权、民生。革命派与改良派围绕《民报》《新民丛报》展开论战。"]}, {"h": "辛亥革命的爆发", "p": ["1911年10月10日武昌起义；1912年1月1日中华民国成立，孙中山任临时大总统。", "《中华民国临时约法》是中国第一部具有资产阶级共和国宪法性质的文件。", "辛亥革命开创了完全意义上的近代民族民主革命。"]}, {"h": "意义与失败", "p": ["推翻清王朝，结束了统治中国几千年的君主专制制度。", "失败原因：资产阶级软弱，没有彻底的反帝反封建纲领、没有充分发动群众、没有坚强的革命政党。", "袁世凯窃取了革命果实。"]}], "timeline": [{"d": "1894", "t": "兴中会成立", "x": "孙中山在檀香山创立，喊出“振兴中华”。"}, {"d": "1905", "t": "中国同盟会成立", "x": "在东京成立，是第一个全国性的资产阶级革命政党。"}, {"d": "1911.5", "t": "保路运动", "x": "四川保路风潮为武昌起义创造了有利时机。"}, {"d": "1911.10.10", "t": "武昌起义", "x": "湖北新军中共进会、文学社联合发动起义，揭开辛亥革命序幕。"}, {"d": "1912.1.1", "t": "中华民国成立", "x": "孙中山就任临时大总统，南京临时政府建立。"}, {"d": "1912.2", "t": "清帝退位", "x": "结束了统治中国几千年的君主专制制度。"}, {"d": "1912.3", "t": "《临时约法》", "x": "颁布，是中国第一部资产阶级共和国宪法性质的文件。"}, {"d": "1913", "t": "二次革命", "x": "反对袁世凯的斗争失败，革命果实被窃取。"}], "people": [{"n": "孙中山", "r": "民主革命先行者，建兴中会、同盟会，提三民主义，任临时大总统"}, {"n": "黄兴", "r": "同盟会领导人，发动广州黄花岗起义"}, {"n": "宋教仁", "r": "以同盟会为基础组建国民党，1913年被刺杀"}, {"n": "章炳麟", "r": "著《驳康有为论革命书》，宣传革命"}, {"n": "邹容", "r": "著《革命军》，自署“革命军中马前卒”"}, {"n": "陈天华", "r": "著《警世钟》《猛回头》，号召反清革命"}, {"n": "袁世凯", "r": "窃取辛亥革命果实，刺杀宋教仁，复辟称帝"}, {"n": "蔡锷", "r": "在云南组织护国军，发动护国运动"}, {"n": "张勋", "r": "1917年拥溥仪复辟，12天即败"}], "geo": [{"place": "广州", "lon": 113.3, "lat": 23.1, "d": "1911.4", "t": "黄花岗起义", "x": "同盟会发动，影响最大的武装起义之一。"}, {"place": "成都", "lon": 104.07, "lat": 30.67, "d": "1911.9", "t": "保路运动", "x": "四川保路风潮兴起，造成成都血案，为武昌起义创造时机。"}, {"place": "武汉·武昌", "lon": 114.3, "lat": 30.6, "d": "1911.10", "t": "武昌起义", "x": "新军革命党人打响第一枪，辛亥革命爆发。"}, {"place": "南京", "lon": 118.8, "lat": 32.0, "d": "1912.1", "t": "中华民国成立", "x": "孙中山就任临时大总统，南京临时政府建立，后颁《临时约法》。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1912.2", "t": "清帝退位", "x": "结束统治中国几千年的君主专制制度。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1915", "t": "袁世凯称帝", "x": "接受“二十一条”、复辟帝制，激起护国运动。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1913", "t": "宋教仁遇刺", "x": "袁世凯指使刺杀宋教仁，引发“二次革命”。"}, {"place": "昆明", "lon": 102.7, "lat": 25.0, "d": "1915.12", "t": "护国运动", "x": "蔡锷等在云南组织护国军，反对袁世凯称帝。"}]}, "4": {"title": "中国共产党成立和中国革命的新局面", "subtitle": "新文化运动 · 五四运动 · 建党", "knowledge": [{"h": "新文化运动", "p": ["1915年陈独秀创办《青年杂志》（后改《新青年》），高举民主与科学（德先生、赛先生）旗帜。"]}, {"h": "马克思主义的传播", "p": ["1917年俄国十月革命一声炮响，为中国送来了马克思列宁主义。", "李大钊是在中国传播马克思主义的先驱。"]}, {"h": "五四运动", "p": ["1919年5月4日爆发，是彻底反帝反封建的爱国运动。", "工人阶级登上政治舞台，是中国新民主主义革命的开端。"]}, {"h": "中国共产党成立", "p": ["上海最早建立共产党早期组织。", "1921年7月中共一大在上海召开（后转至嘉兴南湖），中国共产党成立。", "1922年中共二大第一次明确提出反帝反封建的民主革命纲领。"]}, {"h": "第一次国共合作", "p": ["1924年国民党一大确立新三民主义，第一次国共合作正式形成。", "北伐战争节节胜利；1927年四一二、七一五反革命政变，大革命失败。"]}], "timeline": [{"d": "1915", "t": "新文化运动", "x": "《青年杂志》创刊，高举民主与科学旗帜。"}, {"d": "1917", "t": "十月革命", "x": "俄国十月革命胜利，社会主义由理论变为现实，为中国送来马列主义。"}, {"d": "1919.5.4", "t": "五四运动", "x": "工人阶级登上政治舞台，标志新民主主义革命开端。"}, {"d": "1920", "t": "党的早期组织", "x": "上海建立中国第一个共产党早期组织。"}, {"d": "1921.7", "t": "中共一大", "x": "在上海召开并转至嘉兴南湖，宣告中国共产党成立。"}, {"d": "1922", "t": "中共二大", "x": "第一次明确提出反帝反封建的民主革命纲领。"}, {"d": "1924", "t": "国民党一大", "x": "确立新三民主义，第一次国共合作正式形成。"}, {"d": "1926", "t": "北伐战争", "x": "国民革命军北伐，打击北洋军阀。"}, {"d": "1927", "t": "大革命失败", "x": "四一二、七一五反革命政变，第一次国共合作破裂。"}], "people": [{"n": "陈独秀", "r": "创办《青年杂志》(《新青年》)，新文化运动旗手，建党领袖"}, {"n": "李大钊", "r": "在中国率先举起马克思主义旗帜，著《我的马克思主义观》"}, {"n": "蔡元培", "r": "1917年任北大校长，聘陈独秀为文科学长"}, {"n": "陈望道", "r": "首译《共产党宣言》中文全本，“真理的味道非常甜”"}, {"n": "毛泽东", "r": "中共一大代表，早期开展农民运动"}, {"n": "周恩来", "r": "旅欧期间确立共产主义信仰"}, {"n": "蔡和森", "r": "留法“猛看猛译”马克思主义书籍"}, {"n": "孙中山", "r": "改组国民党，主持国民党一大，推动第一次国共合作"}, {"n": "叶挺", "r": "国民革命军第四军独立团团长，北伐先锋"}], "geo": [{"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1915", "t": "《青年杂志》创刊", "x": "陈独秀创办，掀起新文化运动。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1919.5", "t": "五四运动", "x": "学生在天安门集会示威，工人阶级登上政治舞台。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1921.7", "t": "中共一大", "x": "在上海法租界召开，宣告中国共产党成立。"}, {"place": "嘉兴·南湖", "lon": 120.75, "lat": 30.75, "d": "1921.7", "t": "南湖红船", "x": "一大最后一天会议转移到嘉兴南湖游船上举行。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1922.7", "t": "中共二大", "x": "第一次明确提出反帝反封建的民主革命纲领。"}, {"place": "武汉", "lon": 114.3, "lat": 30.6, "d": "1923.2", "t": "二七惨案", "x": "京汉铁路工人大罢工遭反动军阀血腥镇压。"}, {"place": "广州", "lon": 113.3, "lat": 23.1, "d": "1924.1", "t": "国民党一大", "x": "确立新三民主义，第一次国共合作正式形成。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1925.5", "t": "五卅运动", "x": "上海掀起反帝爱国运动，迅速席卷全国。"}, {"place": "广州", "lon": 113.3, "lat": 23.1, "d": "1926", "t": "北伐誓师", "x": "国民革命军从广东出发，开创反帝反封建新局面。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1927.4", "t": "四一二政变", "x": "蒋介石在上海发动反共政变，大肆捕杀共产党人。"}, {"place": "武汉", "lon": 114.3, "lat": 30.6, "d": "1927.7", "t": "七一五政变", "x": "汪精卫集团叛变，第一次国共合作破裂，大革命失败。"}]}, "5": {"title": "中国革命的新道路", "subtitle": "武装反抗 · 井冈山 · 长征", "knowledge": [{"h": "国民党的统治", "p": ["1928年东北易帜，国民党在形式上统一全国，实行一党专政的军事独裁统治。"]}, {"h": "武装反抗与道路探索", "p": ["1927年南昌起义打响武装反抗国民党反动派的第一枪；八七会议确定土地革命和武装反抗方针；秋收起义后创建井冈山革命根据地（第一个农村革命根据地）。", "毛泽东开辟“农村包围城市、武装夺取政权”的道路。", "1929年古田会议确立党对军队的绝对领导。"]}, {"h": "长征", "p": ["王明“左”倾错误导致第五次反“围剿”失败。", "1934年10月红军开始长征；1935年1月遵义会议确立毛泽东在党和红军中的领导地位，是党生死攸关的转折点。", "1936年10月红军三大主力会师，长征胜利结束。"]}], "timeline": [{"d": "1927.8.1", "t": "南昌起义", "x": "打响武装反抗国民党反动派的第一枪。"}, {"d": "1927.8.7", "t": "八七会议", "x": "确定土地革命和武装反抗国民党反动统治的总方针。"}, {"d": "1927.9", "t": "秋收起义", "x": "毛泽东领导，受挫后率部向井冈山进军。"}, {"d": "1927.10", "t": "井冈山根据地", "x": "创建第一个农村革命根据地，开辟革命新道路。"}, {"d": "1928.12", "t": "东北易帜", "x": "张学良通电服从国民政府，国民党形式上统一全国。"}, {"d": "1929.12", "t": "古田会议", "x": "确立党对军队的绝对领导，红军必须绝对服从党的领导。"}, {"d": "1934.10", "t": "红军长征", "x": "第五次反“围剿”失败，红军被迫开始战略转移。"}, {"d": "1935.1", "t": "遵义会议", "x": "确立毛泽东的领导地位，是党生死攸关的历史转折点。"}, {"d": "1936.10", "t": "三大主力会师", "x": "红军三大主力会师，长征胜利结束。"}], "people": [{"n": "毛泽东", "r": "领导秋收起义、开辟井冈山道路，著《反对本本主义》《星星之火，可以燎原》"}, {"n": "朱德", "r": "率南昌起义余部上井冈山，与毛泽东会师组建红四军"}, {"n": "周恩来", "r": "南昌起义前敌委员会书记"}, {"n": "贺龙", "r": "南昌起义主要领导人之一"}, {"n": "叶挺", "r": "南昌起义、广州起义重要领导人"}, {"n": "张太雷", "r": "与叶挺、叶剑英领导广州起义"}, {"n": "项英、陈毅", "r": "中央红军长征后留守，坚持南方三年游击战争"}, {"n": "王明", "r": "“左”倾教条主义代表，使革命遭受严重挫折"}], "geo": [{"place": "南昌", "lon": 115.86, "lat": 28.68, "d": "1927.8.1", "t": "南昌起义", "x": "打响武装反抗国民党反动派的第一枪。"}, {"place": "武汉·汉口", "lon": 114.3, "lat": 30.6, "d": "1927.8.7", "t": "八七会议", "x": "确定土地革命和武装反抗的总方针，毛泽东提出“枪杆子里出政权”。"}, {"place": "萍乡·文家市", "lon": 113.85, "lat": 27.63, "d": "1927.9", "t": "秋收起义", "x": "毛泽东领导，打出“工农革命军”旗帜，受挫后向井冈山进军。"}, {"place": "井冈山", "lon": 114.18, "lat": 26.57, "d": "1927.10", "t": "井冈山根据地", "x": "创建第一个农村革命根据地，开辟革命新道路。"}, {"place": "广州", "lon": 113.3, "lat": 23.1, "d": "1927.12", "t": "广州起义", "x": "张太雷、叶挺、叶剑英领导，反击国民党屠杀政策。"}, {"place": "井冈山", "lon": 114.18, "lat": 26.57, "d": "1928.4", "t": "井冈山会师", "x": "朱德、陈毅率部与毛泽东会师，成立红四军。"}, {"place": "上杭·古田", "lon": 116.82, "lat": 25.08, "d": "1929.12", "t": "古田会议", "x": "确立思想建党、政治建军原则与党对军队的绝对领导。"}, {"place": "瑞金", "lon": 116.03, "lat": 25.89, "d": "1931.11", "t": "中华苏维埃", "x": "中华苏维埃第一次全国代表大会在瑞金召开。"}, {"place": "瑞金·于都", "lon": 115.41, "lat": 25.95, "d": "1934.10", "t": "长征出发", "x": "第五次反“围剿”失败，中央红军开始战略转移。"}, {"place": "全州·湘江", "lon": 111.07, "lat": 25.93, "d": "1934.11", "t": "湘江战役", "x": "红军损失惨重，由8.6万锐减到3万多人。"}, {"place": "黎平", "lon": 109.14, "lat": 26.23, "d": "1934.12", "t": "黎平会议", "x": "采纳毛泽东建议，改向贵州进军。"}, {"place": "遵义", "lon": 106.92, "lat": 27.73, "d": "1935.1", "t": "遵义会议", "x": "确立毛泽东领导地位，党生死攸关的转折点。"}, {"place": "赤水·茅台", "lon": 105.8, "lat": 27.84, "d": "1935", "t": "四渡赤水", "x": "红军灵活机动，摆脱敌人重兵围堵。"}, {"place": "泸定", "lon": 102.23, "lat": 29.91, "d": "1935.5", "t": "飞夺泸定桥", "x": "红军强渡大渡河，飞夺泸定桥。"}, {"place": "小金·夹金山", "lon": 102.36, "lat": 30.99, "d": "1935.6", "t": "翻越雪山·懋功会师", "x": "中央红军翻越夹金山，与红四方面军会师。"}, {"place": "吴起镇", "lon": 108.18, "lat": 36.93, "d": "1935.10", "t": "到达陕北", "x": "中央红军到达陕北吴起镇。"}, {"place": "会宁", "lon": 105.05, "lat": 35.69, "d": "1936.10", "t": "三大主力会师", "x": "红军三大主力会师，长征胜利结束。"}]}, "6": {"title": "中华民族的抗日战争", "subtitle": "全民族抗战 · 中流砥柱 · 伟大胜利", "knowledge": [{"h": "日本侵华", "p": ["1931年九一八事变，局部抗战开始；1935年华北事变；1937年七七事变（卢沟桥事变），全国性抗战爆发。", "1927年日本“东方会议”宣示侵略中国的方针；南京大屠杀等暴行。"]}, {"h": "抗日民族统一战线", "p": ["1935年瓦窑堡会议确定建立抗日民族统一战线的策略。", "1936年西安事变和平解决，十年内战基本结束；1937年第二次国共合作正式形成。"]}, {"h": "两个战场", "p": ["正面战场：国民党军队，台儿庄大捷等；张自忠在枣宜会战中殉国。", "敌后战场：共产党领导，平型关大捷、百团大战。"]}, {"h": "中流砥柱", "p": ["毛泽东《论持久战》批驳“速胜论”“亡国论”，指明胜利道路。", "1945年中共七大确立毛泽东思想为党的指导思想。", "1945年8月15日日本宣布投降，中国取得近代以来反抗外敌入侵的第一次完全胜利。"]}], "timeline": [{"d": "1931.9.18", "t": "九一八事变", "x": "日本侵占东北，中国局部抗战开始。"}, {"d": "1935", "t": "华北事变", "x": "民族危机空前严重，抗日救亡运动高涨。"}, {"d": "1936.12", "t": "西安事变", "x": "张学良、杨虎城发动，和平解决，十年内战基本结束。"}, {"d": "1937.7.7", "t": "卢沟桥事变", "x": "七七事变爆发，全国性抗日战争开始。"}, {"d": "1937.12", "t": "南京大屠杀", "x": "日军在南京制造惨绝人寰的大屠杀暴行。"}, {"d": "1938", "t": "《论持久战》", "x": "毛泽东发表，科学预见抗战进程，坚定抗战信心。"}, {"d": "1940", "t": "百团大战", "x": "八路军在华北发动大规模破袭战，振奋全国军民。"}, {"d": "1945.4", "t": "中共七大", "x": "确立毛泽东思想为党的指导思想。"}, {"d": "1945.8.15", "t": "日本投降", "x": "中国人民抗日战争取得伟大胜利。"}], "people": [{"n": "张学良、杨虎城", "r": "发动西安事变，促成抗日民族统一战线"}, {"n": "毛泽东", "r": "著《论持久战》，批驳“速胜论”“亡国论”"}, {"n": "朱德、彭德怀", "r": "八路军正、副总指挥"}, {"n": "叶挺、项英", "r": "新四军正、副军长"}, {"n": "马本斋", "r": "领导冀中回民支队抗日"}, {"n": "张自忠", "r": "枣宜会战中殉国的第三十三集团军总司令"}, {"n": "戴安澜", "r": "中国远征军第二〇〇师师长，缅北殉国"}, {"n": "谢晋元", "r": "率“八百壮士”死守四行仓库"}, {"n": "李宗仁", "r": "指挥台儿庄战役取得大捷"}, {"n": "陈嘉庚", "r": "华侨筹赈祖国难民总会主席"}, {"n": "陈纳德", "r": "组建美国援华志愿航空队，开辟驼峰航线"}, {"n": "王稼祥", "r": "传达共产国际指示，确立毛泽东的领导地位"}], "geo": [{"place": "沈阳", "lon": 123.43, "lat": 41.8, "d": "1931.9.18", "t": "九一八事变", "x": "日本侵占东北，中国局部抗战开始。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1932.1", "t": "一·二八事变", "x": "第十九路军奋起抗击进犯上海的日军。"}, {"place": "北平", "lon": 116.4, "lat": 39.9, "d": "1935.12", "t": "一二·九运动", "x": "北平学生抗日游行，掀起抗日救亡新高潮。"}, {"place": "子长·瓦窑堡", "lon": 109.67, "lat": 37.13, "d": "1935.12", "t": "瓦窑堡会议", "x": "确定建立抗日民族统一战线的策略方针。"}, {"place": "西安", "lon": 108.94, "lat": 34.27, "d": "1936.12", "t": "西安事变", "x": "张学良、杨虎城兵谏，和平解决，十年内战基本结束。"}, {"place": "北平·卢沟桥", "lon": 116.2, "lat": 39.85, "d": "1937.7.7", "t": "卢沟桥事变", "x": "七七事变爆发，全国性抗日战争开始。"}, {"place": "洛川", "lon": 109.43, "lat": 35.76, "d": "1937.8", "t": "洛川会议", "x": "制定抗日救国十大纲领。"}, {"place": "上海", "lon": 121.5, "lat": 31.2, "d": "1937.8", "t": "淞沪会战", "x": "谢晋元率“八百壮士”死守四行仓库。"}, {"place": "灵丘·平型关", "lon": 113.97, "lat": 39.4, "d": "1937.9", "t": "平型关大捷", "x": "八路军取得全国抗战以来第一次重大胜利。"}, {"place": "南京", "lon": 118.8, "lat": 32.0, "d": "1937.12", "t": "南京大屠杀", "x": "日军屠杀我同胞30万人以上。"}, {"place": "枣庄·台儿庄", "lon": 117.73, "lat": 34.56, "d": "1938.3", "t": "台儿庄大捷", "x": "李宗仁部歼灭大量日军。"}, {"place": "华北·太行", "lon": 113.5, "lat": 37.8, "d": "1940", "t": "百团大战", "x": "八路军在华北发动大规模破袭战。"}, {"place": "泾县·皖南", "lon": 118.4, "lat": 30.69, "d": "1941.1", "t": "皖南事变", "x": "国民党顽固派围袭新四军军部。"}, {"place": "延安·南泥湾", "lon": 109.6, "lat": 36.4, "d": "1941", "t": "大生产运动", "x": "三五九旅把南泥湾变成“陕北江南”。"}, {"place": "延安", "lon": 109.49, "lat": 36.59, "d": "1945.4", "t": "中共七大", "x": "确立毛泽东思想为党的指导思想。"}]}, "7": {"title": "为建立新中国而奋斗", "subtitle": "重庆谈判 · 战略决战 · 人民胜利", "knowledge": [{"h": "抗战胜利后的形势", "p": ["国民党统治集团代表大地主大资产阶级，根本目标是维护其统治。", "1945年重庆谈判，签订双十协定；1946年政治协商会议。"]}, {"h": "全面内战与统治危机", "p": ["1946年6月国民党发动全面内战。", "国统区经济崩溃、政治孤立，学生运动等构成反对国民党的“第二条战线”。"]}, {"h": "民主党派的抉择", "p": ["走资产阶级共和国“第三条道路”的主张破产。", "1948年中共发布“五一口号”，各民主党派积极响应，接受共产党领导。"]}, {"h": "战略决战与胜利", "p": ["1947年人民解放军转入战略反攻，刘邓大军挺进大别山。", "1948—1949年辽沈、淮海、平津三大战役，基本消灭国民党军主力。", "1949年渡江战役解放南京；七届二中全会；毛泽东《论人民民主专政》。"]}], "timeline": [{"d": "1945.8", "t": "重庆谈判", "x": "国共谈判，签订“双十协定”。"}, {"d": "1946.1", "t": "政治协商会议", "x": "在重庆召开，但和平建国方针很快被国民党破坏。"}, {"d": "1946.6", "t": "全面内战爆发", "x": "国民党大举进攻解放区，全面内战开始。"}, {"d": "1947", "t": "战略反攻", "x": "刘邓大军挺进大别山，人民解放军转入战略进攻。"}, {"d": "1948.9", "t": "三大战役", "x": "辽沈、淮海、平津战役基本消灭国民党军主力。"}, {"d": "1949.3", "t": "七届二中全会", "x": "提出党的工作重心由乡村转移到城市。"}, {"d": "1949.4", "t": "渡江战役", "x": "解放南京，宣告国民党反动统治覆灭。"}], "people": [{"n": "毛泽东", "r": "赴重庆谈判，七届二中全会作报告，著《论人民民主专政》"}, {"n": "周恩来", "r": "重庆谈判中共代表"}, {"n": "刘伯承、邓小平", "r": "率晋冀鲁豫野战军千里跃进大别山"}, {"n": "李济深、沈钧儒", "r": "民主党派领导人，发表《对时局的意见》响应共产党"}, {"n": "马叙伦", "r": "中国民主促进会主要发起人"}, {"n": "黄炎培", "r": "中国民主政团同盟中央常委主席"}], "geo": [{"place": "重庆", "lon": 106.55, "lat": 29.56, "d": "1945.8", "t": "重庆谈判", "x": "国共谈判签订“双十协定”，次年召开政协会议。"}, {"place": "信阳·中原", "lon": 114.3, "lat": 31.8, "d": "1946.6", "t": "全面内战爆发", "x": "国民党军以进攻中原解放区为起点挑起内战。"}, {"place": "大别山", "lon": 115.1, "lat": 31.5, "d": "1947.6", "t": "挺进大别山", "x": "刘邓大军千里跃进，转入战略进攻。"}, {"place": "锦州·沈阳", "lon": 121.13, "lat": 41.1, "d": "1948.9", "t": "辽沈战役", "x": "三大战役之一，解放东北全境。"}, {"place": "徐州", "lon": 117.18, "lat": 34.26, "d": "1948.11", "t": "淮海战役", "x": "三大战役之一，基本解放长江以北。"}, {"place": "北平·天津", "lon": 116.4, "lat": 39.9, "d": "1948.11", "t": "平津战役", "x": "三大战役之一，北平和平解放。"}, {"place": "西柏坡", "lon": 114.0, "lat": 38.3, "d": "1949.3", "t": "七届二中全会", "x": "提出党的工作重心由乡村转移到城市。"}, {"place": "南京", "lon": 118.8, "lat": 32.0, "d": "1949.4", "t": "渡江战役", "x": "解放南京，宣告国民党反动统治覆灭。"}]}, "8": {"title": "中华人民共和国成立与社会主义制度确立", "subtitle": "开国 · 巩固政权 · 三大改造", "knowledge": [{"h": "新中国成立", "p": ["1949年10月1日开国大典；《共同纲领》起临时宪法作用。", "毛泽东被任命为人民革命军事委员会主席。"]}, {"h": "巩固新生政权", "p": ["抗美援朝、土地改革、镇压反革命，彻底废除列强强加的不平等条约和在华特权。", "确立民族区域自治制度——我国一项基本政治制度。"]}, {"h": "向社会主义过渡", "p": ["过渡时期总路线：“一化三改”（实现工业化，对农业、手工业、资本主义工商业的社会主义改造）。", "1954年第一届全国人大召开，制定第一部《中华人民共和国宪法》。"]}, {"h": "社会主义制度确立", "p": ["1956年三大改造基本完成，社会主义基本制度在中国全面确立。", "中共八大正确分析了国内主要矛盾。"]}], "timeline": [{"d": "1949.10.1", "t": "开国大典", "x": "中华人民共和国成立，中国人民从此站起来了。"}, {"d": "1950", "t": "抗美援朝/土改", "x": "保家卫国，并在全国基本完成土地改革。"}, {"d": "1953", "t": "过渡时期总路线", "x": "提出“一化三改”，确定向社会主义过渡的方向。"}, {"d": "1954", "t": "第一届全国人大", "x": "制定第一部《中华人民共和国宪法》。"}, {"d": "1956", "t": "三大改造完成", "x": "社会主义基本制度在中国全面确立。"}, {"d": "1956.9", "t": "中共八大", "x": "正确分析社会主要矛盾，探索社会主义建设道路。"}], "people": [{"n": "毛泽东", "r": "中央人民政府主席、人民革命军事委员会主席"}, {"n": "周恩来", "r": "政务院总理兼外交部长"}, {"n": "彭德怀", "r": "中国人民志愿军司令员兼政治委员"}, {"n": "屠呦呦", "r": "1972年提取出抗疟新药青蒿素"}, {"n": "袁隆平", "r": "1973年首次培育成功籼型杂交水稻"}, {"n": "王进喜", "r": "大庆“铁人”，“宁肯少活20年也要拿下大油田”"}, {"n": "焦裕禄", "r": "兰考县委书记，带领群众封沙治水，积劳成疾"}], "geo": [{"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1949.10.1", "t": "开国大典", "x": "中华人民共和国成立，中国人民从此站起来了。"}, {"place": "丹东·鸭绿江", "lon": 124.38, "lat": 40.12, "d": "1950.10", "t": "抗美援朝", "x": "志愿军跨过鸭绿江，保家卫国。"}, {"place": "鞍山", "lon": 122.99, "lat": 41.11, "d": "1953", "t": "鞍钢建设", "x": "“一五”计划重点项目，奠定钢铁工业基础。"}, {"place": "长春", "lon": 125.32, "lat": 43.82, "d": "1956", "t": "第一汽车厂", "x": "建成投产，结束中国不能造汽车的历史。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1954.9", "t": "一届全国人大", "x": "制定第一部《中华人民共和国宪法》。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1956.9", "t": "中共八大", "x": "正确分析国内主要矛盾，三大改造基本完成。"}, {"place": "武汉", "lon": 114.3, "lat": 30.6, "d": "1957", "t": "武汉长江大桥", "x": "“一桥飞架南北”，万里长江第一桥建成。"}, {"place": "拉萨", "lon": 91.1, "lat": 29.65, "d": "1954", "t": "川藏青藏公路", "x": "两路通车，密切了西藏与内地的联系。"}]}, "9": {"title": "社会主义建设在探索中曲折发展", "subtitle": "探索与曲折 · 伟大转折 · 改革开放", "knowledge": [{"h": "探索中的曲折", "p": ["1957年整风反右扩大化；1958年“大跃进”、人民公社化运动；1959—1961年严重经济困难。", "1966—1976年“文化大革命”是全局性、长时间的严重错误。"]}, {"h": "建设成就", "p": ["建立起独立的、比较完整的工业体系和国民经济体系，“两弹一星”等成就举世瞩目。"]}, {"h": "历史性转折", "p": ["1976年粉碎“四人帮”，结束“文革”；真理标准问题大讨论解放思想。", "1978年12月中共十一届三中全会实现伟大历史转折，开启改革开放和社会主义现代化建设新时期。"]}, {"h": "改革开放与理论", "p": ["农村家庭联产承包责任制、设立经济特区。", "1997年中共十五大把邓小平理论确立为党的指导思想；此后形成“三个代表”重要思想、科学发展观。"]}], "timeline": [{"d": "1956", "t": "开始全面建设", "x": "进入全面建设社会主义的探索时期。"}, {"d": "1958", "t": "“大跃进”", "x": "“大跃进”和人民公社化运动，造成严重失误。"}, {"d": "1966", "t": "“文化大革命”", "x": "1966—1976年的全局性严重错误，使党和国家遭受重大损失。"}, {"d": "1976.10", "t": "粉碎“四人帮”", "x": "结束“文化大革命”，挽救了党和国家。"}, {"d": "1977", "t": "恢复高考", "x": "中断十年的高考制度恢复，570万人参加考试。"}, {"d": "1978.12", "t": "十一届三中全会", "x": "实现伟大历史转折，开启改革开放新时期。"}, {"d": "1980", "t": "设立经济特区", "x": "深圳等经济特区设立，对外开放迈出关键步伐。"}, {"d": "1992", "t": "南方谈话/十四大", "x": "邓小平南方谈话，中共十四大确立社会主义市场经济体制目标。"}, {"d": "1997", "t": "中共十五大", "x": "把邓小平理论确立为党的指导思想，写入党章。"}], "people": [{"n": "邓小平", "r": "改革开放和现代化建设总设计师，南方谈话，提“中国式现代化/小康”"}, {"n": "叶剑英", "r": "发表谈话，提出和平统一台湾九条方针"}, {"n": "撒切尔", "r": "英国首相，1982年访华就香港问题谈判"}, {"n": "江泽民", "r": "提出“三个代表”重要思想，强调一个中国原则"}, {"n": "小岗村农民", "r": "1978年率先实行包干到户"}], "geo": [{"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1976.10", "t": "粉碎“四人帮”", "x": "结束“文化大革命”，挽救了党和国家。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "1978.12", "t": "十一届三中全会", "x": "实现伟大历史转折，开启改革开放新时期。"}, {"place": "罗布泊", "lon": 90.5, "lat": 40.5, "d": "1964", "t": "第一颗原子弹", "x": "中国第一颗原子弹爆炸成功。"}, {"place": "大庆", "lon": 125.0, "lat": 46.6, "d": "1960s", "t": "大庆油田", "x": "王进喜等建成我国最大石油基地，实现石油自给。"}, {"place": "凤阳·小岗村", "lon": 117.6, "lat": 32.92, "d": "1978", "t": "包干到户", "x": "小岗村18户农民按下红手印，拉开农村改革序幕。"}, {"place": "深圳", "lon": 114.06, "lat": 22.55, "d": "1980", "t": "深圳经济特区", "x": "对外开放窗口，蛇口工业区率先开工，1992年南方谈话。"}, {"place": "珠海", "lon": 113.58, "lat": 22.27, "d": "1980", "t": "珠海经济特区", "x": "首批设立的经济特区之一。"}, {"place": "汕头", "lon": 116.68, "lat": 23.35, "d": "1980", "t": "汕头经济特区", "x": "首批设立的经济特区之一。"}, {"place": "厦门", "lon": 118.09, "lat": 24.48, "d": "1980", "t": "厦门经济特区", "x": "首批设立的经济特区之一。"}, {"place": "海南", "lon": 110.33, "lat": 20.0, "d": "1988", "t": "海南经济特区", "x": "设立海南省并建立最大的经济特区。"}, {"place": "上海·浦东", "lon": 121.5, "lat": 31.23, "d": "1990", "t": "浦东开发开放", "x": "带动长江流域，设立上海证券交易所。"}, {"place": "香港", "lon": 114.17, "lat": 22.32, "d": "1997.7", "t": "香港回归", "x": "中国对香港恢复行使主权。"}, {"place": "澳门", "lon": 113.55, "lat": 22.2, "d": "1999.12", "t": "澳门回归", "x": "中国对澳门恢复行使主权。"}, {"place": "拉萨", "lon": 91.1, "lat": 29.65, "d": "2006", "t": "青藏铁路", "x": "世界海拔最高、线路最长的高原铁路通车。"}, {"place": "汶川", "lon": 103.4, "lat": 31.0, "d": "2008.5", "t": "汶川地震", "x": "抗震救灾，万众一心。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "2008.8", "t": "北京奥运会", "x": "成功举办第29届夏季奥运会。"}, {"place": "上海", "lon": 121.5, "lat": 31.23, "d": "2010", "t": "上海世博会", "x": "首次在发展中国家举办的注册类世博会。"}]}, "10": {"title": "中国特色社会主义进入新时代", "subtitle": "十八大 · 新思想 · 民族复兴", "knowledge": [{"h": "进入新时代", "p": ["2012年11月中共十八大召开，在全面建成小康社会决定性阶段召开。", "中国特色社会主义总依据是社会主义初级阶段，总布局是“五位一体”，总任务是实现社会主义现代化和中华民族伟大复兴。"]}, {"h": "新思想新方略", "p": ["2017年中共十九大确立习近平新时代中国特色社会主义思想为党必须长期坚持的指导思想。", "“四个全面”战略布局：全面建成小康社会、全面深化改革、全面依法治国、全面从严治党。", "贯彻新发展理念，提出总体国家安全观。"]}, {"h": "民族复兴", "p": ["实现中华民族伟大复兴的中国梦。", "2021年实现全面建成小康社会的第一个百年奋斗目标，向第二个百年奋斗目标进军。"]}], "timeline": [{"d": "2012.11", "t": "中共十八大", "x": "在全面建成小康社会决定性阶段召开，开启新时代。"}, {"d": "2013", "t": "全面深化改革", "x": "十八届三中全会作出全面深化改革的决定。"}, {"d": "2017.10", "t": "中共十九大", "x": "确立习近平新时代中国特色社会主义思想为指导思想。"}, {"d": "2021", "t": "全面建成小康社会", "x": "实现第一个百年奋斗目标，建党百年。"}, {"d": "2022.10", "t": "中共二十大", "x": "对全面建设社会主义现代化国家作出战略部署。"}], "people": [{"n": "习近平", "r": "新时代中国特色社会主义思想，提出中国梦、“一带一路”、总体国家安全观"}, {"n": "黄文秀", "r": "百色百坭村第一书记，扶贫路上遭遇山洪殉职"}, {"n": "毛相林", "r": "重庆下庄村党支部书记，带领乡亲绝壁凿路"}, {"n": "连战", "r": "2005年与胡锦涛会谈，实现国共领导人60年来首次握手"}, {"n": "马英九", "r": "2015年与习近平在新加坡会晤，两岸领导人首次会晤"}], "geo": [{"place": "北京", "lon": 116.4, "lat": 39.9, "d": "2012.11", "t": "中共十八大", "x": "中国特色社会主义进入新时代。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "2017.10", "t": "中共十九大", "x": "确立习近平新时代中国特色社会主义思想为指导思想。"}, {"place": "北京", "lon": 116.4, "lat": 39.9, "d": "2021.7", "t": "建党百年大会", "x": "庆祝中国共产党成立100周年。"}, {"place": "上杭·古田", "lon": 116.82, "lat": 25.08, "d": "2014.10", "t": "全军政治工作会议", "x": "新世纪第一次全军政治工作会议在古田召开。"}, {"place": "杭州", "lon": 120.21, "lat": 30.25, "d": "2016.9", "t": "G20杭州峰会", "x": "推动二十国集团向长效治理机制转型。"}, {"place": "武汉", "lon": 114.3, "lat": 30.6, "d": "2020", "t": "抗击新冠疫情", "x": "举国动员抗击疫情，2020年中国成唯一正增长主要经济体。"}, {"place": "百色·百坭村", "lon": 106.62, "lat": 23.9, "d": "2020", "t": "脱贫攻坚·黄文秀", "x": "驻村第一书记黄文秀殉职，全国脱贫攻坚取得全面胜利。"}, {"place": "巫山·下庄村", "lon": 109.88, "lat": 31.07, "d": "2020", "t": "脱贫攻坚·毛相林", "x": "带领乡亲绝壁凿路，摆脱贫困。"}, {"place": "海南", "lon": 110.33, "lat": 20.0, "d": "2018", "t": "海南自贸港", "x": "建设中国特色自由贸易港。"}]}};
+const ESSAYS = {"1": [{"q": "为什么说鸦片战争是中国近代史的起点？", "frame": "社会性质变→主要矛盾变→两大任务出→民族民主革命始", "pts": [["社会性质改变", "独立封建社会沦为半殖民地半封建社会（《南京条约》等破坏领土关税司法主权）", "23-24、30"], ["主要矛盾改变", "帝国主义与中华民族（最主要）、封建主义与人民大众两大矛盾", "23"], ["两大历史任务提出", "求民族独立人民解放、求国家富强人民幸福", "23-24"], ["革命由此开端", "反侵略救亡与近代意义的民族民主革命从鸦片战争开始", "35"]]}, {"q": "资本-帝国主义的入侵给中国带来了什么？", "frame": "军事侵略 / 政治控制 / 经济掠夺 / 文化渗透 → 一切灾难总根源", "pts": [["军事侵略", "发动战争屠杀、割地、巨额赔款（马关2亿、辛丑近10亿）、驻军设租界", "23-26"], ["政治控制", "控内政外交、攫领事裁判权、把持海关（赫德）、扶植代理人", "26-29"], ["经济掠夺", "夺关税自主权、商品倾销资本输出、控经济命脉，沦为经济附庸", "29-32"], ["文化渗透", "披宗教外衣、奴化思想（种族优劣论、黄祸论、庚款兴学）", "33-34"], ["总评", "是近代中国一切灾难的总根源；客观上又刺激了民族觉醒", "32、44"]]}, {"q": "反对外国侵略斗争的意义？", "frame": "打击侵略者→铸民族魂→粉碎瓜分图谋→警醒促觉醒", "pts": [["沉重打击侵略者", "三元里抗英、邓世昌黄海血战、义和团等，显英雄气概", "35-38"], ["铸成民族魂", "爱国主义使国家民族历劫难、屡遭侵略而不亡", "38"], ["粉碎瓜分图谋", "不屈反抗是列强瓜分阴谋破产最根本原因", "39-41"], ["促进民族觉醒", "失败从反面警醒人民，为民族民主革命准备条件", "41、44"]]}, {"q": "反侵略战争失败的根本原因和教训？", "frame": "制度腐败(根本)+技术落后 → 教训:落后就要挨打、须革命", "pts": [["两方面原因", "社会制度腐败（更根本）+ 经济技术落后", "41-42"], ["制度腐败=最根本", "清廷昏庸妥协投降、压制民众（琦善、挪海军费、镇压义和团）", "42-43"], ["技术落后", "武器与综合实力落后；但决定战争的是人不是物", "43-44"], ["教训", "落后就要挨打；须推翻三座大山、实现富强，旧式改良行不通", "23、44"]]}], "2": [{"q": "如何认识太平天国农民战争的意义和失败原因、教训？", "frame": "意义(打击封建/旧农战最高峰)→根本原因(农民阶级局限)→教训", "pts": [["意义①打击封建统治", "历时14年、转战18省，撼动清政府统治根基", "53"], ["意义②旧式农民战争最高峰", "《天朝田亩制度》表达土地渴望、《资政新篇》首个发展资本主义方案；冲击儒家与外国侵略", "53"], ["失败根本原因", "农民阶级局限：非先进生产力代表、无科学理论、无先进阶级领导，提不出正确纲领", "53-54"], ["其他原因", "领导集团腐败内讧（天京事变）、战略失误、拜上帝教局限", "54"], ["教训", "农民有伟大潜力，但单纯农民战争不能完成反帝反封建、不能独立领导", "54"]]}, {"q": "如何认识洋务运动的性质和失败原因、教训？", "frame": "性质(地主阶级自救)→失败标志(甲午)→三因(封建性/依赖性/腐朽性)", "pts": [["性质", "地主阶级洋务派以“自强求富”、“中体西用”、不触动封建统治的自救运动", "55-57"], ["历史作用", "促早期工业与民族资本、开新式学堂派留学（近代教育开端）、冲击旧观念", "57"], ["失败标志", "甲午战争中北洋海军全军覆没", "58"], ["失败原因", "①封建性（中体西用维护封建）②依赖性（依赖外国如与虎谋皮）③管理腐朽（衙门式贪腐）", "58"], ["教训", "不触动封建制度、单纯学技术走改良，不可能使中国富强", "58"]]}, {"q": "如何认识戊戌维新运动的意义和失败原因、教训？", "frame": "三重意义(救亡/政治改良/思想启蒙)→失败(守旧强+维新弱)→教训:改良不通须革命", "pts": [["意义①爱国救亡", "民族危亡下高举救亡图存、要求变法图强", "63"], ["意义②资产阶级政治改良", "突破“中体西用”，主张君主立宪取代君主专制", "64"], ["意义③思想启蒙", "传播西方学说、宣传自由平等社会进化、批判封建纲常", "64"], ["失败原因", "客观:慈禧守旧势力强大(戊戌政变);主观:维新派软弱(不否定封建、幻想帝国主义、脱离群众、靠无实权光绪);根本:民族资本主义弱", "64-65"], ["教训", "自上而下的改良在半殖民地半封建中国行不通，须革命手段", "65"]]}], "3": [{"q": "革命派在与改良派论战中如何论述革命的必要性、正义性、进步性？", "frame": "背景焦点→必要性→正义性→进步性→意义", "pts": [["论战背景", "1905-1907以《民报》对《新民丛报》；焦点:要不要革命、要不要共和、要不要社会革命", "75"], ["必要性", "清政府是帝国主义鹰犬，爱国必须革命，唯革命能免瓜分之祸", "75-76"], ["正义性", "“不革命则杀人流血之祸”也不可免；革命可救世救人", "76"], ["进步性", "牺牲换取历史进步；破坏与建设相辅而行", "76"], ["论战意义", "划清革命与改良界限、传播民主思想（也暴露反帝、土地问题理论弱点）", "76-77"]]}, {"q": "为什么说辛亥革命引起了近代中国的历史性巨大变化？", "frame": "完全意义资产阶级民主革命→推翻清/结束帝制/思想解放/社会变革/国际影响", "pts": [["总论", "比较完全意义的资产阶级民主革命，救亡振兴的里程碑", "81"], ["①推翻清王朝", "打击中外反动势力，使其再不能建立稳定统治", "81"], ["②结束君主专制", "建立首个资产阶级共和政府，民主共和观念深入人心", "81"], ["③思想解放", "打开禁锢思想的闸门，激发爱国与民族觉醒", "81"], ["④社会变革", "兴实业、改公历、剪辫放足、革除旧称", "81"], ["⑤国际影响", "打击帝国主义、推动亚洲民族解放运动高涨", "82"]]}, {"q": "辛亥革命为什么会失败？说明了什么？", "frame": "根本(资本主义方案行不通)+三主观(无纲领/不靠群众/无政党)→须新探索", "pts": [["根本原因", "帝国主义时代、半殖民地半封建中国，资本主义建国方案行不通；中外反动勾结绞杀", "87"], ["主观①无彻底纲领", "不明确反帝、只反满不反整个封建阶级", "87-88"], ["主观②脱离群众", "不敢依靠农民主力军，革命根基单薄", "88"], ["主观③无坚强政党", "同盟会松懈；根源是民族资产阶级软弱妥协性", "88"], ["说明", "资产阶级共和国方案救不了中国、资产阶级不能领导革命，须新阶级新道路", "88-89"]]}], "4": [{"q": "中国的先进分子为什么和怎样选择了马克思主义？", "frame": "原因(旧路不通/十月革命/反复比较)→途径(李大钊/五四/思想运动)", "pts": [["原因①旧路走不通", "辛亥失败后资产阶级民主主义失效，先进分子苦闷彷徨", "93"], ["原因②十月革命推动", "同国情俄国的胜利、平等对华、工农革命方法的启示", "93-94"], ["原因③反复比较", "各种社会主义流派中比较后选择；从此精神由被动转主动", "94、102"], ["途径①李大钊擎旗", "《庶民的胜利》《我的马克思主义观》，系统传播开始", "94-95"], ["途径②五四运动", "促马克思主义广泛传播并与工人运动结合，形成早期队伍", "98-100"], ["途径③思想运动", "重理论、联系实际、知识分子与工农结合，论战划清界限", "100-101"]]}, {"q": "为什么说中国共产党的成立是“开天辟地的大事变”？", "frame": "解决领导核心问题→最高理想→建党精神→三个深刻改变", "pts": [["总论", "中华民族发展史上开天辟地的大事变", "109"], ["解决根本问题", "此前斗争屡败最重要原因是无先进坚强政党，中共诞生改变此局面", "109"], ["最高理想使命", "以共产主义为最高理想，肩负民族复兴使命", "108-109"], ["伟大建党精神", "坚持真理坚守理想/践行初心担当使命/不怕牺牲英勇斗争/对党忠诚不负人民", "109"], ["三个深刻改变", "深刻改变民族方向进程、人民前途命运、世界趋势格局", "108-109"]]}, {"q": "什么是中国共产党人的初心使命？为什么必须“不忘初心、牢记使命”？", "frame": "初心=为人民谋幸福为民族谋复兴→根本动力/保先进性/开创未来", "pts": [["初心使命", "为中国人民谋幸福、为中华民族谋复兴（成立之日即确立）", "108、189"], ["原因①根本动力", "为实现初心前赴后继、巨大牺牲，才取得革命胜利、建立新中国", "189-190"], ["原因②保持先进纯洁", "“没有共产党就没有新中国”是科学结论；牢记才能同群众血肉联系", "189"], ["原因③开创未来", "新时代唯有不忘初心，才能团结人民实现民族复兴", "118"]]}, {"q": "中国共产党成立后，中国革命呈现了哪些新面貌？", "frame": "新纲领→工农运动→国共合作大革命→独特作用→焕然一新", "pts": [["新革命纲领", "中共二大首提反帝反封建民主革命纲领（最高/最低纲领）", "109-110"], ["发动工农运动", "工运第一个高潮（香港海员→京汉铁路）、农民运动", "110-111"], ["国共合作大革命", "推动第一次国共合作，北伐基本摧毁北洋军阀主力", "111-115"], ["独特不可替代作用", "政治口号提出者、统一战线组织者、群众运动发动者", "114-115"], ["总评", "有了新领导核心、科学指导、明确目标、新方法，革命面貌焕然一新", "109"]]}], "5": [{"q": "以毛泽东为主要代表的中国共产党人是如何探索开辟中国革命新道路的？", "frame": "八七会议→武装起义→井冈山→理论概括→古田会议", "pts": [["背景", "大革命失败、白色恐怖下，举起独立武装斗争和土地革命旗帜", "123"], ["八七会议", "1927.8.7定土地革命与武装起义方针，“枪杆子里出政权”", "124"], ["武装反抗", "南昌起义第一枪、秋收/广州起义；三湾改编确立党对军队领导", "124-125"], ["井冈山道路", "秋收起义转向农村建井冈山根据地，开辟农村包围城市道路", "124-126"], ["理论概括", "《红色政权为什么能存在》《井冈山的斗争》《星星之火可以燎原》《反对本本主义》", "126-127"], ["古田会议", "1929.12确立思想建党政治建军；后建中华苏维埃，革命走向复兴", "127-129"]]}, {"q": "中国革命新道路“新”在哪里？", "frame": "道路新/立足点形式新/依靠力量新/实质:马克思主义中国化", "pts": [["道路选择新", "打破“城市中心”与俄国城市起义模式，走农村包围城市", "125-126"], ["立足点形式新", "立足农村，发动农民、游击战、土地革命、工农武装割据", "125-126"], ["依靠力量新", "依靠农民主力军、搞土地革命；“先有农村红军后有城市政权”", "126、128"], ["实质", "独立自主把马列主义同中国实际结合，马克思主义中国化重大成果", "126-127"]]}, {"q": "怎样认识长征的意义？如何继承发扬长征精神？", "frame": "伟大远征→促党成熟→转危为安→长征精神→走好新长征路", "pts": [["伟大远征", "理想信念、检验真理、唤醒民众、开创新局的伟大远征", "134"], ["促党成熟", "认识到马列主义同中国实际结合、独立自主才能引向胜利", "134"], ["转危为安关键", "粉碎反动派图谋、实现战略转移与革命伟大转折（宣言书宣传队播种机）", "134-135"], ["长征精神", "信念高于一切、不怕牺牲、独立自主实事求是、顾全大局守纪律、依靠群众", "135"], ["如何继承", "坚定信念、艰苦奋斗、团结依靠人民，走好新时代长征路", "135"]]}, {"q": "土地革命战争时期，中国共产党是如何总结历史经验、加强党的思想理论建设的？", "frame": "古田会议→《反对本本主义》→遵义会议→到陕北理论工作→奠基抗战", "pts": [["古田会议", "确立思想建党政治建军，纠正党内非无产阶级思想", "127"], ["《反对本本主义》", "“没有调查没有发言权”，初步形成实事求是、群众路线、独立自主", "127、136"], ["遵义会议", "坚持真理修正错误，确立正确领导，独立自主解决革命问题新阶段", "133"], ["到陕北理论工作", "写《中国革命战争的战略问题》、讲《实践论》《矛盾论》批判教条主义", "135"], ["意义", "系统阐述政治军事思想路线，为全民族抗战奠定思想政治组织基础", "135"]]}], "6": [{"q": "为什么说中国的抗日战争是神圣的民族解放战争？", "frame": "日寇灭华暴行→全民族抗战→根本目的救亡→首次完全胜利转折点", "pts": [["正义反侵略战争", "面对日本灭华暴行（九一八、南京大屠杀、三光、细菌战），民族到最危险时刻", "138-140、144"], ["全民族抗战", "抗日民族统一战线下，工农各党派各民族、台港澳同胞华侨万众一心", "144-145"], ["根本目的", "救亡图存、争民族独立解放、捍卫主权领土并保卫世界和平", "144、164"], ["历史转折点", "近代以来反抗外敌首次完全胜利，洗刷屡败耻辱，民族复兴转折点", "164-165"]]}, {"q": "为什么说中国共产党是抗日战争的中流砥柱？", "frame": "率先抗日→倡导维护统战→全面抗战+持久战→敌后战场→团结抗战→根据地党建", "pts": [["率先高举抗日", "九一八后率先号召抗日，直接领导东北抗联", "141"], ["倡导维护统一战线", "瓦窑堡会议新政策、促西安事变和平解决、促成第二次国共合作", "142-144"], ["全面抗战+持久战", "洛川会议十大纲领；《论持久战》批驳亡国论、速胜论", "148-149"], ["开辟敌后战场", "建根据地、作战12.5万余次歼日伪171万，敌后上升为主战场", "149-151"], ["坚持团结抗战", "“坚持抗战团结进步”，统战中独立自主、以斗争求团结", "151-153"], ["根据地与党建", "三三制、减租减息、大生产；整风、七大确立毛泽东思想——中流砥柱是胜利关键", "153-160、164"]]}, {"q": "怎样评价国民党政府在抗战中的路线和正面战场的地位作用？", "frame": "片面抗战路线→防御阶段有作用→局限→相持消极→总评", "pts": [["片面抗战路线", "不敢发动民众、单纯政府正规军阵地防御，与中共全面抗战根本不同", "146"], ["防御阶段作用", "正面战场担抗击主任务，淞沪忻口徐州武汉等大战（台儿庄大捷），较努力", "145-146"], ["局限", "片面路线+单纯防御致多数战役失败，短期丧大片国土", "146"], ["相持阶段消极", "推“防共限共溶共”，消极抗战保实力制造摩擦，致豫湘桂大溃败", "146-147"], ["总评", "初期有重要作用，但因阶级局限作用渐降，不能领导全民族取胜", "146-147"]]}, {"q": "如何理解抗日战争胜利对实现中华民族伟大复兴的意义？", "frame": "历史转折点→捍卫主权洗耻→抗战精神→壮大革命力量→重确大国地位", "pts": [["历史转折点", "中华民族从近代深重危机走向伟大复兴的转折点", "165"], ["捍卫主权洗刷耻辱", "粉碎日本殖民图谋、台湾光复、洗刷屡战屡败耻辱", "165"], ["伟大抗战精神", "爱国情怀、民族气节、英雄气概、必胜信念", "165"], ["壮大革命力量", "促人民觉醒、革命力量空前壮大，为新民主主义革命胜利奠基", "165-166"], ["重确大国地位", "成为联合国安理会常任理事国，国际地位提高，开启浴火重生新征程", "165-166"]]}], "7": [{"q": "抗战胜利后，国民党政府为什么陷入全民包围并迅速崩溃？", "frame": "根本(代表大地主大资产阶级/独裁内战)→政治/经济/第二条战线/军事", "pts": [["根本原因", "代表大地主大资产阶级、基础狭隘，坚持独裁内战的反人民方针", "168-171、184"], ["政治违背民意", "撕毁政协协议发动内战失人心；中共争和平民主（重庆谈判、政协）赢主动", "170-172"], ["经济陷入危机", "滥发纸币恶性通胀、官僚资本膨胀、工商凋敝；“劫收”腐败大失民心", "176-177"], ["第二条战线", "国统区学生运动为先导（一二一、五二〇）的人民民主运动形成第二条战线", "176-178"], ["军事彻底失败", "土改(《土地法大纲》)发动农民，三大战役摧毁主力，1949.4解放南京覆灭统治", "172-175、184-186"]]}, {"q": "如何认识民主党派的历史作用？多党合作和政治协商格局是怎样形成的？", "frame": "性质→历史作用→中间路线幻灭→五一口号→正式确立", "pts": [["性质", "民族资产阶级、小资产阶级及其知识分子的阶级联盟政党，重要政治力量", "180"], ["历史作用", "主张爱国民主反独裁，作为“第三方面”同中共反内战独裁、参加爱国民主运动", "180-181"], ["中间路线幻灭", "“第三条道路”行不通，国民党迫害使改良幻想破灭，1948民盟一届三中全会接受中共领导", "181-182"], ["五一口号", "1948.4.30中共号召召开政协、建联合政府，各党派响应，奠定多党合作基础", "182-183"], ["正式确立", "1949.1李济深沈钧儒等55人发《对时局的意见》接受中共领导；1949.9人民政协召开标志制度确立", "183-184、188-189"]]}, {"q": "为什么说“没有共产党就没有新中国”？革命取得胜利的基本经验是什么？", "frame": "根本靠党领导→三经验(马克思主义中国化/三大法宝/人民民主专政)", "pts": [["根本原因", "革命走向胜利，从根本上说是由于有了中国共产党的领导", "189"], ["党的作用", "确立初心使命、指明目标、找到正确道路，把“一盘散沙”凝聚成不可战胜力量", "189"], ["科学结论", "为初心前赴后继、巨大牺牲，故“没有共产党就没有新中国”", "189-190"], ["经验①马克思主义中国化", "马列基本原理同中国实际结合（毛泽东思想指引正确纲领路线）", "190-191"], ["经验②三大法宝", "统一战线、武装斗争、党的建设", "191"], ["经验③人民民主专政", "革命根本问题是政权；建工农联盟为基础的人民民主专政、团结国际革命力量", "191"]]}]};
+const ESSAYS_AI = {"1": [["社会性质发生根本变化。鸦片战争前的中国是一个独立的封建社会；战后，西方列强通过《南京条约》等一系列不平等条约破坏了中国的领土、领海、司法、关税和贸易等主权，独立的中国逐步变成半殖民地，封建的中国逐步变成半封建，中国开始沦为半殖民地半封建社会。【教材第23—24、30页】", "社会主要矛盾发生变化。帝国主义和中华民族的矛盾、封建主义和人民大众的矛盾成为近代中国社会的主要矛盾，而帝国主义与中华民族的矛盾是最主要的矛盾。【教材第23页】", "革命任务（两大历史任务）由此提出。争得民族独立和人民解放、实现国家富强和人民幸福，成为近代以来中华民族面临的两大历史任务，无数志士仁人为此进行了不屈不挠的斗争。【教材第23—24页】", "中国人民反抗外国侵略、救亡图存的斗争和近代意义上的民族民主革命，正是从鸦片战争开始的。因此鸦片战争是中国近代史的起点。【教材第23—24、35页】"], ["军事侵略。发动一次次侵华战争并屠杀中国人民（旅顺大屠杀、江东六十四屯惨案等）；侵占中国大片领土、划分势力范围（英割香港、俄共侵占150多万平方公里、日据台湾）；勒索巨额赔款（《马关条约》2亿两、《辛丑条约》本息近10亿两）；在华驻军、设立租界。【教材第23—26页】", "政治控制。控制中国内政外交、把当权者变成代理人（公使驻京、操纵清政府）；攫取领事裁判权；把持中国海关（赫德掌海关四十余年）；勾结清政府镇压中国人民的反抗；扶植、收买代理人（奕䜣、曾国藩、李鸿章、袁世凯等）。【教材第26—29页】", "经济掠夺。控制通商口岸、剥夺中国关税自主权；大规模商品倾销和资本输出；操纵中国的经济命脉（控制近代工业、金融、铁路航运）；破坏中国农业经济。使中国丧失经济独立，沦为西方大国的经济附庸。【教材第29—32页】", "文化渗透。披着宗教外衣进行侵略活动，为侵略中国制造舆论，宣扬殖民主义奴化思想、“种族优劣论”“黄祸论”，推行“庚款兴学”等，企图麻醉中国人民的精神、摧毁中国人的民族自尊心和自信心。【教材第33—34页】", "总之，资本-帝国主义的入侵是近代中国一切灾难的总根源，它使中国沦为半殖民地半封建社会，造成了近代中国经济的落后和人民的贫困；但其侵略也从反面教育了中国人民，刺激了中华民族的觉醒和反抗。【教材第32、34、44页】"], ["中国人民和爱国官兵进行了英勇顽强的反侵略斗争（三元里抗英、太平军重创洋枪队、台湾军民抗击日本、左宗棠收复新疆、冯子材镇南关大捷、邓世昌黄海血战、义和团运动等），沉重打击了外国侵略者，表现了中国人民不甘屈服、敢于斗争的英雄气概。【教材第35—38页】", "这种爱国主义精神进一步铸成了中华民族的民族魂。正是由于中国人民前仆后继、英勇顽强的斗争，才使我们的国家和民族历尽劫难、屡遭侵略而不亡。【教材第38页】", "粉碎了帝国主义列强瓜分和灭亡中国的图谋。包括义和团在内的中华民族不屈不挠的反侵略斗争，是列强瓜分中国阴谋破产的最根本原因，使侵略者认识到中国民族“是不可消灭的”。【教材第39—41页】", "反侵略斗争和反侵略战争的失败，从反面教育和警醒了中国人民，促进了民族意识的觉醒，为以后的民族民主革命准备了条件。【教材第41、44页】"], ["从中国内部因素看，失败主要有两方面原因：一是社会制度的腐败，二是经济技术的落后，而前者是更根本的原因。【教材第41—42页】", "社会制度的腐败是最重要、最根本的原因。清王朝昏庸愚昧、官员贪腐、将帅怕死，对外妥协投降，又压制人民群众的动员（鸦片战争重用琦善、中法战争“不败而败”、甲午挪用海军军费办寿、八国联军时反过来镇压义和团）。正是腐败的半殖民地半封建社会制度，阻碍了中国人民群众的广泛动员和抵抗。【教材第42—43页】", "经济技术的落后是另一个重要原因。国家综合实力特别是经济技术和作战能力落后（清军多用冷兵器、旧式火器，英军普遍使用步枪、开花弹）。但武器是战争的重要因素而非决定因素，决定因素是人而不是物。【教材第43—44页】", "教训：落后就要挨打。要争得民族独立和人民解放，必须从根本上推翻帝国主义、封建主义联合统治的半殖民地半封建社会制度，必须改变经济技术落后的面貌，实现国家富强；旧式的、改良的斗争都无法完成这一任务，必须寻找新的领导力量和正确的革命道路。【教材第23、44页】"]], "2": [["历史意义之一：沉重打击了封建统治阶级，强烈撼动了清政府的统治根基（历时14年、转战18省、建立了与清王朝对峙的政权）。【教材第53页】", "历史意义之二：是中国旧式农民战争的最高峰。《天朝田亩制度》比较完整地表达了农民对土地的渴望，《资政新篇》是近代中国第一个比较系统的发展资本主义的方案，使其具有不同于以往农民战争的新的历史特点；同时它冲击了孔子和儒家经典的正统权威，有力打击了外国侵略势力，并冲击了西方殖民者在亚洲的统治。【教材第53页】", "失败的根本原因：农民阶级不是新的生产力和生产关系的代表，无法克服小生产者固有的阶级局限性，缺乏科学理论指导，没有先进阶级的领导，因而提不出完整、正确的政治纲领和社会改革方案。【教材第53—54页】", "其他原因：后期领导集团腐败、争权夺利、内讧（天京事变）；军事战略上的重大失误（未与捻军结盟、死守孤城）；以拜上帝教发动组织群众，不能正确指导斗争；未能正确对待儒学，也不能把西方侵略者与人民区别开来。【教材第54页】", "教训：在半殖民地半封建的中国，农民具有伟大的革命潜力，但单纯的农民战争不可能完成争取民族独立和人民解放的历史任务，农民阶级自身不能担负起领导反帝反封建斗争取得胜利的重任。【教材第54页】"], ["性质：洋务运动是19世纪60—90年代地主阶级洋务派（奕䜣、曾国藩、李鸿章、左宗棠、张之洞等）以“自强”“求富”为目标，在不触动封建统治的前提下引进西方军事和生产技术、兴办近代企业的一场地主阶级自救运动，其指导思想是“中学为体，西学为用”，根本目的是维护封建统治，而非使中国走向独立的资本主义。【教材第55—57页】", "历史作用：客观上促进了中国早期工业和民族资本主义的发展；开办新式学堂、派遣留学生，是中国近代教育的开始；传播了新知识，冲击了传统观念，有利于资本主义经济发展和社会风气的改变。【教材第57页】", "失败标志：甲午战争中北洋海军全军覆没，标志着洋务运动的失败。【教材第58页】", "失败原因：（1）封建性——指导思想“中体西用”，以维护巩固封建统治为目的，决定了它必然失败；（2）依赖性——对外“和戎”，企图依赖外国达到“自强”“求富”，无异于与虎谋皮；（3）管理的腐朽性——新式企业管理仍是封建衙门式，营私舞弊、贪污浪费。【教材第58页】", "教训：在不触动封建制度根本的前提下，单纯学习西方技术、走改良道路，不可能使中国真正富强，也不可能为中国摆脱贫弱找到出路。【教材第58页】"], ["意义之一：是一次爱国救亡运动。维新派在民族危亡关头高举救亡图存旗帜，要求变法图强、发展资本主义，推动了中华民族的觉醒。【教材第63页】", "意义之二：是一场资产阶级性质的政治改良运动。它突破洋务派“中体西用”的局限，主张以君主立宪制取代君主专制制度，在政治、经济等领域一定程度上冲击了封建制度。【教材第64页】", "意义之三：是一场思想启蒙运动。维新派传播西方资产阶级社会政治学说和自然科学知识，宣传自由平等、社会进化观念，批判封建君权和纲常伦理，促进了思想解放、文化革新和近代教育的发展。【教材第64页】", "失败原因：客观上是以慈禧太后为首的强大守旧势力的反对（戊戌政变）；主观上是维新派自身的局限——不敢否定封建主义、对帝国主义抱有幻想、惧怕人民群众而脱离群众，只能把希望寄托在没有实权的光绪皇帝身上。根本上则是当时民族资本主义经济力量微弱、民族资产阶级力量弱小。【教材第64—65页】", "教训：在半殖民地半封建的旧中国，企图通过统治者走自上而下的改良道路是根本行不通的，必须用革命的手段推翻帝国主义、封建主义联合统治的社会制度。“戊戌六君子”流血的教训，促使一部分人放弃改良、走上革命道路。【教材第65页】"]], "3": [["论战背景与焦点：1905—1907年间，革命派与改良派分别以《民报》《新民丛报》为阵地展开大论战，焦点是：要不要以革命手段推翻清王朝、要不要推翻帝制实行共和、要不要进行社会革命。【教材第75页】", "论述革命的必要性：清政府是帝国主义的“鹰犬”，因此爱国必须革命；只有通过革命才能“免瓜分之祸”，获得民族独立和社会进步；不革命而容忍清王朝的统治，中国人民将长期遭受难堪的痛苦并作出更大的牺牲。【教材第75—76页】", "论述革命的正义性：针对改良派“革命要杀人流血、破坏一切”的责难，革命派指出，革命虽不免流血牺牲，但“不革命则杀人流血之祸”也不可免；革命可以“救世救人”，是疗治社会的捷径，因而是正义的。【教材第76页】", "论述革命的进步性：人们在革命中付出的努力乃至牺牲，是以换取历史的进步作为补偿的；“革命之破坏与革命之建设必相辅而行”，破坏与建设是革命的两个方面，革命本身正是为了建设。【教材第76页】", "论战意义：这场论战划清了革命与改良的界限，传播了民主革命思想，促进了革命形势的发展（同时也暴露了革命派在反帝、土地等问题上的理论弱点）。【教材第76—77页】"], ["辛亥革命是一次比较完全意义上的资产阶级民主革命，是中国人民为救亡图存、振兴中华而奋起革命的一座里程碑，使中国发生了历史性的巨变。【教材第81页】", "第一，推翻了清王朝的统治，沉重打击了中外反动势力，此后帝国主义和封建势力在中国再也不能建立起比较稳定的统治，为中国人民斗争的发展开辟了道路。【教材第81页】", "第二，结束了延续两千多年的封建君主专制制度，建立了中国历史上第一个资产阶级共和政府，使民主共和的观念开始深入人心（“敢有帝制自为者，天下共击之”）。【教材第81页】", "第三，推动了中国人民的思想解放，打开了禁锢思想进步的闸门，激发了人民的爱国热情和民族觉醒。【教材第81页】", "第四，推动了中国社会变革，促使社会经济、思想习惯和社会风俗等方面发生新的积极变化（兴办实业、改用公历、剪辫放足、革除旧称等）。【教材第81页】", "第五，不仅在一定程度上打击了帝国主义的侵略势力，而且推动了亚洲各国民族解放运动的高涨。【教材第82页】"], ["根本原因：在帝国主义时代、在半殖民地半封建的中国，资本主义的建国方案是行不通的。帝国主义决不容许中国建立独立富强的资产阶级共和国，它们与封建势力、旧官僚、立宪派相勾结，从外部和内部绞杀了这场革命。【教材第87页】", "主观原因之一：没有提出彻底的反帝反封建的革命纲领。革命派没有明确提出反帝口号，甚至幻想以妥协退让换取帝国主义的承认；只强调反满和建立共和，没有认识到必须反对整个封建统治阶级。【教材第87—88页】", "主观原因之二：不能充分发动和依靠人民群众，尤其不敢依靠反封建的主力军农民群众，使革命的根基相当单薄。【教材第88页】", "主观原因之三：不能建立坚强的革命政党作为团结一切革命力量的核心（同盟会组织松懈、派系纷杂）。这些弱点根源于中国民族资产阶级的软弱性和妥协性。【教材第88页】", "失败说明：辛亥革命的失败表明，资产阶级共和国的方案没有能够救中国，资产阶级不能领导中国革命取得胜利；先进的中国人需要进行新的探索，为中国谋求新的出路（呼唤新的领导阶级和新的革命道路）。【教材第88—89页】"]], "4": [["原因一（旧路走不通）：辛亥革命失败后，资产阶级民主主义不能为人们提供认识和改造中国的有效思想武器，先进分子陷于苦闷和彷徨之中。【教材第93页】", "原因二（十月革命的推动）：俄国十月革命使中国人看到了民族解放的新希望——它发生在国情与中国相同或近似的俄国、具有特殊吸引力；社会主义俄国号召反帝并以平等态度对待中国；十月革命中工农兵群众广泛发动赢得胜利，给中国先进分子以新的革命方法的启示。【教材第93—94页】", "原因三（反复比较的结果）：在无政府主义等各种社会主义流派纷然杂陈的情况下，中国先进分子是经过反复比较才选择了马克思主义的；自从学会马克思列宁主义，中国人在精神上就由被动转入主动。【教材第94、102页】", "途径一：李大钊率先在中国举起马克思主义旗帜（《庶民的胜利》《我的马克思主义观》），标志着马克思主义在中国进入比较系统的传播阶段。【教材第94—95页】", "途径二：五四运动促进了马克思主义的广泛传播及其同中国工人运动的结合，形成了早期马克思主义者队伍（李大钊、陈独秀为先驱擎旗人，毛泽东等五四左翼骨干为主体，还有董必武等）。【教材第98—100页】", "途径三：早期马克思主义思想运动重视基本理论学习、注意从中国实际出发运用马克思主义、开始提出知识分子同劳动群众相结合；并通过同改良主义、无政府主义等反马克思主义思潮的论战，划清界限，推动更多人走上马克思主义道路。【教材第100—101、105—106页】"], ["中国共产党的成立是中华民族发展史上一个开天辟地的大事变，具有伟大而深远的意义。【教材第109页】", "近代以后中国人民反帝反封建斗争屡遭失败，最重要的原因就是没有先进的、坚强的政党作为凝聚力量的领导核心；中国共产党的诞生从根本上改变了这种局面。【教材第109页】", "中国共产党一经成立，就把实现共产主义作为最高理想和最终目标，义无反顾地肩负起实现中华民族伟大复兴的历史使命，中国人民由此踏上了争取民族独立、人民解放，实现国家富强、人民幸福的光明道路。【教材第108—109页】", "它形成了伟大建党精神（坚持真理、坚守理想，践行初心、担当使命，不怕牺牲、英勇斗争，对党忠诚、不负人民），这是中国共产党的精神之源。【教材第109页】", "中国共产党是以马克思列宁主义为指导的新型工人阶级革命政党，它的成立深刻改变了近代以后中华民族发展的方向和进程，深刻改变了中国人民和中华民族的前途和命运，深刻改变了世界发展的趋势和格局。【教材第108—109页】"], ["中国共产党人的初心使命：中国共产党从成立之日（诞生之日）起，就把为中国人民谋幸福、为中华民族谋复兴确立为自己的初心使命。【教材第108页；第189页】", "原因一：这个初心使命是激励中国共产党人不断前进的根本动力。正是为了实现初心使命，中国共产党进行了前赴后继的不懈奋斗、作出了巨大牺牲，才领导中国革命取得胜利、建立了新中国。【教材第189—190页】", "原因二：“没有共产党就没有新中国”是中国人民依据近代中国革命历史经验得出的科学结论；只有不忘初心、牢记使命，党才能始终保持先进性和纯洁性，始终同人民群众保持血肉联系。【教材第189页】", "原因三：在新时代，只有不忘初心、牢记使命，才能继续团结带领人民以史为鉴、开创未来，实现中华民族伟大复兴（参见习近平在庆祝中国共产党成立100周年大会上的讲话）。【教材第118页（必读文献）】"], ["制定了新的革命纲领：中共二大第一次提出反帝反封建的民主革命纲领（最高纲领是实现社会主义、共产主义，最低纲领是打倒军阀、推翻国际帝国主义压迫、统一中国为真正的民主共和国），为中国人民指明了明确的斗争目标。【教材第109—110页】", "发动了工农运动：领导掀起中国工人运动的第一个高潮（香港海员罢工到京汉铁路罢工），开展农民运动（浙江萧山、广东海丰农会），并开展青年运动和妇女运动。【教材第110—111页】", "实行国共合作、掀起大革命高潮：推动建立革命统一战线（第一次国共合作），领导反帝反封建的大革命，北伐战争基本摧毁了北洋军阀的主力，形成了空前广大的人民解放运动。【教材第111—115页】", "在大革命中起了独特的、不可替代的作用：中国共产党是反帝反军阀政治口号的提出者、统一战线的组织者、群众运动的主要发动者和组织者、革命战争的重要力量。【教材第114—115页】", "总之，中国共产党的成立使中国革命有了新的领导核心、科学的指导思想、明确的奋斗目标和新的革命方法，中国革命的面貌焕然一新。【教材第109页】"]], "5": [["在大革命失败后的严峻环境（白色恐怖）下，中国共产党人毅然举起独立领导武装斗争和土地革命的旗帜，开始了对革命新道路的艰难探索。【教材第123页】", "八七会议（1927年8月7日）确定了土地革命和武装起义的方针，毛泽东提出“政权是由枪杆子中取得的”，并提出“找着新的道路”的任务，实现了由大革命失败到土地革命战争兴起的历史性转变。【教材第124页】", "发动武装反抗国民党反动统治的斗争：南昌起义打响了武装反抗国民党反动派的第一枪，秋收起义、广州起义及各地近百次起义相继举行；三湾改编从组织上确立了党对军队的领导。【教材第124—125页】", "进军农村、创建井冈山根据地：秋收起义攻打长沙受挫后，毛泽东果断转向农村，创建井冈山农村革命根据地，点燃了“工农武装割据”的星星之火，开辟了农村包围城市、武装夺取政权这条前人没有走过的正确道路。【教材第124—126页】", "从理论上作出概括：毛泽东写《中国的红色政权为什么能够存在？》《井冈山的斗争》《星星之火，可以燎原》，提出“工农武装割据”思想；《反对本本主义》提出“没有调查，没有发言权”。【教材第126—127页】", "古田会议（1929年12月）确立了思想建党、政治建军的原则，解决了在以农民为主要成分的条件下保持党的无产阶级先锋队性质、建设新型人民军队的重大问题；随后开展土地革命和反“围剿”斗争，建立中华苏维埃共和国，推动中国革命走向复兴。【教材第127—129页】"], ["道路选择新：它打破了“以城市为中心”的传统观念和俄国十月革命城市武装起义的模式，走的是农村包围城市、武装夺取政权这样一条前人没有走过的崭新道路。【教材第125—126页】", "立足点和形式新：把武装斗争的立足点放在农村，在农村发动农民群众、开展游击战争、进行土地革命、创建工农政权，实行“工农武装割据”。【教材第125—126页】", "依靠力量新：紧紧依靠农民这个民主革命的主力军，领导农民进行土地制度的革命，从而抓住并解决了中国革命的基本问题。“先有农村红军，后有城市政权”，这是中国革命的特征，是中国经济基础的产物。【教材第126、128页】", "实质：这条新道路体现了中国共产党独立自主地把马克思列宁主义基本原理同中国革命具体实际相结合，是马克思主义中国化的重大成果。【教材第126—127页】"], ["长征是人类历史上的伟大壮举，是一次理想信念的伟大远征，是一次检验真理、唤醒民众、开创新局的伟大远征。【教材第134页】", "长征的胜利极大地促进了党在政治上和思想上的成熟——使党进一步认识到，只有把马克思主义基本原理同中国革命具体实际结合、独立自主解决中国革命重大问题，才能把革命引向胜利。【教材第134页】", "长征的胜利是中国革命转危为安的关键。它宣告了国民党反动派消灭共产党和红军图谋的彻底失败，实现了党和红军的战略转移，实现了中国革命从挫折走向胜利的伟大转折，开启了为实现民族独立、人民解放而斗争的新的伟大进军（“长征是宣言书，长征是宣传队，长征是播种机”）。【教材第134—135页】", "长征精神的内涵：把全国人民和中华民族的根本利益看得高于一切、坚定革命理想信念；为救国救民不怕任何艰难险阻、不惜付出一切牺牲；坚持独立自主、实事求是、一切从实际出发；顾全大局、严守纪律、紧密团结；紧紧依靠人民群众、艰苦奋斗。【教材第135页】", "如何继承发扬：新时代青年要坚定理想信念，发扬艰苦奋斗、独立自主、实事求是的精神，顾全大局、紧密团结、依靠人民，把个人理想融入民族复兴伟业，走好新时代的长征路。【教材第135页（结合阐发）】"], ["古田会议确立思想建党、政治建军原则，着重纠正党内各种非无产阶级思想，阐述加强党的思想建设的极端重要性。【教材第127页】", "毛泽东撰写《反对本本主义》，提出“没有调查，没有发言权”“中国革命斗争的胜利要靠中国同志了解中国情况”，初步形成实事求是、群众路线、独立自主的思想路线。【教材第127页；第136页（必读文献）】", "遵义会议坚持真理、修正错误，确立党中央的正确领导，开启了党独立自主解决中国革命实际问题的新阶段。【教材第133页】", "红军长征到达陕北后，毛泽东、党中央用很大精力总结历史经验、加强党的思想理论建设：写《论反对日本帝国主义的策略》《中国革命战争的战略问题》，讲授《实践论》《矛盾论》，从马克思主义认识论高度批判主观主义尤其是教条主义，科学阐明党的马克思主义思想路线。【教材第135页】", "这些理论工作对党的政治路线、军事路线和思想路线作了系统阐述，在理论上武装了全党，为即将到来的全民族抗日战争从思想上、政治上和组织上奠定了坚实基础。【教材第135页】"]], "6": [["面对日本企图灭亡中国的野蛮侵略（九一八事变、华北事变、七七事变，南京大屠杀、“三光”政策、细菌战等空前严重的罪行），中华民族到了最危险的时刻，抗日战争是中华民族全民族的反侵略战争，是正义战争。【教材第138—140、144页】", "它是在抗日民族统一战线旗帜下进行的全民族抗战：工人、农民、知识分子、民族工商业者、各党派、各民族、台湾同胞、港澳同胞和海外华侨等全体中华儿女万众一心、共御外侮。【教材第144—145页】", "其根本目的是救亡图存、争取民族独立和解放，捍卫国家主权和领土完整，并保卫世界和平，因而是神圣的民族解放战争。【教材第144、164页】", "它是近代以来中国人民反抗外敌入侵第一次取得完全胜利的民族解放斗争，彻底洗刷了近代以来抗击外来侵略屡战屡败的民族耻辱，是中华民族从近代以来陷入深重危机走向伟大复兴的历史转折点。【教材第164—165页】"], ["率先高举武装抗日旗帜：九一八事变后中国共产党率先发表宣言号召抗日，直接领导东北人民的抗日武装斗争（东北抗日联军），积极参加和推动抗日救亡运动。【教材第141页】", "倡导建立并维护抗日民族统一战线：提出抗日民族统一战线新政策（瓦窑堡会议），推动西安事变和平解决，促成第二次国共合作和全民族抗战局面的形成。【教材第142—144页】", "实行全面抗战路线（人民战争路线）和持久战的战略总方针：洛川会议制定抗日救国十大纲领；毛泽东《论持久战》批驳“亡国论”“速胜论”，科学指明了抗战的发展规律和胜利道路。【教材第148—149页】", "开辟敌后战场、坚持游击战争：开辟广大敌后抗日根据地，人民军队对敌作战12.5万余次，消灭日伪军171.4万余人，敌后战场逐步上升为主战场，成为坚持抗战、夺取胜利的决定性力量。【教材第149—151页】", "坚持团结抗战、反对妥协分裂倒退：提出“坚持抗战、团结、进步”三大口号，坚持统一战线中的独立自主原则，以斗争求团结，维护了抗战大局。【教材第151—153页】", "加强抗日民主根据地建设（“三三制”政权、减租减息、大生产运动）和党的自身建设（提出“马克思主义中国化”，开展整风运动，召开中共七大确立毛泽东思想的指导地位）。结论：中国共产党的中流砥柱作用是中国人民抗日战争胜利的关键。【教材第153—160、164页】"], ["路线：国民党政府实行片面抗战路线——不敢放手发动和武装民众，把希望单纯寄托在政府和正规军的抵抗上，战略战术上进行单纯的阵地防御战。这与中国共产党的全面抗战（人民战争）路线根本不同。【教材第146页】", "战略防御阶段的地位与作用：以国民党军队为主体的正面战场担负了抗击日军战略进攻的主要任务，组织了淞沪、忻口、徐州、武汉等一系列大战役（取得台儿庄大捷），爱国官兵英勇抗战，对消耗日军、粉碎其速战速决企图起了重要作用，这一时期国民党政府对日作战比较努力。【教材第145—146页】", "局限：由于实行片面抗战路线和单纯阵地防御的战略指导失误，正面战场大多数战役以退却、失败告终，使中国在短时间内丧失大片国土。【教材第146页】", "战略相持阶段：国民党推行“防共”“限共”“溶共”方针，在全局上日趋消极抗战、保存实力，制造反共“摩擦”，直至豫湘桂大溃败，国民党统治陷入深刻危机。【教材第146—147页】", "总体评价：国民党正面战场在抗战初期发挥了重要作用，但由于其阶级局限和片面抗战路线，作用逐渐下降，不能担负起领导全民族取得抗战胜利的重任。【教材第146—147页】"], ["抗日战争的伟大胜利，是中华民族从近代以来陷入深重危机走向伟大复兴的历史转折点。【教材第165页】", "它彻底粉碎了日本军国主义殖民奴役中国的图谋，有力捍卫了国家主权和领土完整（台湾光复），彻底洗刷了近代以来抗击外来侵略屡战屡败的民族耻辱。【教材第165页】", "它促进了中华民族的大团结，形成了伟大的抗战精神（天下兴亡、匹夫有责的爱国情怀，视死如归、宁死不屈的民族气节，不畏强暴、血战到底的英雄气概，百折不挠、坚忍不拔的必胜信念），是弥足珍贵的精神财富。【教材第165页】", "它促进了中国人民的觉醒和中国革命力量的空前壮大，为党领导人民赢得新民主主义革命胜利奠定了重要基础。【教材第165—166页】", "它重新确立了中国在世界上的大国地位，中国成为联合国安理会五个常任理事国之一，国际地位显著提高，中华民族赢得了崇高的民族声誉，并开启了古老中国凤凰涅槃、浴火重生的历史新征程。【教材第165—166页】"]], "7": [["根本原因：国民党政权代表大地主、大资产阶级的利益，其统治的社会基础极其狭隘，它坚持独裁、内战的反人民方针，违背了历史发展方向和全国人民的根本利益。【教材第168—171、184页】", "政治上违背民意、发动内战：国民党撕毁政协协议、悍然发动全面内战，丧失人心；而中国共产党真诚争取和平民主（重庆谈判、政协会议），使各界群众认清了谁应对战争负责，在政治上赢得了主动（“满载人心归去”）。【教材第170—172页】", "经济上陷入危机、掠夺人民：国民党政府滥发纸币、恶性通货膨胀，官僚资本极度膨胀，工农业萎缩、民族工商业濒于倒闭，国统区陷入严重经济危机；接收变“劫收”、贪污腐败，大失民心。【教材第176—177页】", "第二条战线的形成：国统区以学生运动为先导的人民民主运动（一二·一运动、抗暴运动、五二〇运动等）迅速高涨，工人罢工、农民暴动、民变蜂起，形成配合人民解放战争的第二条战线，使国民党政府陷入全民的包围。【教材第176—178页】", "军事上的彻底失败：人民解放军以革命战争反对反革命战争，经土地改革（《中国土地法大纲》）广泛发动农民、取得人力物力支援，经战略防御转入战略进攻，通过辽沈、淮海、平津三大战役基本摧毁国民党主力；1949年4月解放南京，宣告延续22年的国民党反动统治覆灭。【教材第172—175、184—186页】"], ["民主党派的性质：中国各民主党派形成时的社会基础，主要是民族资产阶级、城市小资产阶级以及同这些阶级相联系的知识分子和其他爱国分子，是阶级联盟性质的政党，是中国政治生活中一支重要的力量。【教材第180页】", "民主党派的历史作用：各民主党派都主张爱国、反对卖国，主张民主、反对独裁，在这些方面同中共的新民主主义革命政纲基本一致；它们作为“第三方面”同中共一起反对国民党的内战独裁政策，为和平民主奔走，积极参加和支持国统区的爱国民主运动，在第二条战线斗争中尽了一份力量。【教材第180—181页】", "格局形成（一）：“第三条道路”（中间路线）的幻灭。客观形势决定了中国没有走中间路线的余地，国民党的暴力迫害（宣布民盟为“非法团体”）使改良幻想破灭，1948年民盟一届三中全会等明确宣布接受中共领导、走人民革命道路。【教材第181—182页】", "格局形成（二）：1948年4月30日中共发布纪念“五一”劳动节口号，号召召开政治协商会议、成立民主联合政府，得到各民主党派热烈响应，揭开了协商建国的序幕，奠定了多党合作和政治协商制度的基础；中共还护送大批民主人士北上。【教材第182—183页】", "格局形成（三）：1949年1月，李济深、沈钧儒等55人发表《对时局的意见》，公开自愿接受中国共产党的领导；民主党派由旧中国的在野党转变为在中共领导下共同建设新中国的参政力量。1949年9月人民政协会议的召开，标志着中国共产党领导的多党合作和政治协商制度正式确立。【教材第183—184、188—189页】"], ["中国革命之所以能够走上胜利发展的道路，从根本上说，是由于有了中国共产党的领导。【教材第189页】", "中国共产党从诞生之日起就把为中国人民谋幸福、为中华民族谋复兴确立为初心使命；它为中国人民指明了斗争目标，找到了使革命走向胜利的正确道路，把被视为“一盘散沙”的中国人民团结凝聚成万众一心、不可战胜的力量。【教材第189页】", "为实现初心使命，中国共产党进行了前赴后继的不懈奋斗、作出了巨大牺牲。所以说“没有共产党就没有新中国”，这是中国人民依据近代中国革命历史经验得出的科学结论。【教材第189—190页】", "基本经验之一：必须坚持把马克思列宁主义基本原理同中国具体实际结合起来，不断推进马克思主义中国化——正是在毛泽东思想指引下，党制定了正确的纲领和路线方针政策，找到了适合本国国情的革命道路。【教材第190—191页】", "基本经验之二：锻造出战胜敌人的三个主要法宝——统一战线、武装斗争、党的建设。【教材第191页】", "基本经验之三：革命的根本问题是国家政权问题，必须建立工人阶级（经过共产党）领导的、以工农联盟为基础的人民民主专政，并同国际革命力量团结一致。中国人民革命的胜利和人民民主专政新中国的创建，为实现中华民族伟大复兴创造了根本社会条件。【教材第191页】"]]};
+const ESSAYS_ORG = {"1": [["鸦片战争是中国近代史的起点，原因在于：", "（1）中国的社会性质发生了根本性的变化鸦片战争后，中国由封建社会沦为半殖民地半封建社会。", "（2）中国的发展方向发生了变化鸦片战争前中国是一个没落的封建大国，封建制度已经非常腐朽，在缓慢地向资本主义社会发展，如果没有外来势力干扰，中国最终也会向西方大国那样发生资产阶级革命成为资本主义国家：而鸦片战争后中国的民族资本主义不可能获得正常发展，中国也就不可能发展为成熟的资本主义社会，而最终选择了社会主义道路。", "（3）社会主要矛盾发生了变化随着中国社会性质的变化，中国社会的主要矛盾也必然发生变化。鸦片战争前中国的主要矛盾是农民阶级与封建地主阶级的矛盾，而战后社会主要矛盾变得复杂化，主要有两对：即外国资本主义和中华民族的矛盾：封建主义和人民大众的矛盾。而且，随着外国资本主义侵略的深入，外国资本主义和中华民族的矛盾，成为各种社会矛盾中最主要的矛盾。", "（4）革命任务发生了变化随着中国社会矛盾的变化，中国革命任务也必然发生变化。战前，中国革命的性质是农民阶级的反封建斗争。从鸦片战争开始，中国人民开始反对外国资本主义侵略、反对本国封建统治的双重革命，从此。中国进入了旧民主主义革命总之，鸦片战争是中国遭受外国资本主义奴役的起点。随着外国资本主义的入侵，中国的封建社会逐步变成了半殖民地半封建社会。中国人民逐渐开始了反帝反封建的资产阶级民主革命。正因为如此，片战争就成为中国近代史的起点。"], ["资本-帝国主义的入侵从经济、政治、军事、文化、社会上给中国带来了多方面的危害。具体分析如下：", "（1）经济上沦为资本-帝国主义的附庸资本-帝国主义对中国经济的入侵，主要是强追中国支付战争赔款和签订一系列的不平等条约。主要方式有：控制中国的通商口岸：剥夺中国的关税自主权：实行商品倾销和资本输出：榨取中国的经济命脉等等。资本-帝国主义列强的入侵，使中国在经济上丧失了独立性。中国被纳入资本主义的世界经济体系，成了西方大国的经济附庸。并且他们同中国封建主义相勾结，导致了近代中国经济的落后和人民的贫困。", "（2）政治上丧失部分主权帝国主义主要通过控制中国的政府，来控制中国的内政、外交。随着中国领土，领海、司法、关税和贸易主权开始遭到严重破坏，中国人民的反抗被镇压，军阀、官僚被扶植成代理人，中国逐渐由一个独立自主的国家沦为半殖民地半封建社会国家。", "（3）文化上进行侵略和渗透的是为帝国主义侵略中国制造舆论", "（4）社会主要矛盾的变化西方列强的入侵给近代中国带来了深远影响，中华民族不甘心受列强入侵，开始了一系列反对侵略的抗争，因此，外国资本-帝国主义同中华民族的矛盾代替了本国封建主义同人民大众的矛盾而上升为主要矛盾。", "（5）部分中国知识分子开始探索实现国家独立和现代化无论在经济、政治体系还是其他方面中国和西方列强都明显存在很大差距，西方列强的入侵时，一部分知识分子开始注目世界，寻求强国御辱之道，新思潮前发，冲击了封建思想。甲午中日战争、戊戌维新、辛亥革命，这些为了救亡图存、振兴中华而进行的斗争和探索，使中华民族燃起了新的希望，标志着中华民族的进一步觉醒。"], ["反对外国侵略的斗争的意义主要体现在以下几个方面：", "（1）粉碎了帝国主义瓜分中国的图谋近代中国人民进行的反侵略战争，沉重打击了帝国主义侵华的野心，粉碎了他们瓜分中国和把中国变成完全殖民地的图谋。中国人民的英勇斗争，表现了中国人民不屈不挠的爱国主义精神，给外国侵略者以沉重打击和深刻教训，使他们越来越清楚地认识到，中国是一个很难征服的国家，他们虽然可以强迫清政府签订一个又一个不平等条约，但是始终无法把中国变成他们完全的殖民地。尤其是甲午中日战争以后，在瓜分危机的严重关头，中国各阶层人民救亡图存的努力探索和奋起抗争，使侵略者看到了中国人民所隐含的不甘屈服的伟大力量。", "（2）振奋了民族精神，激励了民族斗志近代中国人民进行的反侵略战争，教育了中国人民，振奋了中华民族的民族精神，鼓舞了人民反帝反封建的斗志，大大提高了中国人民的民族觉醒意识。", "（3）促进了部分中国人的觉，开始关注和研究国际形势发展帝国主义的侵略给中华民族带来了巨大灾难，但没有哪一次巨大的历史灾难不是以历史的进步作为补偿的，列强发动的侵华战争以及中国人民反侵略战争的失败，从反面教育了中国人民，极大地促进了中国人民的思考、探索和奋起直追。例如，鸦片战争以后，先进的中国人开始注意了解国际形势，研究外国历史地理，提出师夷长技以制夷的思想：甲午战争以后，中华民族的民族意识开始普遍觉醒，救亡图存思想日益高涨等。"], ["从1840年到1919年的80年间，中国人民对外来侵略进行了英勇顽强的反抗，这些反抗侵略斗争具有重大的历史作用，但是历次的反侵略战争都是以中国的失败而告终，中国政府被迫签订了一系列丧权辱国的条约。", "（1）反侵略战争失败的根本原因中国在历次反侵略战争中失败的根本原因是社会制度的腐败。近代中国社会政治制度的腐败和清政府的腐朽无能是中国反侵略战争失败的根本原因。一方面，清政府封闭自守，妄自尊大，骄奢淫逸，盲目进攻：另一方面，清军指挥人员在战争面前完全没有应变的能力和心态，不适应近代战争，不少将帅贪生怕死，临阵脱逃，有的甚至出卖国家和民族利益，另外，清政府尤其害怕人民群众，担心人民群众动员起来会危及自身统治，因此，不敢发动和依靠人民群众的力量。", "（2）反侵略战争的失败的教训", "①近代中国，要争取国家独立和民族富强，必须推翻帝国主义、封建主义联合统治的半殖民地半封建的社会制度。帝国主义侵略是造成中国人民巨大灾难的根源。与此同时，腐朽的清政府也已失去了领导中国人民进行反侵略战争胜利的能力和资格。因此，反对帝国主义侵略，同时又妥推翻封建腐朽的封建专制制度，是历史赋予中国人民的两大历史任务。", "②落后就要挨打，要取得反侵略战争的胜利，需要在科学技术方面奋起直追，需要进行现代化建设。但现代化建设的前提是获得民族独立和人民解放，不推翻帝国主义对中国的反动统治，就没有进行现代化的前提和条件，就难以使中国真正强大起来。"]], "2": [["（1）太平天国农民战争的意义", "①太平天国农民战争是中国近代民主革命准备时期的重要事件。沉重打击了清王朝的封建专制统治秩序，动摇了清王朝封建统治的基础，加速了清王朝的衰败。反抗并有力地打击了外国侵略势力，捍卫了国家独立和民族利益。拒绝承认不平等条约和禁止鸦片走私。并与外国侵略势力勇敢作战。.冲击了孔子和儒家经典的正统权威，瓦解了封建思想与文化，在一定程度上削弱了封建统治的精神支柱。", "②太平天国农民战争历时14年，转战18省，是中国旧式农民战争的最高峰，具有不同于以往农民战争的新的历史特点《天朝田亩制度》的主张，从根本上否定了封建社会的基础即封建地主的土地所有制，体现了广大农民要求平均分配土地的强烈愿望，是对以往农民战争中“均贫富”“等贵贱”和“均平”“均田”思想的发展和超越。具有进步意义。《资政新篇》是中国近代历史上第一个比较系统的发展资本主义的方案，这反映了太平天国某些领导人在后期试图通过向外国学习来寻求出路的一种努力，因此，太平天国起义具有了不同于以往农民战争的新的历史特点。", "③太平天国农民战争对日后反帝反封建的启迪和鼓舞。在19世纪中叶的近代亚洲民族解放运动中，太平天国起义“时间最久、规模最大、影响最深”，它和其他亚洲国家的民族解放运动一道，有力地冲击了西方殖民主义者在亚洲的统治。对中国资产阶级革命派的启示和激励。孙中山在辛亥革命就以“洪秀全第二”自居，赞扬和宣传太平天国的斗争精神，决心武力反清。", "（2）太平天国农民战争失败的原因和教训太平天国农民起义动摇了清王朝封建统治的基础，有力地打击了西方资本主义侵略者，显示了农民阶级的反抗精神和战斗力量，然而，其失败的原因和教训是深刻的。", "①农民阶级不是新的生产力和生产关系的代表，无法克服小生产者所固有的阶级局限性，缺乏科学思想理论的指导，没有先进阶级的领导，因而无法从根本上提出完整的、正确的政治纲领和社会改革方案。", "②太平天国后期无法制止和克服领导集团自身腐败现象的滋生，领导集团的一些人在生活上追求享乐，在政治上争权夺利。", "③太平天国军事战略上出现了重大失误，比如，没有解决好与军这一抗清斗争主力的关系，没有同他们结成同盟，以致丢失了在北方赖以发展的良机，使北伐军艰难支撑直至失败：在天京被围困的情况下死守孤城，拒绝“让城别走”，导致太平天国的最后覆灭。", "④太平天国是以宗教来发动、组织群众的，但是，拜上帝教教义不仅不能正确指导斗争，而且给农民战争带来了危害。在太平天国后期，洪秀全甚至认为“天生真命主，不用兵而定太平一统”，梦想以虚幻的力量代替农民起义者自身的努力。", "③太平天国也未能正确地对待儒学。他们开始时把儒家经书笼统地斥之为“妖书”，后来虽主张将“四书”“五经”删改后加以利用，但原封不动地保留了儒学中的封建纲常伦理原则。太平天国的领袖们不承认不平等条约，这是很正确的。但他们不能把西方国家的侵略者与人民群众区别开来，而是笼统地把信奉天父上帝的西方人都视为“洋兄弟”，这说明他们对于西方资本主义侵略者还缺乏理性的认识。太平天国起义及其失败表明，在半殖民地半封建的中国，由于受阶级和时代的局限，农民阶级虽然具有强大的力量，但是不能担负起领导反帝反封建斗争取得胜利的重任，单纯的农民战争不可能完成争取民族独立和人民解放的历史任务。"], ["（1）洋务运动的性质洋务运动是清朝封建统治阶级中的地主阶级洋务派为了维护清朝的封建统治而进行的一场自救运动，既具有进步性，也具有落后的保守性。", "（2）洋务运动失败的原因", "①洋务运动具有封建性。洋务运动的指导思想是“中学为体，西学为用”，洋务误企医在不改变中国固有的制度与道德的前提下，以吸取西方近代生产技术为手段，来达到维护和巩固中国封建统治的目的，这就严重限制了洋务运动的发展。", "②洋务运动对外国具有依赖性。西方列强依据种种特权，从政治、经济等各方面加紧对中国的侵略和控制，它们并不希望中国真正富强起来，而洋务派却处处依赖外国，企图以此来达到自强求富的目的，无异于与虎谋皮。", "③洋务企业的管理具有腐朽性。洋务企业虽然具有一定的资本主义性质，但其管理却仍是封建衙门式的，企业内部充斥着营私舞弊、贪污中饱、挥霍浪费等腐败现象。", "（3）洋务运动失败的教训洋务运动的失败说明，在不触动封建专制统治、不摆脱外国资本-帝国主义的侵略与控制的前提下，谋求通过局部的改革来发展本国资本主义，达到自强求富的目的是行不通的。"], ["（1）戊戌维新运动的意义", "①戊戌维新运动是一次爱国救亡运动。维新派在民族危亡的关键时刻，高举救亡图存的旗帜，要求通过变法，发展资本主义，使中国走上富强之路。维新派的政治实践和思想理论，不仅贯穿着强烈的爱国主义精神，而且推动了中华民族的觉醒。主张君主立宪制取代君主专制制度。戊戌维新运动虽然未能成功地建立起资本主义的君主立宪制度。其颁布的促进民族资本主义发展的若干措施也未能生效，但在政治、经济等领域一定程度上冲击了封建制度。", "③戊戌维新运动也是一场思想启蒙运动。在维新运动期间，维新派通过组织学会、创办报刊、翻译西书、开办学堂，大力传播西方资产阶级的社会政治学说和自然科学知识，宣传自由平等、社会进化观念，批判封建君权和封建纲常伦理，开阔了人们的视野。解放了人们的思想。在维新派的推动下，文化界还形成了广泛的文化革新运动。", "④维新派在改革社会风俗习惯方面也提出了许多新的主张。比如，维新派主张革除吸食鸦片及妇女缠足等恶俗陋习，提出“剪辫易服”的主张，倡导讲文明、重卫生等。", "（2）戊戌维新运动失败的原因戊戌维新运动的失败，主要是由于维新派自身的局限和以慈禧太后为首的强大的守旧势力的反对。派的势力更是非常弱小，他们既没有严密的组织，也不掌握实权和军队，更没有去发动群众，只能将希望寄托在一个没有实权的皇帝身上，而以慈禧太后为首的反对变法的守旧势力却相当强大，新旧势力对比的差距预示者这场运动难以取胜。", "②维新派自身的局限性是这场运动失败的重要原因，具体表现在以下三个方面：不敢否定封建主义。他们在政治上不敢根本否定封建君主制度：在经济上虽然要求发展民族资本主义，却未触及封建主义的经济基础封建土地所有制：在思想上，他们虽然提倡学习西学，却仍要打着孔子的旗号，借古代圣贤之名“托古改制”。对帝国主义抱有幻想。他们虽然在大声疾呼救亡图存，却又幻想西方列强能帮助自已变法维新，结果却是处处碰壁。惧怕人民群众。维新派的活动基本上局限于官士大夫和知识分子的小圈子。他们不但脱离了人民群众，而且惧怕甚至仇视人民群众，因此，运动未能得到人民群众的支持。", "（3）戊戌维新运动失败的教训戊戌维新运动的失败，不但暴露了中国民族资产阶级的软弱性，同时也说明在半殖民地半封建的中国，企图通过统治者走自上而下的改良道路，是根本行不通的。要想争取国家的独立，民主、富强，就必须用革命的手段，推翻帝国主义与封建主义联合统治的半殖民地半封建的社会制度。戊戌维新的失败再次暴露出清朝统治樂团的腐朽与测周，这使一部分人放弃改良主张，开始走上革命的道路。"]], "3": [["1905年至1907年间，围绕中国究竟是采取革命手段还是改良方式这个问题，革命派和改良派开展了一场大论战，革命派在论战中论述了革命的必要性、正义性和进步性。", "（1）革命的必要性资产阶级革命派指出，清政府是帝国主义的“鹰犬”，因此爱国必须革命，只有通过革命，才能免“瓜分之祸”，获得民族独立和社会进步。人们在革命过程中所付出的努力，乃至作出的牺牲，是以换取历史的进步作为补偿的。", "（2）革命的正义性对于改良派提出的“中国国民恶劣”说，革命派针锋相对地指出，不是“国民恶劣”，面是“政府恶劣”，民主共和是大势所趋，人心所向，拯救中国与建设中国都必须取法乎上，直接推行民主制度。只有“兴民权改民主”才是中国的唯一出路。(3)革命的进步性有，在进行政治革命的同时实现社会革命，才能进免贫富不均等一系列社会问题的出现。"], ["在近代历史上，辛亥革命是中国人民为救亡图存、振兴中华而奋起革命的一个里程碑，它使中国发生了历史性的巨变，具有伟大的历史意义。", "（1）辛亥革命推翻了封建势力的政治代表、帝国主义在中国的代理人清王朝的统治，沉重打击了中外反动势力，使中国反动统治者在政治上乱了阵脚。在这以后，帝国主义和封建势力在中国再也不能建立起比较稳定的统治，从而为中国人民斗争的发展开辟了道路。", "（2）辛亥革命结束了中国两千多年封建社会的君主专制制度，建立了中国历史上第一个资产阶级共和政府，使民主共和的观念开始深入人心，并在中国形成了“敢有帝制自为者，天下共击之”的民主主义观念。正因为如此，当袁世凯、张动先后复辟帝制时，均受到了社会舆论的强烈遣责和人民程众的坚决反抗。", "（3）辛亥革命推动了中国人民的思想解放，自古以来，皇帝被看作至高无上、神圣不可侵犯的绝对权威，如今连皇帝都可以被打倒，那么还有什么陈腐的东西不可以被怀疑、不可以被抛弃？辛亥革命激发了人民的爱国热情和民族觉醒，打开了禁键思想进步的间门。", "（4）辛亥革命推动了中国的社会变革，促使中国的社会经济、思想习惯和社会风俗等方面发生了新的积极变化。南京临时政府成立后，以振兴实业为目标，设立实业部，先后颁布了一系列有利于工商业发展的政策和措施，以推动民族资本主义经济的发展，使随后的几年成了资本主义发展的“黄金时代”。革命政府还提倡社会新风，扫除旧时代的“风俗之害”，不仅改变了社会风气，也有助于人们的精神解放。"], ["（1）辛亥革命失败原因封建主义在军事实力、玫治经验及社会基确等方面，都大大超过革命派，这是其失败的客观原因：资产阶级革命派政治上的软润性和妥协性，是革命失败的主观原因。具体而言，辛亥革命失败的原因有以下几点：", "①客庭原因从根本上说，是因为在帝国主义时代，在半殖民地半封建的中国，资本主义的建国方案是行不通的。帝国主义决不容许中国建立一个独立、富强的资产阶级共和国，使得帝国主义丧失殖民利益、中国封建势力异常强大而且贪婪顾固，作为掌握政权的他们只想凭借手中的权力来掠夺，竭力的维护封建统治秩序，为此不情与帝国主义相勾结，出卖国家主权。总之，帝国主义与以袁世凯为代表的大地主大买办势力以及旧官僚、立宪派一起勾结起来，从外部和内部绞杀了这场革命。", "②主观原因从主观方面来说，辛亥革命的失败在于其领导者资产阶级革命派的较弱性和妥协性，中国民族资本主义先天不足后天失调，使得其本身存在着许多磊点和错误。具体分析如下：没有提出彻底的反帝反封建的革命纲领。同盟会反满，反君主政体，却放过了主要敌人—帝国主义列强，他们没有明确提出反帝的口号，因此在清帝退位后，就失去了前进的目标。他们不敢和外国资本主义进行正面斗争，幻想以妥协和退让来得到外国资本主义的同情和支持，结果革命却被外国资本主义所绞杀。他们只强调反演和建立共和政体，没有认识到必须反对封建地主阶级，致使一些汉族旧官僚、旧军官也混入革命的营垒，结果让袁世凯募夺了革命果实。不能充分发动和依靠人民群众。由于中国民族资产阶级同封建势力有千丝万缕的联系，因而不敢依靠反封建的主力军农民群众。他们利用会党、新军，却不发动广大农民。在革命的高潮时期，甚至镇压农民的反封建斗争。革命派没有形成统一的、坚强的领导核心。不能建立坚强的革命政党，作为团结一切革命力量的强有力的核心。月显会内部的组织比较松懈，萧系纷余，缺乏一个统一和稳定的领导核心。革命党人没有建立白已的革命武装，以推翻旧政府，保卫新政权。他们依靠的是清军士兵和民间秘密反清会党。武昌起义后，各地建立的民军，大部分是由原来的旧军和会党改编首成，领导权也掌握在立充派和旧管條手里", "（2）辛亥革命的教训", "①中国民族资产阶级革命注重上层，而轻视对下层民众，尤其是对广大工人、农民的争取，他们热衷于暗杀和论战，对武装力量的重视不够。另外，他们提出的革命纲领中并没有彻底的解决广大下层人民尤其是农民的土地问题，无法调动他们的革命热情，无法壮大资产阶级革命的力量，最终造成资产阶级革命的失败。", "②辛亥革命的失败，给中国的教训：中国民族资产阶级不可能彻底推翻外国列强和时建主义的反动统治，不可能独立领导中国革命取得胜利。半殖民地半封建的中国不能重走西方的老路，资产阶级共和国的教国方案，在中国是行不通的。", "③辛亥革命的失败，也给中国留下了一些启示：在20世纪初的中国，要想革命取得成功，必须具备以下条件：必须有一个彻底的反帝反封建的革命纲领。必须有坚强正确的革命政党。必须联合广大的农民，解决农民的土地问题。必须建立一支人民的革命军队。"]], "4": [["中国的先进分子选择马克思主义的思整旗帜，走上马克思主义指引的道路，是他们经过长期的、艰苦的探索之后的必然结果。", "（1）中国的先进分子选择马克思主义的原因", "①新文化运动的开展，在客观上为马克思主义在中国的传播创造了有利的条件。对民主和科学的张扬，对旧民主、旧文化、旧礼教的批判，在政泊上和思想上给子封建统治者前所未有的沉重打击。加速了中国人民的觉醒，促成了一场前所未有的启蒙运动和空前的思想解放运动。.否定了两千多年封建正统思想的权成，使人们政于独立思考问题、政于接受新思想，", "②在新文化运动中，先进知识分子开始对资产阶级民主主义产生怀疑，为先进知识分子接受马克思主义提供了土壤。在帝国主义时代，资本主义制度的内在矛盾已经比较充分地暴露出来。第一次世界大战以极端的形式进一步暴露了资本主义制度固有的不可克服的矛盾。中国人学习西方屡遭失败，给中国人民极大的刺激，从面对资本主义方案产生了更大的怀疑。", "③十月革命推动中国的先进分子从资产阶级民主主义转向社会主义。在十月革命以后，五四运动前后的中国思想界，产生了一批赞成俄国十月社会主义革命，具有初步共产主文思想的知识分子。十月革命启示人们：经济文化落后的国家可以用社会主义思想指导革命走向胜利。十月革命诞生的社会主义新俄国号召反对帝国主义，并以新的平等的态度对待中国，有力地推动了社会主义思想在中国的传播、.十月革命胜利的事实，给予中国的先进分子以新的革命方法的启示，推动他们去研究这个革命所遵循的主文。", "④五四运动促进了马克思主义在中国的传播及其与中国工人运动的结合。了马克思主义在中国的进一步传播，并同工人阶级结合，为中国共产党的成立准备了条件。", "（2）中国的先进分子选择马克思主义的路径", "①进行马克思主义思想运动a早期的马克思主义思想运动。为了适应中国社会发展和革命发展的需要，早期马克思主义者在中国掀起了一场研究、传播马克思主义的思想运动。对马克思主义基本理论的学习，初步形成了马克思主义应当与中国实际相结合的思想，开始提出知识分子应当同劳动群众相结合的思想。新文化运动。中国的先进分子在接受马克思主义之后，继承了五四运动的科学和民主的精神，并赋予它们以新的含文，使它们在更高的层次上得到了发扬。", "②将马克思主义与中国工人运动相结合中国共产党的早期组织进行了各项马克思主义与中国工人运动相结合的活动。马克思主义者到工人中去进行宣传和组织工作，进行了关于建党问题的讨论和实际组织工作，党的发起组制定了《中国共产党宣言》。成立了中国共产党。中国共产党一开始就是一个以马克思列宁主义理沦为基础的政党，是一个区别于第二国际旧式社会改良党的新型工人阶级革命政党。"], ["中国共产党的成立，是中华民族发展史上一个开天辟地的大事变。中国人民从来就勤劳勇收，富于斗争传统。他们的斗争之所以展遭挫折和失败，重要原因之一，是由于没有一个先进的坚强的政党作为凝聚自己力量的领导核心。自从有了中国共产党，这种局面就开始从根本上改变了。这主要体现在：", "（1）中国共产党的成立使中国革命有了坚强的领导核心，灾难深重的中国人民有了可以依赖的组织者和领导者，中国革命从此不断向前发展，由民主主义革命向社会主义革命推进。", "（2）中国共产党的成立，使中国革命有了科学的指导思想。中国共产党以马克思主义为指导思想，把马克思主义和中国革命的具体实践相结合，制定了正确的革命纲领和斗争策略，为中国人民指明了斗争的目标和走向胜利的道路。", "（3）中国共产党的成立，使中国革命有了新的革命方法，并沟通了中国革命和世界无产阶级革命之间的联系，为中国革命获得了广泛的国际握助以及避免走资本主义提供了客观可能性。", "（4）中国共产党的成立，使中国革命的面貌换然一新。", "①中国共产党提出了反帝反封建的民族民主革命钢额，为中国人民指出了明确的斗争目标：基本解决了革命的放友划分同题。", "②中国共产党发动工农群众开展革命斗争，在中国拟起了第一个工人运动的高潮，同时中国共产党也开始从事发动农民的工作，农民运动蓬缺发展：我到了发动群众这一正确的革命方法。", "③中国共产党实行国共合作，井在合作中发挥重要作用，批起了大革命高潮，推翻了北洋军阀的统治。3.什么是中国共产党人的初心和使命？为什么必须“不忘初心，牢记使命”了"], null, ["中国共产党成立后，立即投身于中国革命的洪流中，使中国革命呈现出新面貌，主要体现在以下几个方面：", "（1）中国共产党是在特定的社会历史条件下成立的，它的成立是一个“开天辟地的大事变”，使当时中国革命的前途焕然一新。", "①使中国革命有了坚强的领导核心，中国人民有了可依赖的组织者和领导者，保证了中国革命胜利的发展。", "②使中国革命有了马克思列宁主义科学的指导思想，并与中国实际相结合，为中国人民指明了斗争的目标和走问胜利的道路", "③使中国革命有了新的革命方法，并沟通了中国革命与世界革命的联系，为中国革命获得国际接助和建免走上资本主义提供了客观可能性。目标。", "（3）中国共产党成立后，发动工农群众开展革命斗争，在中国抵起了第一个工人运动的高潮，同时中国共产党也开始从事发动农民的工作，农民运动蓬勃发展。", "（4）中国共产党成立后，实行国共合作，并在其中发挥重要作用，撤起了大革命高满，推翻了北洋军阀的统治。"]], "5": [["以毛泽东为代表的中国共产党人在探索和开辟中国革命新道路上做了以下努力：", "（1）开展武装反抗国民党统治的斗争。", "①1927年8月，中共中央在汉口召开紧急会议，即八七会议，彻底清算了大革命后期的陈独秀右候机会主义错误，确定了土地革命和武装反抗国民党方针。", "②八七会议以后，举行了南昌起义、湘赣边界的秋收起义、广州起义，中国革命由此发展到了一个新阶段。", "（2）走农村包围城市的革命道路。以农村为重点，到农村去发动农民，进行土地革命，开展武装斗争，建设根据地，这是1927年以后中国革命发展的客观规律所要求的，也是人民的智慧。", "（3）毛泽东不仅在实践中首先把革命进攻的方向指向了农村，而且从理论上阐明了武装斗争的极端重要性和农村应当成为党的工作中心的思想。", "①1928年，毛泽东写了《中国的红色政权为什么能够存在？》《井冈山的斗争》等文章，明确指出以农业为主要经济的中国革命，以军事发动暴动，是一种特征：还科学闸明了共产党额导的土地革命、武装斗争与根据地建设这三者之间的辩证统一关系，", "②1930年，毛泽东在《星星之火，可以燎原》一文中指出：红军、游击队和红色区域的建立和发展，是半殖民地中国在无产阶级领导下的农民斗争的最高形式，是半殖民地农民斗争发展的必然结果，并且无疑是促进全国革余高湘的重要因素。", "（4）农村包围城市，武装夺取政权理论，是对1927年革命失败后中国共产党领导的红军和根据地斗争经验的科学概括。", "①它是以毛泽东为代表的中国共产党人同当时党内盛行的马克息主义教条化、把共产国际和苏联经验神圣化的错误倾向做坚决斗争基确上形成的。", "②农村包围城市、武装夺取政权理论的提出，标志着中国化马克思主义，即毛泽东思想的初步形成。", "（5）随着革命新道路的开辟，中国革命开始走向复兴。中国共产党领导的红军和根据地逐步发展起来，红军游击战争实际上已经成为中国革命的主要形式，农村根据地成为积蓄和锻炼革命力量的主要战略阵地。2.20世纪20年代后期、30年代前中期，中国共产党内为什么连续出现“左”顿错误？"], null, ["（1）长征的意义", "①长征为中国革命保存了有生力量，为党培养了一大批优秀的干部，中国共产党正是依掌这支队伍作基干，使革命力量逐步恢复、发展、壮大，直到取得全国的胜利。", "③红军的长征宣告了国民党反动派消灭中国共产党和红军的图谋彻底失败，宣告了中国共产党和红军肩负着民族希望胜利实现了北上抗日的战略转移，实现了中国共产党和中国革命事业从挫折走向胜利的伟大转折。", "（2）继承和发扬长征精神的原因", "①长征精神，就是把全国人民和中华民族的根本利益者得高于一切，坚信正文事业必然胜利的精神：就是为了教国教民，不怕任何跟难险阻，不借付出一切牺牲的精神：就是坚持独立自主、实事求是，一切从实际出发的精补：就是顾全大局、严守纪律、紧密团结的精神：就是紧紧依靠人民群众，患难与共、艰苦奋斗的精神。", "②伟大长征精神，是中国共产党人及其领导的人民军队革命风范的生动反映，是中华民族自强不总的民族品格的集中展示，是以爱国主义为核心的民族精神的最高体现。长征精神为中国革命不断胜利提供了强大精神动力。", "③中国的社会主义事业仍然处于初级阶段，仍然有很多困难，仍然会遇到很多问题，发扬长征精神，有助于我们克服这些困难，保持党的先进性，最终让中国的社会主义事业达到新的高度。中国共产党是如何总结历史经染、加强党的思想理论建设的？"], null], "6": [["中国抗日战争之所以是神圣的民旗解放战争，主要是因为：（1)从世界意义上看，世界反法西斯战争是人类历史上规模空前的战争，战火遍及亚洲、欧洲、非洲、大洋洲，中国的抗日战争是世界反法西斯战争的重要组成部分。是世界反法西斯战争的东方主战场。中国人民抗日战争的胜利，对世界各国夺取反法西斯战争胜利，维护世界和平的伟大事业产生了巨大影响。2)从战争的性质上看，抗日战争是平殖民地半封建的中国和帝国主义的日本之间在20世纪30年代展开的一个民族反对另一个民族侵略、压迫、双役的战争。中国是正文的、进步的反侵略战争，是得道的：日本是非正义的、野蜜的、侵略战争，是失道的。日本侵略者肆意践踏中国的大好河山，屠杀中国军民，强行掠夺中国劳工，跃蹦和推残妇女，进行细菌战和化学战，制造了南京大屠杀等一系列灭绝人性的惨案，犯下了令人发指的罪行，使源远流长的中华文明道到了惨重破坏，使中华民族蒙受了巨大损失。C3）从战争的结果上看，中国人民抗日战争，是近代以来中华民族反抗外敌入侵第一次取得完全胜利的民族解放战争。", "①中国人民彻底打败了日本侵略者，挥卫了中国的国家主权和领土完整，使中华民族避免遭受殖民奴役的尼运。", "②中国人民抗日战争的胜利，促进了中华民族的觉醒，成为中华民族走向复兴的转折点，正是在中国人民抗日战争胜利的基碑上，中国共产党领导中国人民取得了新民主主义革命的胜利。", "③中国人民抗日战争，弘扬了中华民族的伟大精神，人民空前团结起来，使中华民族换发出巨大凝聚力和旺盛生命力。"], ["经历了大革命的失败后，中共有了更适合中国国情的纲领，善于发动广大人民群众，实行全民族抗战，", "（1）以毛泽东为杰出代表的中国共产党人，把马克思列宁主义基本原理同中国革命具体实际相结合，创立和发展了毛泽东思想的科学理论。制定、实施了一套完整的抗战策略和方针，提出了持久战的战略思想，对抗日战争的胜利发挥了重要的思想和战略指导作用。", "（2）共产始终坚持全面抗战路线和持久战的方针，共产党强调要打倒帝国主义关键在于实行全国军事总动员，全国人民总动员，把抗日战争发展成全民族的抗战。最大限度地动员了全国军民共同抗战，成为凝聚全民族力量的杰出组织者和鼓舞者：全面抗战爆发后毛泽东针对各种舆论系统地闸述了抗日战争的特点、前途和发展规律，阐明了持久战的总方针，使全民嵌认清了抗日战争的性质和发展进程，对全国抗战起了积极作用。", "（3）开辟敌后战场，建立抗日根据地。全国抗战开始后，共产党领导的八路军，新四军进行了多次抗战，战场和共产党额导的敌后战场。共产党在敌后建立抗日根据地，采取开展游击战争，有力的打击了日军，牵制了日军战场的作战力下降，转入次妥位置，而敌后游击战则成为主要的抗日作最方式。共产党还在抗日根据地大力发展经济和文化建设，帮助根据地人民渡过难关。", "（4）击退国民党的反共摩擦，巩固和壮大抗日民族统一战线，全面抗战期间，国民党先后发起三次反共高潮，人民军队霍给子了坚决的反击，成功击退国民党。同时中国共产党坚持把中日矛盾放在首位，积极争取抗日合作。并制定了“发展进步势力，争取中间势力，孤立项固势力”的策略和方针，始终坚持抗日续一线线。中国共产党人以自己最富于括牲的爱国主义精神、不怕流血牺牲的模范行动，支撑起全民嵌救亡图存的希望，成为夺取抗战胜利的"], ["国民党政府在抗日战争中执行的路线和正面战场的地位和作用体现在以下几个方面：", "（1）国民党政府执行的是片面抗战路线，即不敢放手发动和武装形众，实行单纯的政府和正规军的抗战：在战略技术上，没有采取积极防御的方计。而是进行单纯的阵继防御战。这是由国民党政府的阶级本质和阶级利益所决定的，不仅使国民党正面战场节节失利，而且危害群众利益，使国民党政府孤立于人民群众之外。2)国民党领导的正面战场对抗日战争的胜利做出了重要责献，特别是在抗日成争初期的战略防御阶段，牵制和消耗了日本大量军力，为兵力的部署调道和人民群众的转移争取了宝贵的时间。G）国民党领导的正面战场在抗目战争中表现不同，其地位和作用也不同，抗战初期的战略防御阶段。国民党政依积极抗成，正面战场在整个抗成中起了重要作用。但由于其实行片面抗成路线，也逾受了巨大损失，特别是进入战略相持阶段后，国民党一面消极抗战，一面制造反共醇擦事件，其在抗战中的地位和作用明显下降。在战略反攻阶段，国民党虽然坚持抗战，但重点是在准备抢夺抗战胜利果实，对夺取抗战最后胜利的作用十分有限。"], null], "7": [["抗战胜利后，国民党陷入全民的包国并迅速走向崩清的原因有：", "（1）国民党政府实行专制独裁统治，官员们贪污腐化，在抗战后期就严重丧失民心。抗战胜利之际，国民党政府所派官员“劫收”论陷区，进一步丧失人心。", "（2）国民党政府在抗战胜利后违育全国人民迫切要求体养生息、和平建国的意愿，执行反人民的内战政策。为了筹措内战经费，向人民征收各种指税，发纸币，导致恶性通货膨账，工农业生产严重娄缩，人民生活困苦。", "（3）代表大地主、大资产阶级利益的国民党政府在抗战胜利后，拒绝全国人民要和平、要民主、要自由的那望，仍然进续并加强独裁统治。因此。国民党政府置自身于人民的对立面，丧失了人心，激起了全国人民的反抗从而陷入了全国的包围之中，并迅速走向别遗。", "（4）共产党代表中国最广大劳动人民的利益，坚决进行反对封建主义、帝国主义和官僚资本主义三座大山"], ["（1）民主党派的历史作用中国各民主党深的政纲不尽相同，但都主张爱国、反对卖国，主张民主、反对独载。在抗线中，他们对反抗日本帝国主义的侵略，特别是文化侵略，对国统区抗日民主运动的发展都起了积极作用。抗战胜利后，民主党派作为“第三方面”，主要与共产党一起，反对国民党的内战、独裁政策，为和平民主面奔走呼号，虽然有些党派后来跟着国民党走，但民翌等大多数民主党派人士是反对国民党一党独裁的，并与共产党一起为和平、民主、自由而斗争。此外，他们还积极参加和支持国民党统治区的爱国民主运动，有力地支握第二条战线的斗争，特别是在新中国成立前，同意接受共产党领导，参加人民政协，为新中国的成立和新民主主义革命的胜利微出了自己的贡献。", "（2）中国共产党额导的多党合作、政治协商格局的形成", "①各民主党派成立时，大多同中国共产党建立了不同程度的合作关系，并在斗争实践中逐步地发展了这种关系。无论是在举行国共谈判、召开政协会议期间，还是在解放战争的进行过程中，中国共产党都及时向各民主党派通报情况，认真听取它们的意见，并就一些重大问题同它们进行协商，以便采取一致行动。中共一贯效励和支持各民主党派反对国民党独裁统治的斗争。同时，又十分注壹尊重和维护其应有的政治地位和合理的利益。对于它们的某些不受当的意见。则善意地提出批评，诚是地帮助其进步。这使得中共与民主党谣的关系更加融洽，合作方式不渐发展、完善。", "②国民党政府坚持一党独裁，迫害民主党派进步人士，使得民主党派逐步转移到新民主主义革命的立场上，特别是1948年1月民盟公开表示与共产党携手合作。1949年1月民主党派和无党派民主人士联合发表（对时局的意见》，表示愿意接受中国共产党的领导，拥护建立人民民主的新中国。", "③中国共产党也邀请各民主党派“积极参政。共同建设新中国”，1949年9月，各民主党谣积极参加了中国人民政治协商会议。这标志着各民主党派正式接受了中国共产党领导和人民共和国，确认了社会主义的正确性。各民主党派世由在野党变成了人民民主专政的参政党，中国共产党额导的多党合作、政治协商制度在此基础上也基本形成。水利国中国中国中华："], null]};
+const CN = ['零','一','二','三','四','五','六','七','八','九','十'];
+const CH_KEYS = Object.keys(QUESTIONS).sort((a,b)=>a-b);
+const palette = ['#a8272b','#c0622a','#9a7b27','#2f7d52','#1f7a86','#3f5aa6','#7a4aa0','#b03f78','#7a5230','#4a7a3a'];
+
+const STORE = (function(){
+  // Claude 站内预览环境提供 window.storage
+  if(typeof window!=='undefined' && window.storage) return window.storage;
+  // 本地浏览器：用 localStorage 适配相同的 get/set 接口，实现做题进度/错题本/Key 的缓存
+  try{
+    const t='__jdsh_test__'; localStorage.setItem(t,'1'); localStorage.removeItem(t);
+    return {
+      get:(k)=>{ const v=localStorage.getItem(k); return v==null?null:{value:v}; },
+      set:(k,v)=>{ try{ localStorage.setItem(k,v); }catch(e){} }
+    };
+  }catch(e){ return null; } // 隐私模式等 localStorage 不可用时，降级为不缓存
+})();
+let state = { mode:'unit', chap:'1', list:[], pos:0 };
+let answers = {};
+let wrong = new Set();
+let ai = { provider:'claude', dskey:'' };
+let examAns={}; let seen=new Set();
+
+function chName(k){ return '第'+CN[+k]+'章 '+CHAPTERS[k].title; }
+function key(it){ return it.type==='essay' ? 'e-'+it.chap+'-'+it.ei : it.chap+'-'+it.qi; }
+function letterIdx(L){ return {A:0,B:1,C:2,D:3}[L]; }
+function cur(){ return state.list[state.pos]; }
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+/* ---------- persistence ---------- */
+async function loadStore(){
+  if(!STORE) return;
+  try{ const a=await STORE.get('jdsh:answers'); if(a) answers=JSON.parse(a.value); }catch(e){}
+  try{ const w=await STORE.get('jdsh:wrong'); if(w) wrong=new Set(JSON.parse(w.value)); }catch(e){}
+  try{ const s=await STORE.get('jdsh:ai'); if(s){ai=JSON.parse(s.value);} }catch(e){}
+}
+async function save(){
+  if(!STORE) return;
+  try{ await STORE.set('jdsh:answers', JSON.stringify(answers), false); }catch(e){}
+  try{ await STORE.set('jdsh:wrong', JSON.stringify([...wrong]), false); }catch(e){}
+}
+async function saveAI(){ if(STORE){ try{ await STORE.set('jdsh:ai', JSON.stringify(ai), false);}catch(e){} } }
+
+/* ---------- list ---------- */
+function buildList(){
+  if(state.mode==='unit'){
+    state.list = QUESTIONS[state.chap].map((d,qi)=>({type:'mcq',chap:state.chap, qi, data:d}));
+  } else if(state.mode==='exam'){
+    state.list = buildExam();
+  } else {
+    state.list = [];
+    CH_KEYS.forEach(k=>QUESTIONS[k].forEach((d,qi)=>state.list.push({type:'mcq',chap:k,qi,data:d})));
+  }
+  state.pos = 0;
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; }
+function buildExam(){
+  const all=[]; CH_KEYS.forEach(k=>QUESTIONS[k].forEach((d,qi)=>all.push({type:'mcq',chap:k,qi,data:d})));
+  const mcq=shuffle(all).slice(0,50);
+  const es=[]; Object.keys(ESSAYS).forEach(k=>(ESSAYS[k]||[]).forEach((d,ei)=>es.push({type:'essay',chap:k,ei,data:d})));
+  const ess=shuffle(es).slice(0,3);
+  return mcq.concat(ess);
+}
+function newExam(){
+  if(state.mode!=='exam'){ setMode('exam'); return; }
+  examAns={}; seen=new Set(); state.list=buildExam(); state.pos=0; renderAll(); toast('已抽取新试卷（50 选择 + 3 思考）');
+}
+function shuffleList(){
+  for(let i=state.list.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[state.list[i],state.list[j]]=[state.list[j],state.list[i]];}
+  state.pos=0; renderAll();
+}
+function reviewWrong(){
+  if(wrong.size===0){ toast('错题本是空的，先去做题吧'); return; }
+  const items=[];
+  CH_KEYS.forEach(k=>QUESTIONS[k].forEach((d,qi)=>{ if(wrong.has(k+'-'+qi)) items.push({type:'mcq',chap:k,qi,data:d}); }));
+  state.list=items; state.pos=0; renderAll();
+  toast('已载入 '+items.length+' 道错题');
+}
+function redoOne(){
+  const it=cur(); if(!it) return;
+  if(it.type==='essay'){ seen.delete(key(it)); renderQuiz(); return; }
+  const store=(state.mode==='exam'?examAns:answers); delete store[key(it)];
+  if(state.mode!=='exam') save();
+  renderQuiz(); renderStats();
+}
+function redoSet(){
+  if(!state.list.length) return;
+  if(state.mode==='exam'){ examAns={}; seen=new Set(); state.pos=0; renderAll(); toast('本套已重置'); return; }
+  state.list.forEach(it=>{ delete answers[key(it)]; });  // 只重置当前这一组，保留错题本
+  state.pos=0; save(); renderAll();
+  toast('本组已重置，可以再刷一遍');
+}
+
+/* ---------- render ---------- */
+function renderAll(){ renderQuiz(); renderSide(); renderStats(); }
+
+function aGet(it){ return (state.mode==='exam'?examAns:answers)[key(it)]; }
+function renderQuiz(){
+  const it=cur(); if(!it) return;
+  if(it.type==='essay') renderEssayItem(it); else renderMcqItem(it);
+  document.getElementById('posLbl').textContent = (state.pos+1)+' / '+state.list.length;
+  renderSheet(); maybeShowResult();
+}
+function renderMcqItem(it){
+  const d=it.data, picked=aGet(it);
+  document.getElementById('qmeta').innerHTML =
+    '<span class="tag red">第'+CN[+it.chap]+'章</span><span class="tag">单选题</span><span>'+(state.mode==='exam'?'模拟考':'本章第 '+(it.qi+1)+' 题')+'</span>';
+  document.getElementById('qstem').innerHTML = '<span class="num">'+(state.pos+1)+'.</span>'+esc(d.q);
+  const opts=document.getElementById('opts'); opts.innerHTML='';
+  ['A','B','C','D'].forEach((L,i)=>{
+    const b=document.createElement('button'); b.className='opt';
+    let cls='';
+    if(picked){ b.classList.add('locked'); if(L===d.a){cls='right';}else if(L===picked){cls='wrong';}else{cls='dim';} }
+    if(cls) b.classList.add(cls);
+    b.innerHTML='<span class="k">'+L+'</span><span class="t">'+esc(d.o[i])+'</span>';
+    if(!picked) b.onclick=()=>pick(L);
+    opts.appendChild(b);
+  });
+  const pre=document.getElementById('preRow'), exp=document.getElementById('exp');
+  if(picked){
+    pre.style.display='none';
+    exp.classList.add('show');
+    const ok=picked===d.a;
+    document.getElementById('expRes').innerHTML = ok ? '<span class="ok">✓ 回答正确</span>' : '<span class="no">✕ 回答错误</span>　你选了 '+picked+'，正确答案是 '+d.a;
+    document.getElementById('expAns').innerHTML = '<b style="color:var(--gold);font-family:var(--serif)">正确答案 '+d.a+'：</b>'+esc(d.o[letterIdx(d.a)]);
+    document.getElementById('aiOut').className='ai-out';
+    document.getElementById('aiExpBtn').disabled=false; document.getElementById('aiExpBtn').textContent='✦ AI 详细解析';
+  }else{
+    pre.style.display='flex'; document.getElementById('hintOut').className='hint-out'; exp.classList.remove('show');
+  }
+}
+function renderEssayItem(it){
+  const d=it.data, revealed=seen.has(key(it));
+  document.getElementById('qmeta').innerHTML='<span class="tag red">第'+CN[+it.chap]+'章</span><span class="tag" style="color:var(--jade);border-color:var(--jade);background:#fff">课后思考题</span><span>主观题 · 参考作答</span>';
+  document.getElementById('qstem').innerHTML='<span class="num">'+(state.pos+1)+'.</span>'+esc(d.q);
+  const fr=d.frame?'<div class="eframe"><b>脉络 ▸ </b>'+esc(d.frame)+'</div>':'';
+  const pts=(d.pts||[]).map(p=>'<li><b class="ek">'+esc(p[0])+'</b>'+esc(p[1])+(p[2]?'<span class="cite">教材p'+esc(p[2])+'</span>':'')+'</li>').join('');
+  document.getElementById('opts').innerHTML='<div class="essay-quiz"><div class="eq-tip">✍️ 先在心里/纸上作答，再点开参考答案</div>'+
+    (revealed?'<div class="essay-a ans-open">'+fr+'<ul>'+pts+'</ul></div>':'<button class="btn solid" onclick="revealEssay()">查看参考答案</button>')+
+    '<div style="margin-top:12px"><button class="btn ai" onclick="askEssayAI()">✦ 让 AI 详讲这道题</button></div></div>';
+  document.getElementById('preRow').style.display='none';
+  document.getElementById('hintOut').className='hint-out';
+  document.getElementById('exp').classList.remove('show');
+}
+function revealEssay(){ seen.add(key(cur())); renderQuiz(); }
+function askEssayAI(){ openAI(); document.getElementById('chatbox').value='请详细讲解这道课后思考题并给出背诵要点：'+cur().data.q; }
+
+function pick(L){
+  const it=cur(); if(it.type==='essay') return;
+  const store=(state.mode==='exam'?examAns:answers); const k=key(it);
+  if(store[k]) return;
+  store[k]=L;
+  if(state.mode!=='exam'){ if(L!==it.data.a) wrong.add(k); else wrong.delete(k); save(); }
+  renderQuiz(); renderStats();
+}
+
+function renderSheet(){
+  const sh=document.getElementById('sheet'); sh.innerHTML='';
+  state.list.forEach((it,i)=>{
+    const b=document.createElement('button'); b.className='gn';
+    if(it.type==='essay'){ b.classList.add('gn-essay'); b.textContent='思'; if(seen.has(key(it))) b.classList.add('done'); }
+    else { b.textContent=i+1; const a=aGet(it); if(a) b.classList.add(a===it.data.a?'ok':'no'); }
+    if(i===state.pos) b.classList.add('cur');
+    b.onclick=()=>{state.pos=i;renderQuiz();renderSide();};
+    sh.appendChild(b);
+  });
+}
+
+function maybeShowResult(){
+  const r=document.getElementById('result');
+  const done=state.list.every(it=> it.type==='essay'?seen.has(key(it)):aGet(it));
+  if(done && state.list.length){
+    const mcq=state.list.filter(it=>it.type!=='essay');
+    const c=mcq.filter(it=>aGet(it)===it.data.a).length;
+    const pct=mcq.length?Math.round(c/mcq.length*100):0;
+    const eN=state.list.length-mcq.length;
+    r.className='card result show';
+    r.innerHTML='<div class="big">'+pct+'<small style="font-size:16px">分</small></div>'+
+      '<div><div style="font-family:var(--serif);font-size:16px">'+(state.mode==='exam'?'模拟考完成':'本组已完成')+'</div>'+
+      '<div class="lbl">选择题 '+c+' / '+mcq.length+' 正确'+(eN?(' · 思考题 '+eN+' 道（自评）'):'')+'</div></div>'+
+      '<div class="grow"></div>'+(state.mode==='exam'?'<button class="btn ghost" onclick="newExam()">再来一套</button>':'<button class="btn ghost" onclick="reviewWrong()">只看错题</button>');
+  }else{ r.className='card result'; }
+}
+
+function go(n){ const np=state.pos+n; if(np<0||np>=state.list.length) return; state.pos=np; renderQuiz(); renderSide(); }
+
+function renderStats(){
+  let done=0,corr=0;
+  Object.keys(answers).forEach(k=>{ done++; const p=k.split('-'); const c=p[0],qi=p[1]; if(QUESTIONS[c]&&QUESTIONS[c][qi]&&answers[k]===QUESTIONS[c][qi].a) corr++; });
+  document.getElementById('stDone').textContent=done;
+  document.getElementById('stCorrect').textContent=corr;
+  document.getElementById('stWrong').textContent=wrong.size;
+}
+
+/* ---------- side: knowledge / people / timeline ---------- */
+let knowOpenTab='k';
+function renderSide(){
+  const it=cur(); if(!it) return;
+  const ch=it.chap, c=CHAPTERS[ch];
+  document.getElementById('knowTitle').textContent='第'+CN[+ch]+'章 · '+c.title;
+  document.getElementById('knowSub').textContent=c.subtitle;
+  const fb=document.getElementById('fullBadge');
+  if(state.mode==='full'){ fb.style.display='inline-block'; fb.textContent='全书模式 · 本题属第'+CN[+ch]+'章'; }
+  else fb.style.display='none';
+
+  const pk=document.getElementById('paneK'); pk.innerHTML='';
+  (c.knowledge||[]).forEach(s=>{
+    const div=document.createElement('div'); div.className='ksec';
+    div.innerHTML='<h4>'+esc(s.h)+'</h4><ul>'+s.p.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>';
+    pk.appendChild(div);
+  });
+
+  const pp=document.getElementById('paneP');
+  pp.innerHTML=(c.people&&c.people.length)
+    ? c.people.map(p=>'<div class="pp"><span class="pp-n">'+esc(p.n)+'</span><span class="pp-r">'+esc(p.r)+'</span></div>').join('')
+    : '<div class="empty">本章暂无人物条目</div>';
+
+  const pt=document.getElementById('paneT');
+  pt.innerHTML='<div class="tl">'+(c.timeline||[]).map(e=>
+    '<div class="ev"><div class="seal">'+esc(e.d)+'</div><div class="row"><div class="ttl">'+esc(e.t)+'</div><div class="hint">点击查看简介</div></div><div class="detail">'+esc(e.x)+'</div></div>'
+  ).join('')+'</div>';
+  pt.querySelectorAll('.ev').forEach(ev=>{ const tog=()=>ev.classList.toggle('open'); ev.querySelector('.seal').onclick=tog; ev.querySelector('.row').onclick=tog; });
+
+  renderEssays(ch);
+
+  setMapView();
+}
+function knowTab(t){
+  knowOpenTab=t;
+  ['k','p','t','e'].forEach(x=>{
+    document.getElementById('tab'+x.toUpperCase()).classList.toggle('on',t===x);
+    document.getElementById('pane'+x.toUpperCase()).style.display=t===x?'':'none';
+  });
+}
+function citeFmt(s){ return s.replace(/\u3010[^\u3011]*\u3011/g, m=>'<span class="cite">'+m+'</span>'); }
+function renderEssays(ch){
+  const list=ESSAYS[ch]||[]; const el=document.getElementById('paneE');
+  if(!list.length){ el.innerHTML='<div class="empty">本章暂无课后思考题（本资料覆盖第一至七章）</div>'; return; }
+  const AI=ESSAYS_AI[ch]||[], OG=ESSAYS_ORG[ch]||[];
+  el.innerHTML='<div class="essay-head">课后“学习思考”题 · 三版对照（精简 / AI总结 / 机构总结） · 共'+list.length+'题</div>'+
+    list.map((e,i)=>{
+      const pts=e.pts.map(p=>'<li><b class="ek">'+esc(p[0])+'</b>'+esc(p[1])+(p[2]?'<span class="cite">教材p'+esc(p[2])+'</span>':'')+'</li>').join('');
+      const fr=e.frame?'<div class="eframe"><b>脉络 ▸ </b>'+esc(e.frame)+'</div>':'';
+      const v0='<div class="ever ever-on">'+fr+'<ul>'+pts+'</ul></div>';
+      const aip=AI[i]||[];
+      const v1='<div class="ever">'+(aip.length?'<ul class="ver-full">'+aip.map(p=>'<li>'+citeFmt(esc(p))+'</li>').join('')+'</ul>':'<div class="empty">无此版本</div>')+'</div>';
+      const og=OG[i];
+      const v2='<div class="ever">'+(og&&og.length?'<ul class="ver-org-list">'+og.map(p=>'<li>'+citeFmt(esc(p))+'</li>').join('')+'</ul>':'<div class="empty">机构版未收录此题</div>')+'</div>';
+      return '<div class="essay"><button class="essay-q" onclick="this.parentNode.classList.toggle(\'open\')"><span class="eq-n">'+(i+1)+'</span><span class="eq-t">'+esc(e.q)+'</span><span class="eq-ar">▸</span></button>'+
+        '<div class="essay-a"><div class="ever-tabs"><button class="on" onclick="everSwitch(this,0)">精简版</button><button onclick="everSwitch(this,1)">AI总结版</button><button onclick="everSwitch(this,2)">机构总结版</button></div>'+v0+v1+v2+'</div></div>';
+    }).join('');
+}
+function everSwitch(btn,idx){
+  const wrap=btn.closest('.essay-a');
+  wrap.querySelectorAll('.ever-tabs button').forEach((b,i)=>b.classList.toggle('on',i===idx));
+  wrap.querySelectorAll('.ever').forEach((d,i)=>d.classList.toggle('ever-on',i===idx));
+}
+
+/* ---------- mobile right-col overlay ---------- */
+function openSide(which){
+  document.getElementById('rightcol').classList.add('open');
+  document.getElementById('scrim').classList.add('on');
+  rcTab(which||'know');
+  setTimeout(()=>{ applyTransform(); }, 60);
+}
+function closeSide(){ document.getElementById('rightcol').classList.remove('open'); document.getElementById('scrim').classList.remove('on'); }
+function rcTab(t){
+  document.getElementById('rcKnow').classList.toggle('on',t==='know');
+  document.getElementById('rcMap').classList.toggle('on',t==='map');
+  document.getElementById('knowCard').classList.toggle('hide', t!=='know');
+  document.getElementById('mapCard').classList.toggle('hide', t!=='map');
+  if(t==='map') setTimeout(applyTransform,40);
+}
+
+/* ===================== MAP ===================== */
+const GEO={lon0:73,lon1:135,lat0:15,lat1:54,W:840,H:640};
+function proj(lon,lat){ return [ (lon-GEO.lon0)/(GEO.lon1-GEO.lon0)*GEO.W, (GEO.lat1-lat)/(GEO.lat1-GEO.lat0)*GEO.H ]; }
+const BORDER=[[87.3,48.9],[90.5,47.8],[95.0,44.3],[96.4,42.8],[100.0,42.6],[105.0,41.8],[110.0,42.5],[111.5,43.7],[115.0,45.4],[117.5,46.6],[119.9,49.4],[120.8,51.6],[122.4,53.5],[126.0,52.6],[127.5,50.2],[130.7,48.9],[134.3,48.4],[133.0,45.5],[131.3,44.0],[131.0,42.9],[130.6,42.4],[128.2,41.5],[126.5,41.6],[124.4,40.1],[123.2,39.3],[121.6,38.9],[122.0,40.5],[118.2,39.0],[117.7,38.6],[118.9,37.4],[122.6,37.4],[120.2,36.0],[119.2,34.4],[121.0,32.0],[121.9,30.9],[121.6,29.0],[120.5,27.2],[119.6,25.2],[118.0,24.4],[116.5,23.2],[113.5,22.2],[110.4,21.0],[108.5,21.5],[106.7,22.0],[105.3,23.3],[103.5,22.6],[101.8,21.2],[99.2,22.1],[98.0,24.1],[97.5,27.0],[98.7,29.0],[96.5,29.0],[94.0,28.2],[91.7,27.5],[88.8,27.3],[85.5,28.3],[82.0,30.3],[79.0,32.5],[78.2,35.5],[74.9,37.0],[73.5,38.7],[75.0,39.6],[76.5,40.5],[80.2,42.0],[82.6,45.0],[85.0,47.0]];
+const TAIWAN=[[121.0,25.3],[122.0,25.0],[121.6,24.0],[120.9,22.6],[120.2,22.9],[120.1,24.5]];
+const HAINAN=[[110.6,20.1],[111.0,19.5],[110.5,18.7],[109.5,18.4],[108.7,19.3],[109.0,20.0],[109.8,20.2]];
+const YELLOW=[[103.8,36.0],[105,37.5],[106.3,38.5],[107,41.0],[110,40.7],[111.3,40.2],[110.5,37.8],[110.4,36.1],[110.3,34.6],[113.6,34.8],[115.5,35.4],[117,36.7],[118.9,37.4]];
+const YANGTZE=[[101.5,26.9],[104.6,28.8],[106.5,29.6],[108.4,30.8],[111.3,30.7],[114.3,30.6],[116,29.7],[117.2,30.9],[118.8,32.0],[120.0,31.9],[121.7,31.4]];
+const SEAS=[['渤海',119.6,38.7],['黄海',123.6,35.4],['东海',125.2,28.6],['南海',112.5,16.6],['台湾海峡',119.6,24.0]];
+const NEI=[['蒙古',103,46.6],['俄罗斯',128,51.2],['哈萨克斯坦',79,46.5],['印度',82,30],['缅甸',96.5,21.2],['朝鲜',127.2,40]];
+
+let svg,vp,baseG,mkG,arrG,pop,mapWrap;
+let ms=1,mtx=0,mty=0,lastMs=1;
+let curGeo=[], curGroups=[], showArrows=false, mapMode='unit', mapHi='1', mapInit=false, lastMapChap=null;
+
+function ptsToPath(arr,close){ let d=''; arr.forEach((p,i)=>{const a=proj(p[0],p[1]); d+=(i?'L':'M')+a[0].toFixed(1)+' '+a[1].toFixed(1);}); if(close)d+='Z'; return d; }
+
+function initMap(){
+  svg=document.getElementById('map'); mapWrap=document.getElementById('mapWrap'); pop=document.getElementById('mapPop');
+  vp=document.getElementById('vp'); baseG=document.getElementById('baseG'); mkG=document.getElementById('mkG'); arrG=document.getElementById('arrG');
+  drawBase(); bindMap(); mapInit=true;
+}
+function drawBase(){
+  let h='';
+  for(let lon=80;lon<=130;lon+=10){const a=proj(lon,GEO.lat1),b=proj(lon,GEO.lat0); h+='<line class="grat" x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'"/>';}
+  for(let lat=20;lat<=50;lat+=10){const a=proj(GEO.lon0,lat),b=proj(GEO.lon1,lat); h+='<line class="grat" x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'"/>';}
+  h+='<path class="land" d="'+ptsToPath(BORDER,true)+'"/>';
+  h+='<path class="land" d="'+ptsToPath(TAIWAN,true)+'"/>';
+  h+='<path class="land" d="'+ptsToPath(HAINAN,true)+'"/>';
+  h+='<path class="river" d="'+ptsToPath(YELLOW,false)+'"/>';
+  h+='<path class="river" d="'+ptsToPath(YANGTZE,false)+'"/>';
+  SEAS.forEach(s=>{const a=proj(s[1],s[2]); h+='<text class="sea" x="'+a[0].toFixed(1)+'" y="'+a[1].toFixed(1)+'">'+s[0]+'</text>';});
+  NEI.forEach(s=>{const a=proj(s[1],s[2]); h+='<text class="nei" x="'+a[0].toFixed(1)+'" y="'+a[1].toFixed(1)+'">'+s[0]+'</text>';});
+  baseG.innerHTML=h;
+}
+function dnum(d){const m=String(d).match(/(\d{4})(?:\D(\d{1,2}))?(?:\D(\d{1,2}))?/); return m?(+m[1])*10000+(m[2]?+m[2]:0)*100+(m[3]?+m[3]:0):0;}
+function groupGeo(list){
+  const m=new Map();
+  list.forEach(e=>{const k=e.lon+','+e.lat; if(!m.has(k))m.set(k,{lon:e.lon,lat:e.lat,place:e.place,events:[]}); m.get(k).events.push(e);});
+  const arr=[...m.values()]; arr.forEach(g=>g.events.sort((a,b)=>dnum(a.d)-dnum(b.d))); return arr;
+}
+function allGeo(){ let a=[]; CH_KEYS.forEach(k=>(CHAPTERS[k].geo||[]).forEach(e=>a.push(Object.assign({chap:k},e)))); return a; }
+
+let legendOff={};
+function setMapView(){
+  if(!mapInit) return;
+  const ch=cur().chap;
+  if(state.mode==='full'){ mapMode='full'; mapHi=ch; curGeo=allGeo(); document.getElementById('mapSub').textContent='全书 · 各章按颜色'; }
+  else { mapMode='unit'; mapHi=ch; curGeo=(CHAPTERS[ch].geo||[]).map(e=>Object.assign({chap:ch},e)); document.getElementById('mapSub').textContent='第'+CN[+ch]+'章 · '+curGeo.length+'个事件'; }
+  curGroups=groupGeo(curGeo);
+  if(ch!==lastMapChap){ mapReset(); lastMapChap=ch; }
+  renderLegend(); drawMarkers(); drawArrows(); closePop();
+}
+function renderLegend(){
+  const lg=document.getElementById('mapLegend');
+  if(mapMode!=='full'){ lg.className='map-legend'; lg.innerHTML=''; return; }
+  lg.className='map-legend show';
+  lg.innerHTML=CH_KEYS.map(k=>'<div class="lg'+(legendOff[k]?' off':'')+'" onclick="toggleLegend(\''+k+'\')"><span class="sw" style="background:'+palette[(+k-1)%palette.length]+'"></span>第'+CN[+k]+'章</div>').join('');
+}
+function toggleLegend(k){ legendOff[k]=!legendOff[k]; renderLegend(); drawMarkers(); drawArrows(); }
+
+function drawMarkers(){
+  let h='';
+  curGroups.forEach((g,gi)=>{
+    const evs = (mapMode==='full') ? g.events.filter(e=>!legendOff[e.chap]) : g.events;
+    if(!evs.length) return;
+    const a=proj(g.lon,g.lat);
+    const baseChap = (mapMode==='full') ? evs[0].chap : mapHi;
+    const col = palette[(+baseChap-1)%palette.length];
+    const faded = (mapMode==='full' && mapHi && !evs.some(e=>String(e.chap)===String(mapHi)));
+    h+='<g class="mk'+(faded?' faded':'')+'" data-gi="'+gi+'" transform="translate('+a[0].toFixed(1)+' '+a[1].toFixed(1)+')">'+
+       '<circle class="mkring" r="'+(8/ms).toFixed(2)+'" fill="'+col+'"/>'+
+       '<circle class="mkdot" r="'+(4.6/ms).toFixed(2)+'" fill="'+col+'" stroke-width="'+(1/ms).toFixed(2)+'"/>'+
+       (evs.length>1?'<text class="mkcount" y="'+(-9.5/ms).toFixed(2)+'" font-size="'+(9/ms).toFixed(2)+'">'+evs.length+'</text>':'')+
+       '<text class="mklbl" x="'+(9/ms).toFixed(2)+'" y="'+(3.6/ms).toFixed(2)+'" font-size="'+(11/ms).toFixed(2)+'" stroke-width="'+(2.4/ms).toFixed(2)+'">'+esc(g.place)+'</text>'+
+       '</g>';
+  });
+  mkG.innerHTML=h;
+  mkG.querySelectorAll('.mk').forEach(el=>el.addEventListener('click',ev=>{ ev.stopPropagation(); openPop(+el.dataset.gi, el); }));
+}
+function drawArrows(){
+  if(!showArrows){ arrG.innerHTML=''; return; }
+  let flat=[...curGeo];
+  if(mapMode==='full') flat=flat.filter(e=>!legendOff[e.chap]);
+  flat.sort((a,b)=>dnum(a.d)-dnum(b.d));
+  let h='', prev=null;
+  flat.forEach(e=>{
+    if(prev && (prev.lon!==e.lon||prev.lat!==e.lat)){
+      const p1=proj(prev.lon,prev.lat), p2=proj(e.lon,e.lat);
+      h+=arrowSeg(p1[0],p1[1],p2[0],p2[1]);
+    }
+    prev=e;
+  });
+  arrG.innerHTML=h;
+}
+function arrowSeg(x1,y1,x2,y2){
+  const ang=Math.atan2(y2-y1,x2-x1);
+  const pad=6/ms, ah=7/ms;
+  const sx=x1+Math.cos(ang)*pad, sy=y1+Math.sin(ang)*pad;
+  const ex=x2-Math.cos(ang)*pad, ey=y2-Math.sin(ang)*pad;
+  const a1x=ex-Math.cos(ang-0.42)*ah, a1y=ey-Math.sin(ang-0.42)*ah;
+  const a2x=ex-Math.cos(ang+0.42)*ah, a2y=ey-Math.sin(ang+0.42)*ah;
+  return '<line class="arr" x1="'+sx.toFixed(1)+'" y1="'+sy.toFixed(1)+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke-width="'+(1.8/ms).toFixed(2)+'"/>'+
+         '<polygon class="arrh" points="'+ex.toFixed(1)+','+ey.toFixed(1)+' '+a1x.toFixed(1)+','+a1y.toFixed(1)+' '+a2x.toFixed(1)+','+a2y.toFixed(1)+'"/>';
+}
+function openPop(gi, el){
+  const g=curGroups[gi];
+  let evs = (mapMode==='full') ? g.events.filter(e=>!legendOff[e.chap]) : g.events;
+  let html='<div class="pop-h"><b>'+esc(g.place)+'</b><button class="pop-x" onclick="closePop()">✕</button></div><div class="pop-b">';
+  evs.forEach(e=>{ const cc=palette[(+e.chap-1)%palette.length];
+    html+='<div class="pop-ev"><span class="pop-d" style="background:'+cc+'">'+esc(e.d)+'</span><div><div class="pop-t">'+esc(e.t)+(mapMode==='full'?'<i class="pop-ch">第'+CN[+e.chap]+'章</i>':'')+'</div><div class="pop-x2">'+esc(e.x)+'</div></div></div>';
+  });
+  html+='</div>'; pop.innerHTML=html; pop.className='map-pop show';
+  const wrap=mapWrap.getBoundingClientRect(), r=el.getBoundingClientRect();
+  let left=r.left-wrap.left+14, top=r.top-wrap.top+10;
+  const pw=Math.min(248, wrap.width*0.84), ph=pop.offsetHeight||220;
+  if(left+pw>wrap.width-8) left=Math.max(8, r.left-wrap.left-pw-10);
+  if(top+ph>wrap.height-8) top=Math.max(8, wrap.height-ph-8);
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function closePop(){ if(pop){ pop.className='map-pop'; } }
+function toggleArrows(){
+  showArrows=!showArrows;
+  const b=document.getElementById('tlBtn'); b.textContent=showArrows?'隐藏时间线':'显示时间线'; b.classList.toggle('on',showArrows);
+  drawArrows();
+}
+
+/* ---- pan / zoom ---- */
+function applyTransform(){
+  if(!vp) return;
+  vp.setAttribute('transform','translate('+mtx+' '+mty+') scale('+ms+')');
+  if(ms!==lastMs){ drawMarkers(); drawArrows(); lastMs=ms; }
+}
+function toSvg(cx,cy){ const m=svg.getScreenCTM(); if(!m||!m.a) return {x:0,y:0}; return {x:(cx-m.e)/m.a, y:(cy-m.f)/m.d}; }
+function clampS(v){ return Math.max(0.7, Math.min(9, v)); }
+function zoomAt(cx,cy,f){ const c=toSvg(cx,cy); let ns=clampS(ms*f); f=ns/ms; mtx=c.x-(c.x-mtx)*f; mty=c.y-(c.y-mty)*f; ms=ns; applyTransform(); }
+function zoomBy(f){ const r=mapWrap.getBoundingClientRect(); zoomAt(r.left+r.width/2, r.top+r.height/2, f); }
+function mapReset(){ ms=1; mtx=0; mty=0; applyTransform(); }
+function bindMap(){
+  const ptrs=new Map();
+  svg.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(e.clientX,e.clientY, e.deltaY<0?1.16:0.86); },{passive:false});
+  svg.addEventListener('pointerdown',e=>{ try{svg.setPointerCapture(e.pointerId);}catch(_){} ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); });
+  svg.addEventListener('pointermove',e=>{
+    if(!ptrs.has(e.pointerId)) return;
+    const prev=ptrs.get(e.pointerId);
+    if(ptrs.size===1){
+      const a=toSvg(prev.x,prev.y), b=toSvg(e.clientX,e.clientY);
+      mtx+=b.x-a.x; mty+=b.y-a.y; applyTransform();
+    } else if(ptrs.size===2){
+      const ids=[...ptrs.keys()]; const oid=ids.find(i=>i!==e.pointerId); const o=ptrs.get(oid);
+      const pMid={x:(prev.x+o.x)/2,y:(prev.y+o.y)/2}, pD=Math.hypot(prev.x-o.x,prev.y-o.y);
+      const cMid={x:(e.clientX+o.x)/2,y:(e.clientY+o.y)/2}, cD=Math.hypot(e.clientX-o.x,e.clientY-o.y);
+      if(pD>0) zoomAt(cMid.x,cMid.y, cD/pD);
+      const a=toSvg(pMid.x,pMid.y), b=toSvg(cMid.x,cMid.y); mtx+=b.x-a.x; mty+=b.y-a.y; applyTransform();
+    }
+    ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>svg.addEventListener(ev,e=>{ ptrs.delete(e.pointerId); }));
+  svg.addEventListener('click',()=>closePop());
+}
+
+/* ---------- mode / chapter ---------- */
+function setMode(m){
+  state.mode=m;
+  document.getElementById('mUnit').classList.toggle('on',m==='unit');
+  document.getElementById('mFull').classList.toggle('on',m==='full');
+  document.getElementById('mExam').classList.toggle('on',m==='exam');
+  document.getElementById('chapSel').style.display = m==='unit'?'':'none';
+  document.getElementById('newExamBtn').style.display = m==='exam'?'':'none';
+  if(m==='exam'){ examAns={}; seen=new Set(); }
+  lastMapChap=null; buildList(); renderAll();
+}
+function onChapChange(){ state.chap=document.getElementById('chapSel').value; lastMapChap=null; buildList(); renderAll(); }
+function resetProgress(){
+  if(!confirm('确定清空所有作答记录和错题本？')) return;
+  answers={}; wrong=new Set(); save(); buildList(); renderAll(); toast('已清空');
+}
+
+/* ---------- AI ---------- */
+function openAI(){ document.getElementById('drawer').classList.add('open'); document.getElementById('scrim').classList.add('on'); }
+function closeAI(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('scrim').classList.remove('on'); }
+function setProvider(p){
+  ai.provider=p;
+  document.getElementById('pvClaude').classList.toggle('on',p==='claude');
+  document.getElementById('pvDS').classList.toggle('on',p==='deepseek');
+  document.getElementById('keyrow').classList.toggle('show',p==='deepseek');
+  saveAI();
+}
+function saveKey(){ ai.dskey=document.getElementById('dskey').value.trim(); saveAI(); }
+function curChapCtx(){
+  const it=cur(); const c=CHAPTERS[it.chap];
+  const kp=(c.knowledge||[]).map(s=>s.h+'：'+s.p.join('')).join('\n');
+  const pe=(c.people||[]).map(p=>p.n+'—'+p.r).join('；');
+  const tl=(c.timeline||[]).map(e=>e.d+' '+e.t).join('；');
+  const es=(ESSAYS[it.chap]||[]).map(e=>e.q).join('；');
+  return '【当前章节：第'+CN[+it.chap]+'章 '+c.title+'】\n知识点：\n'+kp+'\n人物事件：'+pe+'\n时间线：'+tl+(es?'\n课后思考题：'+es:'');
+}
+async function callAI(userText, system){
+  if(ai.provider==='deepseek'){
+    if(!ai.dskey) throw new Error('请先在上方填写 DeepSeek API Key');
+    const r=await fetch('https://api.deepseek.com/chat/completions',{
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+ai.dskey},
+      body:JSON.stringify({model:'deepseek-chat', messages:[{role:'system',content:system},{role:'user',content:userText}], max_tokens:1200, temperature:0.4})
+    });
+    if(!r.ok){ const t=await r.text(); throw new Error('DeepSeek 返回 '+r.status+'：'+t.slice(0,160)); }
+    const d=await r.json(); return d.choices[0].message.content;
+  }else{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200, system:system, messages:[{role:'user',content:userText}]})
+    });
+    if(!r.ok){ const t=await r.text(); throw new Error('请求失败 '+r.status+'：'+t.slice(0,160)); }
+    const d=await r.json(); return (d.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
+  }
+}
+const SYS_TUTOR='你是一位中国近现代史纲要的考试辅导老师。回答准确、简洁、紧扣考点，使用中文，可分点。不要编造史实。';
+async function aiHint(){
+  const it=cur(); const d=it.data; const box=document.getElementById('hintOut');
+  box.className='hint-out show load'; box.textContent='AI 正在想提示…';
+  const q='这是一道中国近现代史单选题。请只给“解题提示/思路引导”，绝对不要直接说出答案或正确选项字母，也不要说“排除某项后剩下的就是答案”。\n题目：'+d.q+'\nA.'+d.o[0]+' B.'+d.o[1]+' C.'+d.o[2]+' D.'+d.o[3]+'\n请用1-3条提示，引导我回忆相关史实、人物或时间，60字以内。';
+  try{ const t=await callAI(q, SYS_TUTOR+'\n'+curChapCtx()); box.className='hint-out show'; box.textContent='💡 '+t; }
+  catch(e){ box.className='hint-out show'; box.textContent='⚠ '+e.message; }
+}
+async function aiExplain(){
+  const it=cur(); const d=it.data;
+  const out=document.getElementById('aiOut'); const btn=document.getElementById('aiExpBtn');
+  out.className='ai-out show load'; out.textContent='AI 正在生成解析…'; btn.disabled=true;
+  const q='请解析这道单选题（已知正确答案是 '+d.a+'）：\n题目：'+d.q+'\nA. '+d.o[0]+'\nB. '+d.o[1]+'\nC. '+d.o[2]+'\nD. '+d.o[3]+'\n\n要求：1) 一句话点明为什么选 '+d.a+'；2) 简述相关史实背景；3) 指出其他迷惑项为何不对。控制在180字内。';
+  try{ const t=await callAI(q, SYS_TUTOR+'\n'+curChapCtx()); out.className='ai-out show'; out.textContent=t; }
+  catch(e){ out.className='ai-out show'; out.textContent='⚠ '+e.message+'\n\n（若用 DeepSeek 且被浏览器拦截，请把本页下载到本地后再用。）'; }
+  btn.disabled=false;
+}
+function askAiAbout(){ const it=cur(); openAI(); document.getElementById('chatbox').value='就上面这道题，帮我讲清楚相关考点：'+it.data.q; }
+function pushMsg(role,text){ const log=document.getElementById('chatlog'); const m=document.createElement('div'); m.className='msg '+role; m.textContent=text; log.appendChild(m); log.scrollTop=log.scrollHeight; return m; }
+function quick(t){ document.getElementById('chatbox').value=t; sendChat(); }
+function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+async function sendChat(){
+  const box=document.getElementById('chatbox'); const text=box.value.trim(); if(!text) return;
+  box.value=''; pushMsg('u',text); const m=pushMsg('a','思考中…');
+  try{ const t=await callAI(text, SYS_TUTOR+'\n'+curChapCtx()+'\n（学生正在复习，请结合当前章节作答。）'); m.textContent=t; }
+  catch(e){ m.textContent='⚠ '+e.message; }
+  document.getElementById('chatlog').scrollTop=1e9;
+}
+
+/* ---------- util ---------- */
+let toastT;
+function toast(msg){
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';
+    t.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:60;box-shadow:0 10px 30px -12px #000a;font-family:var(--serif);transition:opacity .3s';
+    document.body.appendChild(t);}
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(toastT); toastT=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+/* ---------- init ---------- */
+(async function(){
+  const sel=document.getElementById('chapSel');
+  CH_KEYS.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=chName(k)+'（'+QUESTIONS[k].length+'题）';sel.appendChild(o);});
+  await loadStore();
+  setProvider(ai.provider||'claude');
+  if(ai.dskey) document.getElementById('dskey').value=ai.dskey;
+  try{ initMap(); }catch(e){ console.warn('map init failed', e); }
+  buildList(); renderAll();
+  pushMsg('sys','我可以解析任意一道题、做人物事件对照、梳理时间线，或就当前章节出题考你。');
+})();
+</script>
+</body>
+</html>

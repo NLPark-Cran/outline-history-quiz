@@ -4,10 +4,11 @@ import { useState, useMemo, useCallback, useTransition, useEffect, memo, useRef 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { submitAnswer, toggleMistake } from './actions';
-import { Question, ChapterMeta, QUESTIONS, TOTAL_QUESTIONS, CN_NUMBERS, OVERVIEW } from '@/lib/questions';
+import { Question, ChapterMeta, QUESTIONS, TOTAL_QUESTIONS, CN_NUMBERS, OVERVIEW, ESSAYS } from '@/lib/questions';
 import AiExplain from './AiExplain';
 import AiReview from './AiReview';
 import ChapterMap from './ChapterMap';
+import ChapterEssays from './ChapterEssays';
 import { cn } from '@/lib/utils';
 
 interface User {
@@ -31,7 +32,7 @@ interface QuizClientProps {
 }
 
 type Mode = 'unit' | 'full' | 'wrong';
-type SideTab = 'k' | 't' | 'm' | 'o';
+type SideTab = 'k' | 't' | 'm' | 'e' | 'o';
 
 interface ListItem {
   chapter: string;
@@ -762,6 +763,9 @@ export default function QuizClient({
               <SideTab active={sideTab === 'm'} onClick={() => setSideTab('m')}>
                 地图
               </SideTab>
+              <SideTab active={sideTab === 'e'} onClick={() => setSideTab('e')}>
+                课后题
+              </SideTab>
               <SideTab active={sideTab === 'o'} onClick={() => setSideTab('o')}>
                 全书总览
               </SideTab>
@@ -784,6 +788,8 @@ export default function QuizClient({
                 </div>
               ) : sideTab === 'm' ? (
                 <ChapterMap title={`第${CN_NUMBERS[Number(current.chapter)]}章事件地图`} timeline={meta.timeline} />
+              ) : sideTab === 'e' ? (
+                <ChapterEssays essays={ESSAYS[current.chapter] || []} />
               ) : (
                 <OverviewPanel />
               )}
