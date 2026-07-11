@@ -14,6 +14,7 @@ npm run build
 
 echo "[3.5/4] Copying static assets to standalone..."
 cp -r .next/static .next/standalone/.next/
+if [ -d public ]; then cp -r public .next/standalone/; fi
 
 echo "[4/4] Installing systemd service..."
 cp scripts/outline-quiz.service /etc/systemd/system/outline-quiz.service
